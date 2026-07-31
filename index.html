@@ -423,6 +423,12 @@
   .login-msg { font-size: .8rem; margin-top: 12px; min-height: 18px; color: var(--muted); }
   .login-msg.err  { color: var(--red); }
   .login-msg.warn { color: var(--yellow); }
+  .login-link {
+    background: transparent; border: 0; cursor: pointer; margin-top: 16px;
+    font-size: .78rem; color: var(--muted); text-decoration: underline;
+    text-underline-offset: 3px; font-family: inherit;
+  }
+  .login-link:hover { color: var(--red); }
   .login-pie {
     font-size: .72rem; color: var(--muted-2); line-height: 1.55;
     margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border);
@@ -444,14 +450,14 @@
 </head>
 <body class="bloqueada">
 
-<!-- ══════════ PANTALLA DE INGRESO ══════════ -->
+<!-- ══════════ PANTALLA DE INGRESO / BLOQUEO ══════════ -->
 <div class="login-ov" id="ovLogin">
   <div class="login-card">
-    <div class="login-mark">
+    <div class="login-mark" id="loginMark">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
     </div>
-    <h2>Control de Préstamos</h2>
-    <p class="login-sub">Ingresá tu código de acceso</p>
+    <h2 id="loginTitulo">Control de Préstamos</h2>
+    <p class="login-sub" id="loginSub">Ingresá tu código de acceso</p>
 
     <div class="login-inp">
       <input type="password" id="loginCodigo" placeholder="Código de acceso" autocomplete="current-password" spellcheck="false" autocapitalize="off"/>
@@ -460,7 +466,7 @@
       </button>
     </div>
 
-    <label class="login-check">
+    <label class="login-check" id="loginRecordarFila">
       <input type="checkbox" id="loginRecordar" checked/>
       <span>Recordar en este dispositivo</span>
     </label>
@@ -476,7 +482,11 @@
       <button class="btn btn-ghost login-btn" onclick="crearCuentaNueva()">Crear cuenta nueva con este código</button>
     </div>
 
-    <p class="login-pie">
+    <div id="loginSalirFila" style="display:none">
+      <button class="login-link" onclick="cerrarSesion()">Salir de este dispositivo</button>
+    </div>
+
+    <p class="login-pie" id="loginPie">
       El código nunca sale de este dispositivo: se usa para calcular dónde están tus datos.
       Nadie lo puede recuperar, así que anotalo en un lugar seguro y guardá respaldos con el botón <strong>Exportar</strong>.
     </p>
@@ -500,6 +510,10 @@
       <span class="sync-dot off" id="syncDot"></span>
       <span id="syncLabel">Sin sync</span>
     </span>
+    <button class="btn btn-ghost" id="btnCandado" onclick="bloquear()" title="Bloquear la app: pide el código para volver a entrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Bloquear
+    </button>
     <button class="btn btn-ghost" onclick="exportarExcel()" title="Exportar respaldo en Excel">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8"/></svg>
       Excel
@@ -1227,29 +1241,131 @@ function flushSync() {
 }
 
 // ══════════════════════════════════════════
-// ── PANTALLA DE INGRESO ──
+// ── PANTALLA DE INGRESO Y BLOQUEO ──
 // ══════════════════════════════════════════
+// Dos situaciones distintas usan la misma pantalla:
+//   'nuevo'     → este equipo no tiene cuenta todavía; hay que escribir el
+//                 código y, si no existe, crearla.
+//   'bloqueada' → el equipo YA tiene cuenta pero está con candado. Acá sí se
+//                 puede decir "código incorrecto", porque se compara contra la
+//                 sala guardada sin tocar internet.
+// El candado NO borra nada: los datos siguen en el equipo, escondidos detrás
+// de la pantalla. Para borrarlos está "Salir de este dispositivo".
+
+var LS_BLOQUEADA = 'prestamos_bloqueada';
+var LS_VISTO     = 'prestamos_visto';
+var MIN_BLOQUEO  = 2;                          // minutos fuera de la app
+var MS_BLOQUEO   = MIN_BLOQUEO * 60 * 1000;
+var modoPantalla = 'nuevo';
+var relojVisto   = null;
+
 function loginMsg(txt, tipo) {
   var el = document.getElementById('loginMsg');
   if (!el) return;
   el.textContent = txt || '';
   el.className = 'login-msg' + (tipo ? ' ' + tipo : '');
 }
-function loginCargando(on) {
+function textoBoton() { return modoPantalla === 'bloqueada' ? 'Desbloquear' : 'Entrar'; }
+function loginCargando(on, txt) {
   var b = document.getElementById('btnEntrar');
-  if (b) { b.disabled = !!on; b.textContent = on ? 'Verificando…' : 'Entrar'; }
+  if (b) { b.disabled = !!on; b.textContent = on ? (txt || 'Verificando…') : textoBoton(); }
 }
-function mostrarLogin() {
+function ponerTexto(id, txt) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = txt;
+}
+function ponerVisible(id, visible, display) {
+  var el = document.getElementById(id);
+  if (el) el.style.display = visible ? (display || 'block') : 'none';
+}
+
+function mostrarLogin(modo) {
+  modoPantalla = (modo === 'bloqueada') ? 'bloqueada' : 'nuevo';
+  var bloq = modoPantalla === 'bloqueada';
   document.body.classList.add('bloqueada');
-  var ov = document.getElementById('ovLogin');
-  if (ov) ov.style.display = 'flex';
+  ponerVisible('ovLogin', true, 'flex');
+  ponerTexto('loginTitulo', bloq ? 'App bloqueada' : 'Control de Préstamos');
+  ponerTexto('loginSub', bloq ? 'Escribí tu código para volver a entrar'
+                              : 'Ingresá tu código de acceso');
+  ponerTexto('btnEntrar', textoBoton());
+  ponerVisible('loginRecordarFila', !bloq, 'flex');
+  ponerVisible('loginSalirFila', bloq);
+  ponerVisible('loginPie', !bloq);
+  ponerVisible('loginNuevo', false);
+  loginMsg('', '');
   var i = document.getElementById('loginCodigo');
-  if (i) setTimeout(function () { i.focus(); }, 120);
+  if (i) {
+    i.value = '';
+    i.type = 'password';
+    setTimeout(function () { try { i.focus(); } catch (e) {} }, 120);
+  }
 }
 function mostrarApp() {
   document.body.classList.remove('bloqueada');
-  var ov = document.getElementById('ovLogin');
-  if (ov) ov.style.display = 'none';
+  ponerVisible('ovLogin', false);
+}
+
+// ── Reloj de actividad: para saber cuánto lleva la app en segundo plano ──────
+function marcarVisto() {
+  try { localStorage.setItem(LS_VISTO, String(ahora())); } catch (e) {}
+}
+function tiempoFuera() {
+  var v = 0;
+  try { v = parseInt(localStorage.getItem(LS_VISTO) || '0', 10) || 0; } catch (e) {}
+  return v ? (ahora() - v) : 0;
+}
+function marcadaBloqueada() {
+  try { return localStorage.getItem(LS_BLOQUEADA) === '1'; } catch (e) { return false; }
+}
+function arrancarRelojVisto() {
+  clearInterval(relojVisto);
+  marcarVisto();
+  relojVisto = setInterval(marcarVisto, 15000);
+}
+function pararRelojVisto() {
+  clearInterval(relojVisto);
+  relojVisto = null;
+}
+function salaGuardada() {
+  var s = '';
+  try { s = (localStorage.getItem(LS_SALA) || '').trim(); } catch (e) {}
+  return salaValida(s) ? s : '';
+}
+function appBloqueada() { return document.body.classList.contains('bloqueada'); }
+
+// ── Poner el candado ────────────────────────────────────────────────────────
+function bloquear() {
+  if (!salaId || appBloqueada()) return;
+  flushSync();                       // lo pendiente sube antes de cerrar
+  try { localStorage.setItem(LS_BLOQUEADA, '1'); } catch (e) {}
+  pararRelojVisto();
+  if (fbRef) { try { fbRef.off(); } catch (e) {} fbRef = null; }
+  ultimaFirmaRemota = null;
+  cerrar();
+  if (window.cerrarDetalle) cerrarDetalle();
+  setSyncStatus('off');
+  mostrarLogin('bloqueada');
+}
+
+// ── Quitar el candado (el código ya se verificó) ────────────────────────────
+function desbloquear() {
+  try { localStorage.removeItem(LS_BLOQUEADA); } catch (e) {}
+  salaId = salaGuardada();
+  arrancarRelojVisto();
+  cargarDatos();
+  cargarTombstones();
+  if (window.render) render();
+  mostrarApp();
+  conectarFirebase();
+  var inp = document.getElementById('loginCodigo');
+  if (inp) inp.value = '';
+}
+
+// ── Se vuelve a la app: ¿estuvo mucho rato afuera? ──────────────────────────
+function revisarBloqueoAlVolver() {
+  if (!salaId || appBloqueada()) return;
+  if (tiempoFuera() > MS_BLOQUEO) bloquear();
+  else arrancarRelojVisto();
 }
 
 var codigoPendiente = '';
@@ -1257,8 +1373,28 @@ var codigoPendiente = '';
 function entrarConCodigo() {
   var inp = document.getElementById('loginCodigo');
   var cod = (inp ? inp.value : '').trim();
-  document.getElementById('loginNuevo').style.display = 'none';
+  ponerVisible('loginNuevo', false);
   if (cod.length < 4) { loginMsg('El código debe tener al menos 4 caracteres.', 'err'); return; }
+
+  // Equipo con candado: se compara contra la sala guardada, sin internet.
+  if (modoPantalla === 'bloqueada') {
+    loginCargando(true, 'Desbloqueando…');
+    loginMsg('', '');
+    derivarSala(cod).then(function (sala) {
+      loginCargando(false);
+      if (sala === salaGuardada()) {
+        desbloquear();
+      } else {
+        loginMsg('Código incorrecto.', 'err');
+        if (inp) { inp.value = ''; try { inp.focus(); } catch (e) {} }
+      }
+    }).catch(function (e) {
+      loginCargando(false);
+      loginMsg(e.message, 'err');
+    });
+    return;
+  }
+
   var db = fbBase();
   if (!db) { loginMsg('No hay conexión a internet. Intentá de nuevo.', 'err'); return; }
 
@@ -1272,7 +1408,7 @@ function entrarConCodigo() {
       } else {
         codigoPendiente = sala;
         loginMsg('No hay datos guardados con ese código.', 'warn');
-        document.getElementById('loginNuevo').style.display = 'block';
+        ponerVisible('loginNuevo', true);
       }
     });
   }).catch(function (e) {
@@ -1306,10 +1442,12 @@ function abrirSala(sala, esNueva) {
   try {
     if (!recordar || recordar.checked) localStorage.setItem(LS_SALA, sala);
     else localStorage.removeItem(LS_SALA);
+    localStorage.removeItem(LS_BLOQUEADA);
   } catch (e) {}
   limpiarCacheSiOtraSala();
   cargarDatos();
   cargarTombstones();
+  arrancarRelojVisto();
   if (window.render) render();
   mostrarApp();
   conectarFirebase();
@@ -1338,10 +1476,11 @@ function limpiarCacheSiOtraSala() {
 }
 
 function cerrarSesion() {
-  if (!confirm('Vas a salir de la app en ESTE dispositivo.\n\nLos datos siguen guardados en la nube: volvés a entrar con tu código y ahí están.\n\n¿Salir?')) return;
+  if (!confirm('Vas a salir de la app en ESTE dispositivo y se borra la copia que tiene guardada.\n\nLos datos siguen en la nube: volvés a entrar con tu código y ahí están.\n\nSi solo querés dejarlo con candado, usá el botón Bloquear.\n\n¿Salir?')) return;
   flushSync();
   setTimeout(function () {
     if (fbRef) { try { fbRef.off(); } catch (e) {} fbRef = null; }
+    pararRelojVisto();
     salaId = '';
     ultimaFirmaRemota = null;
     lastSyncOkAt = null;
@@ -1350,6 +1489,8 @@ function cerrarSesion() {
       localStorage.removeItem('prestamos_app');
       localStorage.removeItem(LS_TOMB);
       localStorage.removeItem(LS_SALA_DATOS);
+      localStorage.removeItem(LS_BLOQUEADA);
+      localStorage.removeItem(LS_VISTO);
     } catch (e) {}
     prestamos = [];
     pagos = {};
@@ -1357,7 +1498,7 @@ function cerrarSesion() {
     if (window.render) render();
     cerrar();
     setSyncStatus('off');
-    mostrarLogin();
+    mostrarLogin('nuevo');
   }, 350);
 }
 
@@ -1394,12 +1535,18 @@ function syncRender() {
       '<div><span>Última sincronización</span><b>' + ult + '</b></div>' +
       '<div><span>Bajadas / subidas</span><b>' + syncDebug.lecturas + ' / ' + syncDebug.escrituras + '</b></div>' +
     '</div>' +
+    '<div class="sync-info-box" style="margin-top:12px">' +
+      '<strong>Candado y salida</strong><br>' +
+      '<strong>Bloquear</strong> esconde la app detrás del código, sin borrar nada: desbloqueás al instante y funciona sin internet. Además se bloquea sola si dejás la app ' + MIN_BLOQUEO + ' minutos en segundo plano.<br>' +
+      '<strong>Salir de este dispositivo</strong> borra la copia guardada acá. Los datos siguen en la nube.' +
+    '</div>' +
     '<div class="alert-box alert-yellow" style="margin-top:12px">' +
       '⚠ Nadie puede recuperar tu código si lo olvidás. Guardá un respaldo con el botón <strong>Exportar</strong> de vez en cuando.' +
     '</div>' +
     '<div class="fa" style="margin-top:16px">' +
       '<button class="btn btn-ghost" onclick="cerrar()">Cerrar</button>' +
       '<button class="btn btn-danger-ghost" onclick="cerrarSesion()">Salir de este dispositivo</button>' +
+      '<button class="btn btn-primary" onclick="cerrar(); bloquear();">Bloquear ahora</button>' +
     '</div>';
 }
 
@@ -2315,28 +2462,40 @@ document.getElementById('loginCodigo').addEventListener('keydown', e => {
   if (e.key === 'Enter') entrarConCodigo();
 });
 
-// ── Acceso: si este equipo ya entró antes, se conecta solo ──
+// ── Acceso: si este equipo ya entró antes, entra solo… salvo que tenga
+//    candado puesto o haya pasado mucho rato con la app cerrada ──
 (function iniciarAcceso() {
-  let s = '';
-  try { s = (localStorage.getItem(LS_SALA) || '').trim(); } catch (e) {}
-  if (salaValida(s)) {
+  const s = salaGuardada();
+  if (s) {
     salaId = s;
     limpiarCacheSiOtraSala();
     cargarDatos();
     cargarTombstones();
     render();
-    mostrarApp();
-    conectarFirebase();
+    if (marcadaBloqueada() || tiempoFuera() > MS_BLOQUEO) {
+      mostrarLogin('bloqueada');
+    } else {
+      arrancarRelojVisto();
+      mostrarApp();
+      conectarFirebase();
+    }
   } else {
-    mostrarLogin();
+    mostrarLogin('nuevo');
   }
 })();
 
-// Al volver a la app (celular) se fuerza una subida de lo pendiente.
+// Al salir de la app se anota la hora y sube lo pendiente; al volver, si
+// estuvo demasiado tiempo afuera, se pone el candado solo.
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') flushSync();
+  if (document.visibilityState === 'hidden') {
+    marcarVisto();
+    pararRelojVisto();
+    flushSync();
+  } else {
+    revisarBloqueoAlVolver();
+  }
 });
-window.addEventListener('pagehide', flushSync);
+window.addEventListener('pagehide', () => { marcarVisto(); flushSync(); });
 
 </script>
 </body>
