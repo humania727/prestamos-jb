@@ -134,8 +134,15 @@
   .stat.red  .ico { background: var(--red-soft); }    .stat.red  .ico svg { stroke: var(--red); }
   .stat.red  .val { color: var(--red); }
   .stat.green .ico { background: var(--green-soft); } .stat.green .ico svg { stroke: var(--green); }
+  .stat.green .val { color: var(--green); }
   .stat.yellow .ico { background: var(--yellow-soft); } .stat.yellow .ico svg { stroke: var(--yellow); }
   .stat.yellow .val { color: var(--yellow); }
+  .stat.gray .ico { background: rgba(139,155,189,.12); } .stat.gray .ico svg { stroke: var(--muted); }
+  .stat .sub { font-size: .66rem; color: var(--muted); font-weight: 500; margin-top: 3px; }
+  .stat .sub.out { border-top: 1px dashed var(--border-2); padding-top: 4px; margin-top: 5px; color: var(--muted-2); }
+  .stat .sub.out strong { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .stat.link { cursor: pointer; transition: .15s; }
+  .stat.link:hover { border-color: var(--accent); transform: translateY(-1px); }
 
   /* ═══ Cards ═══ */
   .card {
@@ -366,6 +373,48 @@
   .danger-zone { border: 1px solid rgba(248,113,113,.35); border-radius: 11px; padding: 15px; margin-top: 18px; }
   .danger-zone h4 { font-size: .68rem; color: var(--red); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 10px; }
 
+  /* ═══ Pagos recibidos ═══ */
+  .pagos-hdr { cursor: pointer; user-select: none; }
+  .pagos-hdr .chev { margin-left: auto; transition: transform .25s; color: var(--muted); }
+  .pagos-hdr.open .chev { transform: rotate(180deg); }
+  .pagos-hdr .hdr-resumen { font-size: .72rem; color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .pagos-body { padding: 20px; display: none; }
+  .pagos-body.open { display: block; }
+  .rng-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .rng-tab {
+    padding: 7px 14px; border: 1px solid var(--border-2); border-radius: 99px;
+    background: var(--bg-soft); color: var(--muted); font-size: .74rem; font-weight: 600;
+    cursor: pointer; transition: .15s; font-family: inherit;
+  }
+  .rng-tab:hover { color: var(--text); border-color: var(--accent); }
+  .rng-tab.active { background: var(--accent); border-color: transparent; color: #fff; box-shadow: 0 2px 8px rgba(59,130,246,.35); }
+  .rng-fechas { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin-bottom: 16px; }
+  .rng-fechas label { flex: 0 0 165px; }
+  .rng-acciones { margin-left: auto; display: flex; gap: 8px; align-items: flex-end; }
+  .pag-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .pag-stat {
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--border); border-radius: 12px; padding: 13px 16px;
+  }
+  .pag-stat .l { font-size: .63rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-weight: 600; margin-bottom: 4px; }
+  .pag-stat .v { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .pag-stat.green .v { color: var(--green); }
+  .pag-stat.blue  .v { color: var(--accent-2); }
+  .pag-stat.red   .v { color: var(--red); }
+  .pag-stat .s { font-size: .65rem; color: var(--muted-2); font-weight: 500; margin-top: 4px; line-height: 1.4; }
+  .pag-periodo { font-size: .72rem; color: var(--muted); margin-top: 12px; }
+  .cli-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; }
+  .cli-row {
+    display: flex; align-items: center; gap: 10px; background: var(--bg-soft);
+    border: 1px solid var(--border); border-radius: 10px; padding: 9px 13px;
+  }
+  .cli-row .cn { font-size: .8rem; font-weight: 600; }
+  .cli-row .cq { font-size: .66rem; color: var(--muted); margin-top: 1px; }
+  .cli-row .cm { margin-left: auto; font-family: var(--mono); font-weight: 700; color: var(--green); font-size: .82rem; text-align: right; }
+  .pag-tbl { max-height: 430px; overflow: auto; border: 1px solid var(--border); border-radius: 11px; }
+  .pag-tbl th { position: sticky; top: 0; z-index: 2; }
+  .pag-vacio { text-align: center; padding: 30px 16px; color: var(--muted); font-size: .84rem; line-height: 1.7; }
+
   footer { text-align: center; padding: 30px 0 0; font-size: .68rem; color: var(--muted-2); }
 
   @media (max-width: 640px) {
@@ -379,6 +428,9 @@
     .stat .val { font-size: 1.2rem; }
     .card-hdr { flex-wrap: wrap; }
     .tbl-toolbar { margin-left: 0; width: 100%; }
+    .rng-fechas label { flex: 1 1 140px; }
+    .rng-acciones { margin-left: 0; width: 100%; }
+    .pagos-hdr .hdr-resumen { display: none; }
   }
   /* ── Pantalla de ingreso ── */
   body.bloqueada > header, body.bloqueada > .wrap { display: none; }
@@ -623,6 +675,49 @@
 </div>
 
 <div class="card detail" id="detail"></div>
+
+<!-- ══════════ PAGOS RECIBIDOS ══════════ -->
+<div class="card">
+  <div class="card-hdr pagos-hdr open" id="pagosHdr" onclick="togglePagos()">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/><path d="M6 15h4"/></svg>
+      Movimientos del período
+    </h2>
+    <span class="hdr-resumen" id="pagosHdrResumen"></span>
+    <span class="chev">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M6 9l6 6 6-6"/></svg>
+    </span>
+  </div>
+  <div class="pagos-body open" id="pagosBody">
+
+    <div class="rng-tabs" id="rngTabs">
+      <button type="button" class="rng-tab" data-rango="hoy"       onclick="fijarRango('hoy')">Hoy</button>
+      <button type="button" class="rng-tab" data-rango="semana"    onclick="fijarRango('semana')">Esta semana</button>
+      <button type="button" class="rng-tab" data-rango="mes"       onclick="fijarRango('mes')">Este mes</button>
+      <button type="button" class="rng-tab" data-rango="mesPasado" onclick="fijarRango('mesPasado')">Mes pasado</button>
+      <button type="button" class="rng-tab" data-rango="anio"      onclick="fijarRango('anio')">Este año</button>
+      <button type="button" class="rng-tab" data-rango="todo"      onclick="fijarRango('todo')">Todo</button>
+    </div>
+
+    <div class="rng-fechas">
+      <label>Desde <input type="date" id="pDesde" onchange="rangoManual()"/></label>
+      <label>Hasta <input type="date" id="pHasta" onchange="rangoManual()"/></label>
+      <div class="rng-acciones">
+        <button class="btn btn-ghost" onclick="exportarPagosExcel()" title="Exportar a Excel solo los pagos del período">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h8"/></svg>
+          Excel del período
+        </button>
+      </div>
+    </div>
+
+    <div class="pag-stats" id="pagStats"></div>
+    <div class="pag-periodo" id="pagPeriodo"></div>
+
+    <div id="pagPorCliente"></div>
+    <div id="pagDetalle"></div>
+    <div id="pagDesembolsos"></div>
+  </div>
+</div>
 
 <footer>Control de Préstamos · Los datos se sincronizan en la nube con tu código de acceso</footer>
 
@@ -1760,12 +1855,50 @@ const icoSaldo   = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke
 const icoPagados = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>`;
 
 const icoInteres = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>`;
+const icoCobrado = `<svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>`;
+
+// Pagos del mes en curso: cuánto entró y cuántos pagos fueron
+function cobradoEsteMes() {
+  const hoy = new Date();
+  const ini = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
+  const fin = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0));
+  let total = 0, n = 0;
+  prestamos.forEach(p => {
+    (pagos[p.id] || []).forEach(g => {
+      const f = g.fecha || '';
+      if (f >= ini && f <= fin) { total += Number(g.monto_cuota) || 0; n++; }
+    });
+  });
+  return { total, n, mes: hoy.toLocaleDateString('es-CR', { month: 'long' }) };
+}
+
+// Plata que salió en el mes: créditos nuevos entregados en el mes en curso
+function desembolsadoEsteMes() {
+  const hoy = new Date();
+  const ini = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
+  const fin = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0));
+  let total = 0, n = 0;
+  prestamos.forEach(p => {
+    const f = p.fecha_inicio || '';
+    if (f >= ini && f <= fin) { total += Number(p.monto) || 0; n++; }
+  });
+  return { total, n };
+}
+
+// Al tocar el recuadro se abre el panel de pagos con el mes en curso
+function verCobradoDelMes() {
+  const hdr = document.getElementById('pagosHdr');
+  const body = document.getElementById('pagosBody');
+  if (hdr && !hdr.classList.contains('open')) { hdr.classList.add('open'); body.classList.add('open'); }
+  fijarRango('mes');
+  if (hdr && hdr.scrollIntoView) hdr.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
 function renderStats() {
   const act = prestamos.filter(p => p.estado === 'activo');
   const pag = prestamos.filter(p => p.estado === 'pagado');
-  const intPend = prestamos.reduce((a,p) => a + cargosPendientes(p), 0);
-  // El total recaudado se mantiene como histórico interno (visible en el Excel), pero no se muestra
+  const mes = cobradoEsteMes();
+  const des = desembolsadoEsteMes();
   document.getElementById('stats').innerHTML = `
     <div class="stat blue">
       <div class="ico">${icoActivos}</div>
@@ -1775,11 +1908,16 @@ function renderStats() {
       <div class="ico">${icoSaldo}</div>
       <div><div class="lbl">Saldo por cobrar</div><div class="val">${fmt(act.reduce((a,p)=>a+p.saldo,0))}</div></div>
     </div>
-    ${intPend > 0 ? `<div class="stat yellow">
-      <div class="ico">${icoInteres}</div>
-      <div><div class="lbl">Intereses por cobrar</div><div class="val">${fmt(intPend)}</div></div>
-    </div>` : ''}
-    <div class="stat green">
+    <div class="stat green link" onclick="verCobradoDelMes()" title="Ver los pagos de este mes">
+      <div class="ico">${icoCobrado}</div>
+      <div>
+        <div class="lbl">Cobrado en ${mes.mes}</div>
+        <div class="val">${fmt(mes.total)}</div>
+        <div class="sub">${mes.n} ${mes.n === 1 ? 'pago recibido' : 'pagos recibidos'}</div>
+        <div class="sub out">Desembolsado: <strong>${fmt(des.total)}</strong> · ${des.n} ${des.n === 1 ? 'crédito' : 'créditos'}</div>
+      </div>
+    </div>
+    <div class="stat gray">
       <div class="ico">${icoPagados}</div>
       <div><div class="lbl">Créditos pagados</div><div class="val">${pag.length}</div></div>
     </div>
@@ -1890,6 +2028,7 @@ function render() {
   const hoy = new Date(); hoy.setHours(0,0,0,0);
   const list = f ? prestamos.filter(p => p.estado === f) : [...prestamos];
   renderStats();
+  renderPagos();
   if (!list.length) {
     const msg = prestamos.length === 0
       ? 'Bienvenido. Usá el botón <strong>Nuevo Crédito</strong> para registrar tu primer préstamo,<br>o conectá un <strong>Código Sync</strong> si ya tenés datos en otro dispositivo.'
@@ -2449,7 +2588,292 @@ function calcPorCuotas() {
   result.classList.add('show');
 }
 
+// ══════════ PAGOS RECIBIDOS: filtro por fechas ══════════
+// Los pagos se guardan con fecha 'YYYY-MM-DD', así que el rango se compara
+// como texto: no hay zonas horarias de por medio y no se corre ningún día.
+
+let rangoActivo = 'mes';
+
+function togglePagos() {
+  document.getElementById('pagosHdr').classList.toggle('open');
+  document.getElementById('pagosBody').classList.toggle('open');
+}
+
+// Fecha local en formato YYYY-MM-DD (medio día para que no la mueva el huso)
+function ymdLocal(d) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12).toISOString().slice(0, 10);
+}
+
+function fijarRango(preset, sinRender) {
+  rangoActivo = preset;
+  const hoy = new Date();
+  let d = '', h = '';
+  if (preset === 'hoy') {
+    d = h = ymdLocal(hoy);
+  } else if (preset === 'semana') {
+    const ini = new Date(hoy);
+    ini.setDate(ini.getDate() - ((ini.getDay() + 6) % 7));   // lunes
+    const fin = new Date(ini);
+    fin.setDate(fin.getDate() + 6);                          // domingo
+    d = ymdLocal(ini); h = ymdLocal(fin);
+  } else if (preset === 'mes') {
+    d = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
+    h = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0));
+  } else if (preset === 'mesPasado') {
+    d = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1));
+    h = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth(), 0));
+  } else if (preset === 'anio') {
+    d = ymdLocal(new Date(hoy.getFullYear(), 0, 1));
+    h = ymdLocal(new Date(hoy.getFullYear(), 11, 31));
+  }
+  document.getElementById('pDesde').value = d;
+  document.getElementById('pHasta').value = h;
+  if (!sinRender) renderPagos();
+}
+
+// Cuando toca las fechas a mano deja de estar activo cualquier atajo
+function rangoManual() {
+  const d = document.getElementById('pDesde').value;
+  const h = document.getElementById('pHasta').value;
+  if (d && h && d > h) {                 // si las invierte, se acomodan solas
+    document.getElementById('pDesde').value = h;
+    document.getElementById('pHasta').value = d;
+  }
+  rangoActivo = 'libre';
+  renderPagos();
+}
+
+function rangoActual() {
+  const dEl = document.getElementById('pDesde');
+  const hEl = document.getElementById('pHasta');
+  return { desde: dEl ? dEl.value : '', hasta: hEl ? hEl.value : '' };
+}
+
+// Todos los pagos de todos los clientes que caen dentro del rango
+function pagosDelRango() {
+  const r = rangoActual();
+  const out = [];
+  prestamos.forEach(p => {
+    (pagos[p.id] || []).forEach(g => {
+      const f = g.fecha || '';
+      if (!f) return;
+      if (r.desde && f < r.desde) return;
+      if (r.hasta && f > r.hasta) return;
+      out.push({ p, g });
+    });
+  });
+  out.sort((a, b) => (b.g.fecha || '').localeCompare(a.g.fecha || '') || (b.g.id || 0) - (a.g.id || 0));
+  return out;
+}
+
+// Créditos entregados dentro del rango (por fecha de inicio)
+function desembolsosDelRango() {
+  const r = rangoActual();
+  return prestamos.filter(p => {
+    const f = p.fecha_inicio || '';
+    if (!f) return false;
+    if (r.desde && f < r.desde) return false;
+    if (r.hasta && f > r.hasta) return false;
+    return true;
+  }).sort((a, b) => (b.fecha_inicio || '').localeCompare(a.fecha_inicio || ''));
+}
+
+function textoPeriodo() {
+  const r = rangoActual();
+  if (!r.desde && !r.hasta) return 'Todo el historial';
+  if (r.desde && r.hasta) return r.desde === r.hasta ? fd(r.desde) : fd(r.desde) + ' — ' + fd(r.hasta);
+  if (r.desde) return 'Desde ' + fd(r.desde);
+  return 'Hasta ' + fd(r.hasta);
+}
+
+function escTxt(s) {
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+}
+
+function renderPagos() {
+  const tabs = document.getElementById('rngTabs');
+  if (!tabs) return;
+  [].forEach.call(tabs.querySelectorAll('.rng-tab'), b => {
+    b.classList.toggle('active', b.dataset.rango === rangoActivo);
+  });
+
+  const lista = pagosDelRango();
+  const total = lista.reduce((a, x) => a + (Number(x.g.monto_cuota) || 0), 0);
+  const clientes = {};
+  lista.forEach(x => {
+    const k = x.p.cliente || '—';
+    if (!clientes[k]) clientes[k] = { n: 0, monto: 0, codigos: {} };
+    clientes[k].n++;
+    clientes[k].monto += Number(x.g.monto_cuota) || 0;
+    if (x.p.codigo) clientes[k].codigos[x.p.codigo] = 1;
+  });
+  const nClientes = Object.keys(clientes).length;
+  const prom = lista.length ? total / lista.length : 0;
+
+  const desem = desembolsosDelRango();
+  const totalDes = desem.reduce((a, p) => a + (Number(p.monto) || 0), 0);
+  const balance = total - totalDes;
+
+  document.getElementById('pagStats').innerHTML = `
+    <div class="pag-stat green">
+      <div class="l">Recaudado (entró)</div><div class="v">${fmt(total)}</div>
+      <div class="s">${lista.length} ${lista.length === 1 ? 'pago' : 'pagos'} de ${nClientes} ${nClientes === 1 ? 'cliente' : 'clientes'}${lista.length ? ' · promedio ' + fmt(prom) : ''}</div>
+    </div>
+    <div class="pag-stat red">
+      <div class="l">Desembolsado (salió)</div><div class="v">${fmt(totalDes)}</div>
+      <div class="s">${desem.length} ${desem.length === 1 ? 'crédito nuevo' : 'créditos nuevos'}</div>
+    </div>
+    <div class="pag-stat ${balance >= 0 ? 'green' : 'red'}">
+      <div class="l">Balance del período</div><div class="v">${(balance > 0 ? '+' : balance < 0 ? '−' : '') + fmt(Math.abs(balance))}</div>
+      <div class="s">${balance >= 0 ? 'entró más de lo que salió' : 'salió más de lo que entró'}</div>
+    </div>
+    <div class="pag-stat blue">
+      <div class="l">A cobrar de lo prestado</div><div class="v">${fmt(desem.reduce((a, p) => a + (Number(p.total) || 0), 0))}</div>
+      <div class="s">total de los créditos del período</div>
+    </div>`;
+
+  document.getElementById('pagPeriodo').textContent = 'Período: ' + textoPeriodo();
+  document.getElementById('pagosHdrResumen').textContent =
+    lista.length + (lista.length === 1 ? ' pago · ' : ' pagos · ') + fmt(total) +
+    ' · desembolsado ' + fmt(totalDes);
+
+  renderDesembolsos(desem, totalDes);
+
+  if (!lista.length) {
+    document.getElementById('pagPorCliente').innerHTML = '';
+    document.getElementById('pagDetalle').innerHTML =
+      `<div class="pag-vacio">No hay pagos registrados en este período.<br>Probá con otro rango de fechas o con <strong>Todo</strong>.</div>`;
+    return;
+  }
+
+  const orden = Object.entries(clientes).sort((a, b) => b[1].monto - a[1].monto);
+  document.getElementById('pagPorCliente').innerHTML = `
+    <div class="sec-title">Por cliente</div>
+    <div class="cli-grid">
+      ${orden.map(([cli, d]) => `
+        <div class="cli-row">
+          <div>
+            <div class="cn">${escTxt(cli)}</div>
+            <div class="cq">${d.n} ${d.n === 1 ? 'pago' : 'pagos'}${Object.keys(d.codigos).length ? ' · ' + escTxt(Object.keys(d.codigos).join(', ')) : ''}</div>
+          </div>
+          <div class="cm">${fmt(d.monto)}</div>
+        </div>`).join('')}
+    </div>`;
+
+  document.getElementById('pagDetalle').innerHTML = `
+    <div class="sec-title">Detalle de los pagos</div>
+    <div class="pag-tbl">
+      <table>
+        <thead><tr>
+          <th>Fecha</th><th>Cliente</th><th>Concepto</th>
+          <th class="num">Monto</th><th class="num">Saldo después</th>
+        </tr></thead>
+        <tbody>
+          ${lista.map(x => `
+            <tr class="datarow" onclick="verDetalle(${x.p.id})">
+              <td style="font-size:.78rem;white-space:nowrap">${fd(x.g.fecha)}</td>
+              <td class="cliente-cell">${escTxt(x.p.cliente)}<span class="cod">${escTxt(x.p.codigo || '')}</span></td>
+              <td style="font-size:.78rem">${escTxt(x.g.descripcion || 'Pago')}</td>
+              <td class="num"><strong style="color:var(--green)">${fmt(x.g.monto_cuota)}</strong></td>
+              <td class="num">${fmt(x.g.saldo_despues)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// Créditos entregados en el período
+function renderDesembolsos(desem, totalDes) {
+  const cont = document.getElementById('pagDesembolsos');
+  if (!cont) return;
+  if (!desem.length) {
+    cont.innerHTML = `<div class="sec-title">Créditos entregados</div>
+      <div class="pag-vacio" style="padding:20px 16px">No entregó ningún crédito nuevo en este período.</div>`;
+    return;
+  }
+  cont.innerHTML = `
+    <div class="sec-title">Créditos entregados en el período · ${desem.length} por ${fmt(totalDes)}</div>
+    <div class="pag-tbl">
+      <table>
+        <thead><tr>
+          <th>Fecha</th><th>Cliente</th><th class="num">Prestado</th>
+          <th class="num">A cobrar</th><th class="num">Saldo hoy</th><th>Estado</th>
+        </tr></thead>
+        <tbody>
+          ${desem.map(p => `
+            <tr class="datarow" onclick="verDetalle(${p.id})">
+              <td style="font-size:.78rem;white-space:nowrap">${fd(p.fecha_inicio)}</td>
+              <td class="cliente-cell">${escTxt(p.cliente)}<span class="cod">${escTxt(p.codigo || '')}</span></td>
+              <td class="num"><strong>${fmt(p.monto)}</strong></td>
+              <td class="num">${fmt(p.total)}<div class="cargo-tag" style="color:var(--muted)">+ ${fmt((Number(p.total) || 0) - (Number(p.monto) || 0))} interés</div></td>
+              <td class="num">${fmt(p.saldo)}</td>
+              <td><span class="badge badge-${p.estado}">${p.estado}</span></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// Excel solo con los pagos del período que está viendo
+function exportarPagosExcel() {
+  const lista = pagosDelRango();
+  const desem = desembolsosDelRango();
+  if (!lista.length && !desem.length) { toast('No hay movimientos en ese período', false); return; }
+  const r = rangoActual();
+  const total = lista.reduce((a, x) => a + (Number(x.g.monto_cuota) || 0), 0);
+  const totalDes = desem.reduce((a, p) => a + (Number(p.monto) || 0), 0);
+
+  const filas = [['Fecha', 'Cliente', 'Código', 'Concepto', 'Monto Pagado', 'Saldo Después']];
+  lista.slice().reverse().forEach(x => {
+    filas.push([x.g.fecha, x.p.cliente, x.p.codigo || '', x.g.descripcion || 'Pago',
+                x.g.monto_cuota, x.g.saldo_despues]);
+  });
+  filas.push([]);
+  filas.push(['', '', '', 'TOTAL (' + lista.length + ' pagos)', total, '']);
+
+  const ws = XLSX.utils.aoa_to_sheet(filas);
+  ws['!cols'] = [13, 16, 9, 26, 14, 14].map(w => ({ wch: w }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Pagos');
+
+  const filasDes = [['Fecha', 'Cliente', 'Código', 'Prestado', 'A Cobrar', 'Interés', 'Cuotas', 'Saldo Hoy', 'Estado']];
+  desem.slice().reverse().forEach(p => {
+    filasDes.push([p.fecha_inicio, p.cliente, p.codigo || '', p.monto, p.total,
+                   (Number(p.total) || 0) - (Number(p.monto) || 0), p.num_cuotas, p.saldo,
+                   (p.estado || '').toUpperCase()]);
+  });
+  filasDes.push([]);
+  filasDes.push(['', '', 'TOTAL (' + desem.length + ' créditos)', totalDes, '', '', '', '', '']);
+  const wsDes = XLSX.utils.aoa_to_sheet(filasDes);
+  wsDes['!cols'] = [13, 16, 9, 14, 14, 12, 9, 13, 11].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, wsDes, 'Desembolsos');
+
+  const porCli = {};
+  lista.forEach(x => {
+    const k = x.p.cliente || '—';
+    if (!porCli[k]) porCli[k] = { n: 0, monto: 0 };
+    porCli[k].n++; porCli[k].monto += Number(x.g.monto_cuota) || 0;
+  });
+  const res = [['MOVIMIENTOS DEL PERÍODO'], ['Período', textoPeriodo()], [],
+               ['Cantidad de pagos', lista.length], ['Total recaudado (entró)', total],
+               ['Promedio por pago', lista.length ? Math.round(total / lista.length) : 0],
+               ['Clientes que pagaron', Object.keys(porCli).length], [],
+               ['Créditos entregados', desem.length], ['Total desembolsado (salió)', totalDes],
+               ['Balance del período', total - totalDes], [],
+               ['Cliente', 'N° de pagos', 'Monto']];
+  Object.entries(porCli).sort((a, b) => b[1].monto - a[1].monto)
+    .forEach(([cli, d]) => res.push([cli, d.n, d.monto]));
+  const wsRes = XLSX.utils.aoa_to_sheet(res);
+  wsRes['!cols'] = [26, 16, 16].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, wsRes, 'Resumen');
+
+  const nom = 'movimientos_' + (r.desde || 'inicio') + '_a_' + (r.hasta || today()) + '.xlsx';
+  XLSX.writeFile(wb, nom);
+  toast('Excel del período exportado ✓');
+}
+
 // Iniciar
+fijarRango('mes', true);
 render();
 
 // ── Ver / ocultar el código en la pantalla de ingreso ──
