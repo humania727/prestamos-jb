@@ -2726,10 +2726,6 @@ function renderPagos() {
     <div class="pag-stat ${balance >= 0 ? 'green' : 'red'}">
       <div class="l">Balance del período</div><div class="v">${(balance > 0 ? '+' : balance < 0 ? '−' : '') + fmt(Math.abs(balance))}</div>
       <div class="s">${balance >= 0 ? 'entró más de lo que salió' : 'salió más de lo que entró'}</div>
-    </div>
-    <div class="pag-stat blue">
-      <div class="l">A cobrar de lo prestado</div><div class="v">${fmt(desem.reduce((a, p) => a + (Number(p.total) || 0), 0))}</div>
-      <div class="s">total de los créditos del período</div>
     </div>`;
 
   document.getElementById('pagPeriodo').textContent = 'Período: ' + textoPeriodo();
