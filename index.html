@@ -415,6 +415,159 @@
   .pag-tbl th { position: sticky; top: 0; z-index: 2; }
   .pag-vacio { text-align: center; padding: 30px 16px; color: var(--muted); font-size: .84rem; line-height: 1.7; }
 
+  /* ═══ Filtro por cliente ═══ */
+  .cli-buscar { position: relative; }
+  .cli-buscar input {
+    width: 195px; padding: 7px 30px 7px 32px; font-size: .78rem; font-weight: 600;
+    text-transform: none; letter-spacing: 0;
+  }
+  .cli-buscar .lupa {
+    position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    width: 14px; height: 14px; stroke: var(--muted-2); fill: none; stroke-width: 2.2;
+    pointer-events: none;
+  }
+  .cli-buscar .limpiar {
+    position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: .82rem; line-height: 1; padding: 5px 7px; font-family: inherit;
+  }
+  .cli-buscar .limpiar:hover { color: var(--red); }
+  .cli-sug {
+    position: absolute; z-index: 30; top: calc(100% + 6px); right: 0; width: 280px; max-width: 86vw;
+    max-height: 300px; overflow: auto; background: var(--surface-2);
+    border: 1px solid var(--border-2); border-radius: 11px; box-shadow: var(--shadow);
+    padding: 5px; display: none;
+  }
+  .cli-sug.open { display: block; }
+  .cli-sug button {
+    display: flex; width: 100%; align-items: center; gap: 10px; text-align: left;
+    background: none; border: none; color: var(--text); font-family: inherit;
+    padding: 8px 10px; border-radius: 8px; cursor: pointer;
+  }
+  .cli-sug button:hover { background: var(--surface-3); }
+  .cli-sug .col { display: flex; flex-direction: column; min-width: 0; }
+  .cli-sug .sn { font-size: .82rem; font-weight: 600; }
+  .cli-sug .ss { font-size: .65rem; color: var(--muted); margin-top: 1px; }
+  .cli-sug .sm { margin-left: auto; font-family: var(--mono); font-weight: 700; font-size: .78rem; color: var(--red); white-space: nowrap; }
+  .cli-sug .sm.cero { color: var(--muted-2); font-weight: 600; }
+  .cli-sug .vacio { padding: 13px 11px; font-size: .78rem; color: var(--muted); }
+
+  /* Ficha del cliente filtrado */
+  .cli-ficha { padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--bg-soft); display: none; }
+  .cli-ficha.open { display: block; }
+  .cli-ficha .cf-top { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
+  .cli-ficha .cf-nom { font-size: 1.05rem; font-weight: 800; letter-spacing: -.01em; }
+  .cli-ficha .cf-sub { font-size: .7rem; color: var(--muted); margin-top: 2px; }
+  .cli-ficha .cf-acc { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  .cli-ficha .cf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; }
+  .cf-box { background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 11px 14px; }
+  .cf-box .l { font-size: .62rem; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; font-weight: 600; margin-bottom: 4px; }
+  .cf-box .v { font-size: 1.16rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .cf-box .s { font-size: .64rem; color: var(--muted-2); margin-top: 3px; font-weight: 500; line-height: 1.4; }
+  .cf-box.debe { background: linear-gradient(180deg, rgba(248,113,113,.15), var(--surface)); border-color: rgba(248,113,113,.32); }
+  .cf-box.debe .v { color: var(--red); }
+  .cf-box.ok { background: linear-gradient(180deg, var(--green-soft), var(--surface)); border-color: rgba(52,211,153,.3); }
+  .cf-box.ok .v { color: var(--green); }
+  .cf-box.green .v { color: var(--green); }
+  .cf-box.amar .v { color: var(--yellow); }
+  .cf-box .alerta { color: var(--red); font-weight: 700; }
+
+  /* ═══ Refundición ═══ */
+  .ref-box { border: 1px dashed var(--border-2); border-radius: 11px; padding: 12px 14px; background: var(--bg-soft); }
+  .ref-chk {
+    display: flex; flex-direction: row; align-items: flex-start; gap: 9px;
+    text-transform: none; letter-spacing: 0; font-size: .76rem; color: var(--text);
+    font-weight: 600; cursor: pointer; line-height: 1.5;
+  }
+  .ref-chk input[type="checkbox"] {
+    width: 17px; height: 17px; min-width: 17px; margin: 1px 0 0; padding: 0; border: none;
+    background: transparent; accent-color: var(--accent); cursor: pointer;
+  }
+  .ref-det { margin-top: 12px; }
+  .ref-lbl { font-size: .72rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .ref-todos { background: none; border: none; color: var(--accent-2); font-family: inherit;
+    font-size: .7rem; font-weight: 700; cursor: pointer; padding: 0; margin-left: auto; }
+  .ref-lista { display: grid; gap: 6px; max-height: 200px; overflow: auto; margin-top: 8px; }
+  .ref-item {
+    display: flex; flex-direction: row; align-items: center; gap: 10px; cursor: pointer;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px;
+    padding: 8px 11px; text-transform: none; letter-spacing: 0;
+  }
+  .ref-item.on { border-color: var(--accent); background: var(--accent-soft); }
+  .ref-item input[type="checkbox"] {
+    width: 17px; height: 17px; min-width: 17px; margin: 0; padding: 0; border: none;
+    background: transparent; accent-color: var(--accent); cursor: pointer;
+  }
+  .ref-item .rcol { display: flex; flex-direction: column; min-width: 0; }
+  .ref-item .rc { font-size: .78rem; font-weight: 700; font-family: var(--mono); color: var(--text); }
+  .ref-item .rd { font-size: .65rem; color: var(--muted); margin-top: 1px; font-weight: 500; }
+  .ref-item .rm { margin-left: auto; font-family: var(--mono); font-weight: 700; font-size: .8rem; color: var(--red); white-space: nowrap; }
+  .ref-prev {
+    margin-top: 10px; padding: 10px 12px; border-radius: 9px; background: var(--surface-2);
+    border: 1px solid var(--border); font-size: .75rem; line-height: 1.7; color: var(--muted);
+  }
+  .ref-prev strong { color: var(--text); font-variant-numeric: tabular-nums; }
+  .ref-prev.mal { background: var(--red-soft); border-color: rgba(248,113,113,.35); color: var(--red); }
+  .ref-prev.mal strong { color: var(--red); }
+  .ref-tag { font-size: .65rem; color: var(--yellow); font-weight: 700; margin-top: 3px; white-space: nowrap; }
+  .d-ref {
+    margin: 10px 0 4px; padding: 10px 13px; border-radius: 10px; background: var(--yellow-soft);
+    border: 1px solid rgba(251,191,36,.3); font-size: .76rem; color: var(--text); line-height: 1.6;
+  }
+  .d-ref b { font-variant-numeric: tabular-nums; }
+  .d-plan {
+    margin: 10px 0 4px; padding: 10px 13px; border-radius: 10px; background: var(--accent-soft);
+    border: 1px solid rgba(59,130,246,.3); font-size: .76rem; color: var(--text); line-height: 1.6;
+  }
+  .d-plan b { font-variant-numeric: tabular-nums; }
+  .plan-tabs { display: flex; gap: 3px; background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 10px; padding: 3px; margin-bottom: 2px; }
+  .plan-tabs .mode-tab { flex: 1; padding: 8px 10px; font-size: .74rem; line-height: 1.25; }
+  .plan-cap { font-size: .65rem; color: var(--accent-2); font-weight: 700; margin-top: 3px; white-space: nowrap; }
+  .d-ref a { color: var(--accent-2); font-weight: 600; cursor: pointer; }
+
+  /* ═══ Marcar créditos ═══ */
+  th.chk-col, td.chk-col { width: 38px; padding-left: 16px; padding-right: 0; }
+  .chk-col input[type="checkbox"] {
+    width: 17px; height: 17px; min-width: 17px; padding: 0; margin: 0; border: none;
+    background: transparent; accent-color: var(--accent); cursor: pointer;
+  }
+  tr.marcada > td { background: rgba(59,130,246,.10); }
+  .sel-bar {
+    position: fixed; left: 50%; transform: translateX(-50%); bottom: 16px; z-index: 60;
+    display: none; align-items: center; flex-wrap: wrap; gap: 8px 18px;
+    width: max-content; max-width: min(1120px, calc(100vw - 26px));
+    background: var(--surface-2); border: 1px solid var(--border-2); border-radius: 14px;
+    box-shadow: 0 14px 44px rgba(2,6,23,.75); padding: 12px 16px;
+  }
+  .sel-bar.open { display: flex; }
+  .sel-bar .sb-tit { font-size: .8rem; font-weight: 700; }
+  .sel-bar .sb-sub { font-size: .66rem; color: var(--muted); margin-top: 2px; }
+  .sel-bar .sb-nums { display: flex; flex-wrap: wrap; gap: 8px 18px; }
+  .sel-bar .sb-i .l { font-size: .59rem; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+  .sel-bar .sb-i .v { font-size: .98rem; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .sel-bar .sb-i.debe .v { color: var(--red); }
+  .sel-bar .sb-i.verde .v { color: var(--green); }
+  .sel-bar .sb-i.amar .v { color: var(--yellow); }
+  .sel-bar .sb-acc { margin-left: auto; }
+  body.bloqueada .sel-bar { display: none; }
+
+  /* ═══ Deuda por cliente ═══ */
+  .deu-hdr { cursor: pointer; user-select: none; }
+  .deu-hdr .chev { margin-left: auto; transition: transform .25s; color: var(--muted); }
+  .deu-hdr.open .chev { transform: rotate(180deg); }
+  .deu-hdr .hdr-resumen { font-size: .72rem; color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .deu-body { padding: 20px; display: none; }
+  .deu-body.open { display: block; }
+  .deu-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 16px 0 12px; }
+  .deu-tools .der { margin-left: auto; display: flex; gap: 8px; }
+  .deu-tbl { max-height: 470px; overflow: auto; border: 1px solid var(--border); border-radius: 11px; }
+  .deu-tbl th { position: sticky; top: 0; z-index: 2; }
+  .deu-tbl td { font-size: .82rem; }
+  .deu-debe { font-family: var(--mono); font-weight: 800; color: var(--red); font-size: .87rem; }
+  .deu-debe.cero { color: var(--muted-2); font-weight: 600; }
+  .deu-int { font-size: .65rem; color: var(--yellow); margin-top: 2px; white-space: nowrap; }
+
   footer { text-align: center; padding: 30px 0 0; font-size: .68rem; color: var(--muted-2); }
 
   @media (max-width: 640px) {
@@ -427,10 +580,19 @@
     .calc-result .r-grid { grid-template-columns: 1fr; }
     .stat .val { font-size: 1.2rem; }
     .card-hdr { flex-wrap: wrap; }
-    .tbl-toolbar { margin-left: 0; width: 100%; }
+    .tbl-toolbar { margin-left: 0; width: 100%; flex-wrap: wrap; }
     .rng-fechas label { flex: 1 1 140px; }
     .rng-acciones { margin-left: 0; width: 100%; }
-    .pagos-hdr .hdr-resumen { display: none; }
+    .pagos-hdr .hdr-resumen, .deu-hdr .hdr-resumen { display: none; }
+    .cli-buscar { flex: 1 1 100%; }
+    .cli-buscar input { width: 100%; }
+    .cli-sug { width: 100%; max-width: none; }
+    .cli-ficha .cf-acc { margin-left: 0; width: 100%; }
+    .deu-tbl .col-menos { display: none; }   /* en el celular manda lo que debe */
+    .sel-bar { bottom: 10px; padding: 10px 13px; gap: 6px 14px; }
+    .sel-bar .sb-nums { gap: 6px 14px; }
+    .sel-bar .sb-i .v { font-size: .88rem; }
+    .sel-bar .sb-acc { margin-left: 0; }
   }
   /* ── Pantalla de ingreso ── */
   body.bloqueada > header, body.bloqueada > .wrap { display: none; }
@@ -651,6 +813,13 @@
       Cuentas por Cobrar
     </h2>
     <div class="tbl-toolbar">
+      <div class="cli-buscar">
+        <svg class="lupa" viewBox="0 0 24 24" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+        <input id="cliBuscar" placeholder="Buscar cliente…" autocomplete="off" spellcheck="false"
+               oninput="cliInput()" onfocus="abrirSugerencias(true)" onkeydown="cliTecla(event)"/>
+        <button type="button" class="limpiar" id="cliLimpiar" onclick="limpiarCliente()" title="Quitar el filtro de cliente" style="display:none">✕</button>
+        <div class="cli-sug" id="cliSug"></div>
+      </div>
       <select class="fil" id="filtro" onchange="render()">
         <option value="activo" selected>Activos</option>
         <option value="">Todos</option>
@@ -662,9 +831,11 @@
       </button>
     </div>
   </div>
+  <div class="cli-ficha" id="cliFicha"></div>
   <div class="tbl-scroll">
     <table>
       <thead><tr>
+        <th class="chk-col"><input type="checkbox" id="chkTodos" onclick="marcarTodosVisibles(event)" title="Marcar todos los de la lista"/></th>
         <th>Préstamo</th><th class="num">Monto</th><th class="num">Total</th>
         <th class="num">Cuota</th><th>Cuotas</th><th>Próx. pago</th><th>Vence</th>
         <th class="num">Saldo</th><th>Estado</th><th></th>
@@ -675,6 +846,21 @@
 </div>
 
 <div class="card detail" id="detail"></div>
+
+<!-- ══════════ DEUDA POR CLIENTE ══════════ -->
+<div class="card">
+  <div class="card-hdr deu-hdr open" id="deuHdr" onclick="toggleDeuda()">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+      Deuda por cliente
+    </h2>
+    <span class="hdr-resumen" id="deuHdrResumen"></span>
+    <span class="chev">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px"><path d="M6 9l6 6 6-6"/></svg>
+    </span>
+  </div>
+  <div class="deu-body open" id="deuBody"></div>
+</div>
 
 <!-- ══════════ PAGOS RECIBIDOS ══════════ -->
 <div class="card">
@@ -742,15 +928,19 @@
       Nuevo Crédito
     </h2>
     <div class="fg">
-      <label class="s2">Cliente <input id="nCli" placeholder="Ej: Lorena" required/></label>
+      <label class="s2">Cliente <input id="nCli" placeholder="Ej: Lorena" required oninput="refrescarRefundibles()"/></label>
       <label>Código (ddmm) <input id="nCod" placeholder="Ej: 1010" maxlength="6"/></label>
       <label>Fecha inicio <input type="date" id="nFec" required/></label>
+      <div class="s2 plan-tabs">
+        <button type="button" class="mode-tab active" id="tabPlanIguales" onclick="setPlan('iguales')">Cuotas iguales<br><span style="font-weight:500;opacity:.8">capital + interés en cada cuota</span></button>
+        <button type="button" class="mode-tab" id="tabPlanInteres" onclick="setPlan('interes')">Solo intereses<br><span style="font-weight:500;opacity:.8">y el capital al final</span></button>
+      </div>
       <label>Monto solicitado (₡) <input type="number" id="nMnt" min="0" step="1000" placeholder="0" oninput="prevCalc()"/></label>
-      <label>Interés total (₡) <input type="number" id="nInt" min="0" step="1000" placeholder="0" oninput="prevCalc()"/></label>
-      <label>N° de cuotas <input type="number" id="nCuotas" value="1" min="1" oninput="prevCalc()"/></label>
-      <label>Monto de cuota (₡)
+      <label id="nLblInt">Interés total (₡) <input type="number" id="nInt" min="0" step="1000" placeholder="0" oninput="prevCalc()"/></label>
+      <label id="nLblCuotas"><span class="lb">N° de cuotas</span> <input type="number" id="nCuotas" value="1" min="1" oninput="prevCalc()"/></label>
+      <label id="nLblCuota"><span class="lb">Monto de cuota (₡)</span>
         <input type="number" id="nCuota" min="0" step="500" placeholder="Opcional" oninput="prevCalc()"/>
-        <span class="field-hint">Si la ingresás, el total y el interés se calculan solos (cuota × cuotas)</span>
+        <span class="field-hint" id="nCuotaHint">Si la ingresás, el total y el interés se calculan solos (cuota × cuotas)</span>
       </label>
       <label>Frecuencia de pago
         <select id="nFrec" onchange="cambioFrec()">
@@ -775,11 +965,25 @@
           </label>
         </div>
       </div>
-      <label class="s2">Vencimiento (fin del crédito)
-        <input type="date" id="nVenc"/>
+      <label class="s2" id="nLblVenc"><span class="lb">Vencimiento (fin del crédito)</span>
+        <input type="date" id="nVenc" oninput="prevCalc()"/>
         <span class="field-hint" id="nVencHint">Se calcula solo según la frecuencia y el n° de cuotas</span>
       </label>
       <div class="prev-box" id="nPrev"></div>
+      <div class="s2 ref-box" id="nRefBox" style="display:none">
+        <label class="ref-chk">
+          <input type="checkbox" id="nRefunde" onchange="cambioRefunde()"/>
+          <span>Este crédito <strong>refunde</strong> uno o varios créditos del mismo cliente (ese saldo pasa al nuevo, no sale plata otra vez)</span>
+        </label>
+        <div class="ref-det" id="nRefDet" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="ref-lbl">Créditos que se cierran</span>
+            <button type="button" class="ref-todos" id="nRefTodos" onclick="marcarTodosRefundibles()">Marcar todos</button>
+          </div>
+          <div class="ref-lista" id="nRefLista"></div>
+          <div class="ref-prev" id="nRefPrev"></div>
+        </div>
+      </div>
       <label class="s2">Notas <textarea id="nNotas" rows="2" placeholder="Opcional…"></textarea></label>
     </div>
     <div class="fa">
@@ -835,6 +1039,7 @@
           <option value="pagado">Pagado</option>
         </select>
       </label>
+      <div class="s2 d-plan" id="eNotaPlan" style="display:none"></div>
       <label class="s2">Notas <textarea id="eNotas" rows="2" placeholder="Opcional…"></textarea></label>
     </div>
     <div class="fa">
@@ -882,6 +1087,10 @@
       <label>Fecha del pago <input type="date" id="pFec" required/></label>
       <label>Monto (₡) <input type="number" id="pMnt" min="0" step="500" placeholder="0"/></label>
       <label class="s2">Descripción <input id="pDesc" placeholder="Ej: Pago 5 (opcional)"/></label>
+      <label class="s2 ref-chk">
+        <input type="checkbox" id="pNoEfectivo"/>
+        <span>No entró efectivo — es un traslado o refundición (no suma en lo recaudado)</span>
+      </label>
     </div>
     <div class="fa">
       <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
@@ -889,6 +1098,8 @@
     </div>
   </div>
 </div>
+
+<div class="sel-bar" id="selBar"></div>
 
 <div class="toast" id="toast"></div>
 
@@ -1700,34 +1911,36 @@ function exportarExcel() {
   const wb = XLSX.utils.book_new();
 
   const hoy = new Date(); hoy.setHours(0,0,0,0);
-  const filaPrest = [['Cliente','Código','Fecha Inicio','Vencimiento','Monto','Interés','Total','Cuota','N° Cuotas','Cuotas Pagadas','Saldo','Estado','Frecuencia','Próximo Pago','Notas']];
+  const filaPrest = [['Cliente','Código','Fecha Inicio','Vencimiento','Monto','Refundido','Efectivo Entregado','Interés','Total','Cuota','N° Cuotas','Cuotas Pagadas','Saldo','Estado','Plan','Frecuencia','Próximo Pago','Notas']];
   prestamos.forEach(p => {
     const venc = p.vencimiento ? new Date(p.vencimiento+'T12:00') : null;
     const estado = p.estado === 'activo' && venc && venc < hoy ? 'VENCIDO' : p.estado.toUpperCase();
     filaPrest.push([
       p.cliente, p.codigo, p.fecha_inicio, p.vencimiento || '',
-      p.monto, p.interes, p.total, p.cuota,
+      p.monto, montoRefundido(p), efectivoEntregado(p), p.interes, p.total, p.cuota,
       p.num_cuotas, p.cuotas_canceladas, p.saldo,
-      estado, FREC_TXT[p.frecuencia] || '', proxPagoDe(p) || '', p.notas || ''
+      estado, esPlanInteres(p) ? 'Solo intereses + capital al final' : 'Cuotas iguales',
+      FREC_TXT[p.frecuencia] || '', proxPagoDe(p) || '', p.notas || ''
     ]);
   });
   const wsPrest = XLSX.utils.aoa_to_sheet(filaPrest);
-  wsPrest['!cols'] = [14,8,13,13,12,12,12,12,10,14,12,10,12,13,20].map(w=>({wch:w}));
+  wsPrest['!cols'] = [14,8,13,13,12,12,16,12,12,12,10,14,12,10,28,12,13,20].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb, wsPrest, 'Préstamos');
 
-  const filaPagos = [['Cliente','Código','N° Pago','Fecha','Descripción','Monto Pagado','Saldo Después']];
+  const filaPagos = [['Cliente','Código','N° Pago','Fecha','Descripción','Tipo','Monto Pagado','Saldo Después']];
   prestamos.forEach(p => {
     const ps = pagos[p.id] || [];
     ps.forEach(pg => {
       filaPagos.push([
         p.cliente, p.codigo,
         pg.id, pg.fecha, pg.descripcion,
+        esEfectivo(pg) ? 'Efectivo' : 'Refundición (no entró)',
         pg.monto_cuota, pg.saldo_despues
       ]);
     });
   });
   const wsPagos = XLSX.utils.aoa_to_sheet(filaPagos);
-  wsPagos['!cols'] = [14,8,8,13,20,14,14].map(w=>({wch:w}));
+  wsPagos['!cols'] = [14,8,8,13,20,20,14,14].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb, wsPagos, 'Pagos');
 
   // ── Hoja: Intereses por posponer ──
@@ -1745,7 +1958,7 @@ function exportarExcel() {
 
   const act = prestamos.filter(p => p.estado === 'activo');
   const pag = prestamos.filter(p => p.estado === 'pagado');
-  const totalRec = Object.values(pagos).flat().reduce((a,p)=>a+p.monto_cuota,0);
+  const totalRec = Object.values(pagos).flat().reduce((a,p)=> a + (esEfectivo(p) ? (Number(p.monto_cuota)||0) : 0), 0);
   const saldoTotal = act.reduce((a,p)=>a+p.saldo,0);
   const filaRes = [
     ['RESUMEN AL ' + new Date().toLocaleDateString('es-CR')],
@@ -1866,7 +2079,7 @@ function cobradoEsteMes() {
   prestamos.forEach(p => {
     (pagos[p.id] || []).forEach(g => {
       const f = g.fecha || '';
-      if (f >= ini && f <= fin) { total += Number(g.monto_cuota) || 0; n++; }
+      if (f >= ini && f <= fin && esEfectivo(g)) { total += Number(g.monto_cuota) || 0; n++; }
     });
   });
   return { total, n, mes: hoy.toLocaleDateString('es-CR', { month: 'long' }) };
@@ -1877,12 +2090,12 @@ function desembolsadoEsteMes() {
   const hoy = new Date();
   const ini = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
   const fin = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0));
-  let total = 0, n = 0;
+  let total = 0, n = 0, ref = 0;
   prestamos.forEach(p => {
     const f = p.fecha_inicio || '';
-    if (f >= ini && f <= fin) { total += Number(p.monto) || 0; n++; }
+    if (f >= ini && f <= fin) { total += efectivoEntregado(p); ref += montoRefundido(p); n++; }
   });
-  return { total, n };
+  return { total, n, ref };
 }
 
 // Al tocar el recuadro se abre el panel de pagos con el mes en curso
@@ -1914,7 +2127,7 @@ function renderStats() {
         <div class="lbl">Cobrado en ${mes.mes}</div>
         <div class="val">${fmt(mes.total)}</div>
         <div class="sub">${mes.n} ${mes.n === 1 ? 'pago recibido' : 'pagos recibidos'}</div>
-        <div class="sub out">Desembolsado: <strong>${fmt(des.total)}</strong> · ${des.n} ${des.n === 1 ? 'crédito' : 'créditos'}</div>
+        <div class="sub out">Desembolsado: <strong>${fmt(des.total)}</strong> · ${des.n} ${des.n === 1 ? 'crédito' : 'créditos'}${des.ref > 0 ? ` · <strong>${fmt(des.ref)}</strong> refundidos` : ''}</div>
       </div>
     </div>
     <div class="stat gray">
@@ -2022,18 +2235,108 @@ function ultimoPago(id) {
   return ps.reduce((a, b) => (b.fecha > a.fecha ? b : a));
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// ── MARCAR CRÉDITOS: sumar solo algunos ──
+// ══════════════════════════════════════════════════════════════════════
+// Las marcas son del momento: no se guardan ni viajan a Firebase. Sirven
+// para decir "de estos dos créditos me debés tanto".
+
+var selCreditos = {};      // id del crédito -> marcado
+var idsVisibles = [];      // lo que está a la vista con los filtros de ahora
+
+function creditosMarcados() {
+  return prestamos.filter(function (p) { return selCreditos[p.id]; });
+}
+function toggleSelFila(ev, id) {
+  ev.stopPropagation();
+  if (ev.target.checked) selCreditos[id] = 1; else delete selCreditos[id];
+  renderBarraSel();
+  var fila = ev.target.closest ? ev.target.closest('tr') : null;
+  if (fila) fila.classList.toggle('marcada', !!selCreditos[id]);
+  pintarChkTodos();
+}
+function marcarTodosVisibles(ev) {
+  ev.stopPropagation();
+  var on = ev.target.checked;
+  idsVisibles.forEach(function (id) { if (on) selCreditos[id] = 1; else delete selCreditos[id]; });
+  render();
+}
+function limpiarSeleccion() { selCreditos = {}; render(); }
+function pintarChkTodos() {
+  var ch = document.getElementById('chkTodos');
+  if (!ch) return;
+  var n = idsVisibles.filter(function (id) { return selCreditos[id]; }).length;
+  ch.checked = n > 0 && n === idsVisibles.length;
+  ch.indeterminate = n > 0 && n < idsVisibles.length;
+}
+
+function renderBarraSel() {
+  var bar = document.getElementById('selBar');
+  if (!bar) return;
+  var vivos = {};
+  prestamos.forEach(function (p) { vivos[p.id] = 1; });
+  Object.keys(selCreditos).forEach(function (k) { if (!vivos[k]) delete selCreditos[k]; });
+
+  var sel = creditosMarcados();
+  if (!sel.length) { bar.classList.remove('open'); bar.innerHTML = ''; return; }
+
+  var saldo = 0, intPend = 0, pagado = 0, prestado = 0, nombres = {};
+  var fichas = resumenClientes();
+  sel.forEach(function (p) {
+    if (p.estado === 'activo') { saldo += Number(p.saldo) || 0; intPend += cargosPendientes(p); }
+    prestado += Number(p.monto) || 0;
+    (pagos[p.id] || []).forEach(function (g) { pagado += Number(g.monto_cuota) || 0; });
+    var k = claveCliente(p);
+    if (!nombres[k]) nombres[k] = (fichas[k] ? fichas[k].nombre : ((p.cliente || '').trim() || '(sin nombre)'));
+  });
+  var ns = Object.keys(nombres).map(function (k) { return nombres[k]; });
+  var quien = ns.length === 1 ? 'de ' + ns[0]
+            : 'de ' + ns.length + ' clientes: ' + ns.slice(0, 3).join(', ') + (ns.length > 3 ? '…' : '');
+
+  bar.innerHTML =
+    '<div><div class="sb-tit">' + sel.length + (sel.length === 1 ? ' crédito marcado' : ' créditos marcados') + '</div>' +
+      '<div class="sb-sub">' + escTxt(quien) + '</div></div>' +
+    '<div class="sb-nums">' +
+      '<div class="sb-i debe"><div class="l">Debe</div><div class="v">' + fmt(saldo + intPend) + '</div></div>' +
+      '<div class="sb-i"><div class="l">Saldo</div><div class="v">' + fmt(saldo) + '</div></div>' +
+      '<div class="sb-i amar"><div class="l">Interés</div><div class="v">' + fmt(intPend) + '</div></div>' +
+      '<div class="sb-i verde"><div class="l">Ya pagó</div><div class="v">' + fmt(pagado) + '</div></div>' +
+      '<div class="sb-i"><div class="l">Prestado</div><div class="v">' + fmt(prestado) + '</div></div>' +
+    '</div>' +
+    '<div class="sb-acc"><button class="btn btn-sm" onclick="limpiarSeleccion()">Quitar marcas</button></div>';
+  bar.classList.add('open');
+}
+
 // ── Tabla ──
 function render() {
   const f = document.getElementById('filtro').value;
   const hoy = new Date(); hoy.setHours(0,0,0,0);
-  const list = f ? prestamos.filter(p => p.estado === f) : [...prestamos];
+  const ks = clavesFiltradas();
+  let list = f ? prestamos.filter(p => p.estado === f) : [...prestamos];
+  if (ks) list = list.filter(p => ks.indexOf(claveCliente(p)) >= 0);
   renderStats();
   renderPagos();
+  renderDeuda();
+  renderFichaCliente();
+  renderSugerencias();
+  const btnLimpiar = document.getElementById('cliLimpiar');
+  if (btnLimpiar) btnLimpiar.style.display = hayFiltroCliente() ? 'block' : 'none';
+  idsVisibles = list.map(p => p.id);
+  pintarChkTodos();
+  renderBarraSel();
   if (!list.length) {
-    const msg = prestamos.length === 0
-      ? 'Bienvenido. Usá el botón <strong>Nuevo Crédito</strong> para registrar tu primer préstamo,<br>o conectá un <strong>Código Sync</strong> si ya tenés datos en otro dispositivo.'
-      : 'Sin créditos para mostrar con ese filtro.';
-    document.getElementById('tbody').innerHTML = `<tr><td colspan="10" class="empty">${msg}</td></tr>`;
+    let msg;
+    if (prestamos.length === 0) {
+      msg = 'Bienvenido. Usá el botón <strong>Nuevo Crédito</strong> para registrar tu primer préstamo,<br>o conectá un <strong>Código Sync</strong> si ya tenés datos en otro dispositivo.';
+    } else if (ks && !ks.length) {
+      msg = 'Ningún cliente se llama «' + escTxt(cliTexto.trim()) + '».<br><button class="btn btn-sm" style="margin-top:12px" onclick="limpiarCliente()">Quitar el filtro</button>';
+    } else if (ks) {
+      msg = 'Ese cliente no tiene créditos con el filtro <strong>' + (f === 'activo' ? 'Activos' : 'Pagados') + '</strong>.' +
+            '<br><button class="btn btn-sm" style="margin-top:12px" onclick="verTodosDelCliente()">Ver todos sus créditos</button>';
+    } else {
+      msg = 'Sin créditos para mostrar con ese filtro.';
+    }
+    document.getElementById('tbody').innerHTML = `<tr><td colspan="11" class="empty">${msg}</td></tr>`;
     return;
   }
   document.getElementById('tbody').innerHTML = list.map(p => {
@@ -2045,11 +2348,15 @@ function render() {
     const prox = proxPagoDe(p);
     const proxDue = prox && new Date(prox+'T12:00') <= hoy;
     const cargoPend = cargosPendientes(p);
-    return `<tr class="datarow" onclick="verDetalle(${p.id})">
+    return `<tr class="datarow${selCreditos[p.id] ? ' marcada' : ''}" onclick="verDetalle(${p.id})">
+      <td class="chk-col" onclick="event.stopPropagation()">
+        <input type="checkbox" ${selCreditos[p.id] ? 'checked' : ''} onclick="toggleSelFila(event, ${p.id})" title="Marcar este crédito para sumarlo aparte"/>
+      </td>
       <td class="cliente-cell">${p.cliente}<span class="cod">${p.codigo}</span></td>
       <td class="num">${fmt(p.monto)}</td>
       <td class="num">${fmt(p.total)}</td>
-      <td class="num">${fmt(p.cuota)}</td>
+      <td class="num">${fmt(p.cuota)}${esPlanInteres(p)
+        ? `<div class="plan-cap">+ ${fmt(capitalFinalDe(p))} al final</div>` : ''}</td>
       <td>
         <span class="cuotas-txt">${p.cuotas_canceladas}/${p.num_cuotas}</span>
         <div class="prog-bg"><div class="prog" style="width:${pct}%"></div></div>
@@ -2086,6 +2393,11 @@ function verDetalle(id, scroll=true) {
       <div>
         <h3>${p.cliente} <span style="font-family:var(--mono);font-size:.8rem;color:var(--muted)">${p.codigo}</span></h3>
         <div class="meta">Inicio: ${fd(p.fecha_inicio)} · Vence: ${fd(p.vencimiento)}</div>
+        ${(() => { const rc = resumenClientes()[claveCliente(p)];
+           return rc && (rc.activos + rc.pagados) > 1
+             ? `<div class="meta">Este cliente debe <strong style="color:var(--red)">${fmt(rc.debe)}</strong> en total ·
+                <a href="javascript:void(0)" style="color:var(--accent-2);font-weight:600" onclick="filtrarPorCliente('${escTxt(rc.clave)}')">ver sus ${rc.activos + rc.pagados} créditos</a></div>`
+             : ''; })()}
       </div>
       <button class="cls" onclick="cerrarDetalle()">✕</button>
     </div>
@@ -2103,6 +2415,29 @@ function verDetalle(id, scroll=true) {
       </div>
       <div class="prog-bg" style="height:7px"><div class="prog" style="width:${pct}%;height:7px"></div></div>
       <div class="pct-txt">${pct}% pagado</div>`;
+  // ── Plan de solo intereses ──
+  if (esPlanInteres(p)) {
+    const nInt = pagosDeInteres(p);
+    const hechos = Math.min(p.cuotas_canceladas || 0, nInt);
+    html += `<div class="d-plan">📅 <b>Solo intereses + capital al final</b>: ${nInt} pago${nInt === 1 ? '' : 's'} de
+      <b>${fmt(cuotaInteresDe(p))}</b> (${(FREC_TXT[p.frecuencia] || '').toLowerCase()}) y el capital de
+      <b>${fmt(capitalFinalDe(p))}</b> el <b>${fd(p.vencimiento)}</b>.
+      ${p.estado === 'activo' ? `Van ${hechos} de ${nInt} pagos de interés${hechos >= nInt ? ' — falta solo el capital' : ''}.` : ''}</div>`;
+  }
+  // ── Avisos de refundición ──
+  if (montoRefundido(p) > 0) {
+    const vs = refundeIds(p).map(creditoPorId).filter(Boolean);
+    const cods = vs.map(v => escTxt(v.codigo || ('#' + v.id))).join(', ');
+    html += `<div class="d-ref">🔁 Este crédito <b>refunde</b> ${
+      !vs.length ? 'otros créditos' : (vs.length === 1 ? 'el crédito ' : 'los créditos ') + cods}:
+      se trasladaron <b>${fmt(montoRefundido(p))}</b> y entregaste <b>${fmt(efectivoEntregado(p))}</b> en efectivo.
+      ${vs.map(v => `<a onclick="verDetalle(${v.id})">Ver ${escTxt(v.codigo || ('#' + v.id))}</a>`).join(' · ')}</div>`;
+  }
+  if (p.refundido_en) {
+    const n = creditoPorId(p.refundido_en);
+    html += `<div class="d-ref">🔁 Este crédito se <b>cerró por refundición</b>${n ? ': su saldo pasó al crédito ' + escTxt(n.codigo || ('#' + n.id)) : ''}.
+      No fue plata que entró. ${n ? `<a onclick="verDetalle(${n.id})">Ver el crédito nuevo</a>` : ''}</div>`;
+  }
   html += `<div style="display:flex;gap:9px;margin-bottom:6px;flex-wrap:wrap">
     ${p.estado === 'activo' ? `<button class="btn btn-primary" style="flex:1;justify-content:center" onclick="abrirPago(${p.id})">+ Registrar Pago</button>` : ''}
     ${p.estado === 'activo' ? `<button class="btn" style="flex:1;justify-content:center" onclick="abrirCargo(${p.id})">% Interés por posponer</button>` : ''}
@@ -2159,6 +2494,92 @@ function cerrarDetalle() {
 }
 
 // ── Nuevo crédito ──
+// ══════════════════════════════════════════════════════════════════════
+// ── PLAN DE PAGO: cuotas iguales o solo intereses + capital al final ──
+// ══════════════════════════════════════════════════════════════════════
+// El segundo es el clásico "le cobro 6 quincenas de ₡20.000 de interés y
+// con el aguinaldo me paga los ₡350.000". Se guarda como num_cuotas =
+// pagos de interés + 1 (el del capital), `plan: 'interes'`,
+// `cuota_interes` (lo que paga cada quincena) y `cuota_final` (el capital).
+
+var planNuevoSel = 'iguales';
+function planNuevo() { return planNuevoSel; }
+function esPlanInteres(p) { return !!(p && p.plan === 'interes'); }
+function pagosDeInteres(p) { return esPlanInteres(p) ? Math.max((p.num_cuotas || 1) - 1, 0) : 0; }
+function cuotaInteresDe(p) { return Number(p.cuota_interes) || Number(p.cuota) || 0; }
+function capitalFinalDe(p) { return Number(p.cuota_final) || Number(p.monto) || 0; }
+
+// Cuánto sugerir al registrar un pago
+function cuotaSugerida(p) {
+  if (!p) return 0;
+  if (esPlanInteres(p)) {
+    return p.cuotas_canceladas >= pagosDeInteres(p) ? p.saldo : cuotaInteresDe(p);
+  }
+  var c = Number(p.cuota) || 0;
+  var sal = Number(p.saldo) || 0;
+  return sal > 0 && sal < c ? sal : c;
+}
+function fdCorto(f) {
+  if (!f) return '';
+  return new Date(f + 'T12:00').toLocaleDateString('es-CR', { day: '2-digit', month: 'short' });
+}
+function ponerEtiqueta(idLabel, texto) {
+  var l = document.getElementById(idLabel);
+  if (!l) return;
+  var sp = l.querySelector('.lb');
+  if (sp) sp.textContent = texto;
+  else l.childNodes[0].nodeValue = texto + ' ';
+}
+function setPlan(plan) {
+  planNuevoSel = plan;
+  var esInt = plan === 'interes';
+  document.getElementById('tabPlanIguales').classList.toggle('active', !esInt);
+  document.getElementById('tabPlanInteres').classList.toggle('active', esInt);
+  ponerEtiqueta('nLblCuotas', esInt ? 'N° de pagos de interés' : 'N° de cuotas');
+  ponerEtiqueta('nLblCuota', esInt ? 'Interés por pago (₡)' : 'Monto de cuota (₡)');
+  ponerEtiqueta('nLblVenc', esInt ? 'Fecha en que le paga el capital' : 'Vencimiento (fin del crédito)');
+  document.getElementById('nCuotaHint').textContent = esInt
+    ? 'Lo que le cobra en cada pago (ej: 20.000). El interés total se calcula solo.'
+    : 'Si la ingresás, el total y el interés se calculan solos (cuota × cuotas)';
+  document.getElementById('nVencHint').textContent = esInt
+    ? 'Ej: cuando reciba el aguinaldo. Esta fecha no se calcula sola.'
+    : 'Se calcula solo según la frecuencia y el n° de cuotas';
+  if (esInt && document.getElementById('nFrec').value === 'unico') {
+    document.getElementById('nFrec').value = 'quincenal';
+    cambioFrec();
+  }
+  prevCalc();
+}
+
+// Vista previa del plan de solo intereses
+function prevCalcInteres(m, n, cuotaInt) {
+  var el = document.getElementById('nPrev');
+  var iEl = document.getElementById('nInt');
+  var interes;
+  if (cuotaInt > 0) { interes = cuotaInt * n; iEl.value = Math.round(interes); }
+  else { interes = parseFloat(iEl.value) || 0; cuotaInt = n ? Math.round(interes / n) : 0; }
+  var total = m + interes;
+  var frec = document.getElementById('nFrec').value;
+  var prox = document.getElementById('nProx').value;
+  var venc = document.getElementById('nVenc').value;
+  var fechas = [];
+  if (prox && frec !== 'unico') {
+    var f = prox;
+    for (var k = 0; k < n && k < 24; k++) {
+      fechas.push(f);
+      f = sumarFrecuencia(f, frec, frec === 'quincenal' ? leerDiasNuevo() : null);
+    }
+  } else if (prox) { fechas.push(prox); }
+  el.style.display = 'block';
+  el.innerHTML =
+    '<strong>' + n + '</strong> pago' + (n === 1 ? '' : 's') + ' de interés de <strong>' + fmt(cuotaInt) + '</strong>' +
+    ' + capital <strong>' + fmt(m) + '</strong> al final' +
+    '<br>Total a cobrar: <strong>' + fmt(total) + '</strong> · Interés total: <strong>' + fmt(interes) + '</strong>' +
+    (venc ? '<br>Capital el <strong>' + fd(venc) + '</strong>'
+          : '<br><span style="color:var(--yellow)">Falta la fecha en que le paga el capital</span>') +
+    (fechas.length ? '<br><span style="opacity:.72">Intereses: ' + fechas.map(fdCorto).join(' · ') + '</span>' : '');
+}
+
 function abrirNuevo() {
   document.getElementById('nCli').value    = '';
   document.getElementById('nCod').value    = '';
@@ -2175,6 +2596,14 @@ function abrirNuevo() {
   document.getElementById('nVenc').value   = '';
   document.getElementById('nNotas').value  = '';
   document.getElementById('nPrev').style.display = 'none';
+  document.getElementById('nRefunde').checked = false;
+  document.getElementById('nRefDet').style.display = 'none';
+  document.getElementById('nRefPrev').innerHTML = '';
+  document.getElementById('nRefLista').innerHTML = '';
+  document.getElementById('nRefTodos').textContent = 'Marcar todos';
+  setPlan('iguales');
+  document.getElementById('nPrev').style.display = 'none';
+  refrescarRefundibles();
   document.getElementById('ovNuevo').classList.add('open');
 }
 
@@ -2183,6 +2612,8 @@ function prevCalc() {
   const c  = parseInt(document.getElementById('nCuotas').value) || 1;
   const cu = parseFloat(document.getElementById('nCuota').value) || 0;
   const el = document.getElementById('nPrev');
+  prevRefunde(m);
+  if (planNuevo() === 'interes') { prevCalcInteres(m, c, cu); return; }
   // Calcular cuándo termina el crédito y autocompletar el vencimiento
   const frec = document.getElementById('nFrec').value;
   const prox = document.getElementById('nProx').value;
@@ -2219,28 +2650,50 @@ function guardarCredito() {
   const mnt = parseFloat(document.getElementById('nMnt').value) || 0;
   if (!cli || !fec || !mnt) { toast('Completa los campos obligatorios', false); return; }
   const cod     = document.getElementById('nCod').value.trim() || (fec.slice(8)+fec.slice(5,7));
-  const num     = parseInt(document.getElementById('nCuotas').value) || 1;
+  const plan    = planNuevo();
+  const nPagos  = parseInt(document.getElementById('nCuotas').value) || 1;   // en el plan de interés: pagos de interés
   const cuotaIn = parseFloat(document.getElementById('nCuota').value) || 0;
-  let interes, total, cuota;
-  if (cuotaIn > 0) {
-    total   = Math.round(cuotaIn * num);
+  let interes, total, cuota, num = nPagos, cuotaInt = 0;
+  if (plan === 'interes') {
+    cuotaInt = cuotaIn > 0 ? cuotaIn : Math.round((parseFloat(document.getElementById('nInt').value) || 0) / nPagos);
+    if (!cuotaInt) { toast('Poné cuánto le cobra de interés en cada pago', false); return; }
+    interes = cuotaInt * nPagos;
+    total   = mnt + interes;
+    cuota   = cuotaInt;
+    num     = nPagos + 1;                           // los pagos de interés + el del capital
+  } else if (cuotaIn > 0) {
+    total   = Math.round(cuotaIn * nPagos);
     interes = total - mnt;
     cuota   = cuotaIn;
   } else {
     interes = parseFloat(document.getElementById('nInt').value) || 0;
     total   = mnt + interes;
-    cuota   = Math.round(total / num);
+    cuota   = Math.round(total / nPagos);
   }
   const frec = document.getElementById('nFrec').value;
   const dias = frec === 'quincenal' ? leerDiasNuevo() : null;
   let venc   = document.getElementById('nVenc').value || null;
   let prox   = document.getElementById('nProx').value || null;
-  if (frec === 'unico') {
+  if (plan === 'interes') {
+    if (!venc) { toast('Poné la fecha en que le paga el capital', false); return; }
+    if (!prox) prox = sumarFrecuencia(fec, frec === 'unico' ? 'quincenal' : frec, dias);
+  } else if (frec === 'unico') {
     prox = venc;                                    // pago único → próximo pago = vencimiento
   } else {
     if (!prox) prox = sumarFrecuencia(fec, frec, dias);        // 1ª cuota sugerida
     const fin = calcularFinCredito(prox, frec, num, dias);     // fin del crédito
     if (fin) venc = fin;
+  }
+  const viejos = refundeElegidos();
+  const trasladoDe = viejos.map(v => deudaTraslado(v));      // se calcula ANTES de cerrarlos
+  const traslado = trasladoDe.reduce((a, x) => a + x, 0);
+  if (viejos.length && traslado > mnt) {
+    toast('El crédito nuevo no puede ser menor que lo que se traslada (' + fmt(traslado) + ')', false);
+    return;
+  }
+  if (document.getElementById('nRefunde').checked && !viejos.length) {
+    toast('Marcá cuáles créditos se refunden, o destildá la casilla', false);
+    return;
   }
   const p = { id: nuevoId(), _ts: ahora(), cliente: cli, codigo: cod, monto: mnt, interes, total,
     cuota: cuota, num_cuotas: num, cuotas_canceladas: 0,
@@ -2248,10 +2701,15 @@ function guardarCredito() {
     frecuencia: frec, proximo_pago: prox, dias_pago: dias,
     cargos: [],
     saldo: total, estado: 'activo', notas: document.getElementById('nNotas').value || null };
+  if (plan === 'interes') { p.plan = 'interes'; p.cuota_interes = cuotaInt; p.cuota_final = mnt; }
+  if (viejos.length) { p.refundido = traslado; p.refunde_ids = viejos.map(v => v.id); }
   prestamos.push(p);
+  viejos.forEach((v, i) => cerrarPorRefundicion(v, p, trasladoDe[i]));
   guardar();
   cerrar();
-  toast('Crédito registrado ✓');
+  toast(!viejos.length ? 'Crédito registrado ✓'
+    : viejos.length === 1 ? 'Crédito registrado y refundición aplicada ✓'
+    : 'Crédito registrado · ' + viejos.length + ' créditos refundidos ✓');
   render();
 }
 
@@ -2260,8 +2718,9 @@ function abrirPago(id) {
   const p = prestamos.find(x => x.id === id);
   pagoTarget = id;
   document.getElementById('pFec').value  = today();
-  document.getElementById('pMnt').value  = p.cuota;
+  document.getElementById('pMnt').value  = cuotaSugerida(p);
   document.getElementById('pDesc').value = '';
+  document.getElementById('pNoEfectivo').checked = false;
   document.getElementById('pagoTit').textContent = `Registrar Pago — ${p.cliente} ${p.codigo}`;
   document.getElementById('ovPago').classList.add('open');
 }
@@ -2271,25 +2730,32 @@ function guardarPago() {
   const p   = prestamos.find(x => x.id === id);
   const fec = document.getElementById('pFec').value;
   const mnt = parseFloat(document.getElementById('pMnt').value) || 0;
-  const desc = document.getElementById('pDesc').value.trim() || ('Pago ' + (p.cuotas_canceladas + 1));
+  const chkNoEf = document.getElementById('pNoEfectivo');
+  const noEf = !!(chkNoEf && chkNoEf.checked);
+  const desc = document.getElementById('pDesc').value.trim() ||
+    (noEf ? 'Traslado — no entró efectivo' : ('Pago ' + (p.cuotas_canceladas + 1)));
   if (!fec || !mnt) { toast('Completa fecha y monto', false); return; }
   const saldoN = Math.max(Math.round(p.saldo - mnt), 0);
   const newC   = p.cuotas_canceladas + 1;
   if (!pagos[id]) pagos[id] = [];
-  pagos[id].push({ id: nuevoId(), _ts: ahora(), prestamo_id: id, fecha: fec, descripcion: desc, monto_cuota: mnt, saldo_despues: saldoN });
+  const reg = { id: nuevoId(), _ts: ahora(), prestamo_id: id, fecha: fec, descripcion: desc, monto_cuota: mnt, saldo_despues: saldoN };
+  if (noEf) reg.no_efectivo = true;
+  pagos[id].push(reg);
   p.saldo = saldoN;
   p.cuotas_canceladas = newC;
   if (saldoN === 0 || newC >= p.num_cuotas) p.estado = 'pagado';
   // Avanzar la fecha del próximo pago según la frecuencia
   if (p.estado === 'pagado') {
     p.proximo_pago = null;
+  } else if (esPlanInteres(p) && newC >= pagosDeInteres(p)) {
+    p.proximo_pago = p.vencimiento;          // ya solo falta el capital
   } else if (p.frecuencia && p.frecuencia !== 'unico') {
     p.proximo_pago = sumarFrecuencia(p.proximo_pago || fec, p.frecuencia, diasQuincena(p));
   }
   marcar(p);
   guardar();
   cerrar();
-  toast('Pago registrado ✓');
+  toast(noEf ? 'Traslado registrado ✓' : 'Pago registrado ✓');
   render();
 }
 
@@ -2304,6 +2770,149 @@ function recalcNextCid() {
 
 function cargosDe(p) { return (p && p.cargos) || []; }
 function cargosPendientes(p) { return cargosDe(p).filter(c => !c.pagado).reduce((a,c)=>a+c.monto, 0); }
+
+// ══════════════════════════════════════════════════════════════════════
+// ── REFUNDICIONES: plata que se traslada, no plata que se mueve ──
+// ══════════════════════════════════════════════════════════════════════
+// Cuando un crédito de ₡50.000 se refunde en uno nuevo de ₡100.000, solo
+// salen ₡50.000 de efectivo y NO entra nada. Por eso:
+//   · el pago que cierra el crédito viejo lleva `no_efectivo: true` y no
+//     suma en "Recaudado" ni en "Cobrado en el mes";
+//   · el crédito nuevo guarda `refundido` (lo trasladado) y `refunde_de`
+//     (el crédito que cerró), y en los reportes solo cuenta como
+//     desembolso la diferencia: monto − refundido.
+// El cliente sigue debiendo un solo saldo: el del crédito nuevo.
+
+function esEfectivo(g) { return !(g && g.no_efectivo); }
+function montoRefundido(p) { return Number(p && p.refundido) || 0; }
+function efectivoEntregado(p) { return Math.max((Number(p.monto) || 0) - montoRefundido(p), 0); }
+function creditoPorId(id) { return prestamos.find(function (x) { return x.id === id; }); }
+// Lo que hay que trasladar para dejar el crédito viejo en cero
+function deudaTraslado(p) { return (Number(p.saldo) || 0) + cargosPendientes(p); }
+
+function refundiblesDe(cli) {
+  var k = normNombre(cli);
+  if (!k) return [];
+  return prestamos.filter(function (p) { return p.estado === 'activo' && claveCliente(p) === k; })
+                  .sort(function (a, b) { return deudaTraslado(b) - deudaTraslado(a); });
+}
+// Los créditos que este crédito refunde (uno o varios). Los datos viejos
+// guardaban un solo id en `refunde_de`; los nuevos guardan la lista en `refunde_ids`.
+function refundeIds(p) {
+  if (!p) return [];
+  if (p.refunde_ids && p.refunde_ids.length) {
+    return p.refunde_ids.filter(function (x) { return x != null; });
+  }
+  return p.refunde_de ? [p.refunde_de] : [];
+}
+// Muestra u oculta la caja de refundir según el cliente que se esté escribiendo
+function refrescarRefundibles() {
+  var box = document.getElementById('nRefBox');
+  var cont = document.getElementById('nRefLista');
+  var chk = document.getElementById('nRefunde');
+  if (!box || !cont || !chk) return;
+  var lista = refundiblesDe(document.getElementById('nCli').value);
+  if (!lista.length) {
+    box.style.display = 'none';
+    chk.checked = false;
+    document.getElementById('nRefDet').style.display = 'none';
+    cont.innerHTML = '';
+    return;
+  }
+  var marcados = {};
+  [].forEach.call(cont.querySelectorAll('input[data-id]'), function (i) {
+    if (i.checked) marcados[i.getAttribute('data-id')] = 1;
+  });
+  var soloUno = lista.length === 1;
+  cont.innerHTML = lista.map(function (p) {
+    var on = soloUno || marcados[p.id];       // con uno solo se marca de una vez
+    return '<label class="ref-item' + (on ? ' on' : '') + '">' +
+      '<input type="checkbox" data-id="' + p.id + '"' + (on ? ' checked' : '') + ' onchange="marcarRefItem(this)"/>' +
+      '<span class="rcol"><span class="rc">' + escTxt(p.codigo || ('#' + p.id)) + '</span>' +
+      '<span class="rd">' + escTxt(p.cliente || '') +
+        (p.vencimiento ? ' · vence ' + fd(p.vencimiento) : '') + '</span></span>' +
+      '<span class="rm">' + fmt(deudaTraslado(p)) + '</span>' +
+    '</label>';
+  }).join('');
+  var btn = document.getElementById('nRefTodos');
+  if (btn) btn.style.display = lista.length > 1 ? 'block' : 'none';
+  box.style.display = 'block';
+}
+function marcarRefItem(inp) {
+  var fila = inp.closest ? inp.closest('.ref-item') : null;
+  if (fila) fila.classList.toggle('on', inp.checked);
+  prevCalc();
+}
+function marcarTodosRefundibles() {
+  var cont = document.getElementById('nRefLista');
+  if (!cont) return;
+  var casillas = [].slice.call(cont.querySelectorAll('input[data-id]'));
+  var faltan = casillas.some(function (i) { return !i.checked; });
+  casillas.forEach(function (i) { i.checked = faltan; marcarRefItem(i); });
+  var btn = document.getElementById('nRefTodos');
+  if (btn) btn.textContent = faltan ? 'Desmarcar todos' : 'Marcar todos';
+}
+function cambioRefunde() {
+  var on = document.getElementById('nRefunde').checked;
+  document.getElementById('nRefDet').style.display = on ? 'block' : 'none';
+  prevCalc();
+}
+// Los créditos marcados en la lista
+function refundeElegidos() {
+  var chk = document.getElementById('nRefunde');
+  var cont = document.getElementById('nRefLista');
+  if (!chk || !chk.checked || !cont) return [];
+  return [].slice.call(cont.querySelectorAll('input[data-id]'))
+    .filter(function (i) { return i.checked; })
+    .map(function (i) { return creditoPorId(parseInt(i.getAttribute('data-id'), 10)); })
+    .filter(Boolean);
+}
+function prevRefunde(mnt) {
+  var el = document.getElementById('nRefPrev');
+  if (!el) return;
+  var viejos = refundeElegidos();
+  if (!viejos.length) {
+    el.className = 'ref-prev';
+    el.innerHTML = document.getElementById('nRefunde') && document.getElementById('nRefunde').checked
+      ? 'Marcá cuáles créditos se cierran con este.' : '';
+    return;
+  }
+  var traslado = viejos.reduce(function (a, v) { return a + deudaTraslado(v); }, 0);
+  var efectivo = mnt - traslado;
+  var codigos = viejos.map(function (v) { return escTxt(v.codigo || ('#' + v.id)); }).join(', ');
+  if (mnt > 0 && efectivo < 0) {
+    el.className = 'ref-prev mal';
+    el.innerHTML = 'El crédito nuevo (<strong>' + fmt(mnt) + '</strong>) es menor que lo que se traslada (<strong>' +
+      fmt(traslado) + '</strong>). Subí el monto a por lo menos ' + fmt(traslado) + '.';
+    return;
+  }
+  el.className = 'ref-prev';
+  el.innerHTML = (viejos.length === 1 ? 'Se cierra el crédito <strong>' : 'Se cierran ' + viejos.length + ' créditos (<strong>') +
+    codigos + '</strong>' + (viejos.length === 1 ? '' : ')') +
+    ' y se trasladan <strong>' + fmt(traslado) + '</strong> al nuevo — esa plata no entra ni vuelve a salir.' +
+    (mnt > 0
+      ? '<br>Efectivo que entregás hoy: <strong>' + fmt(efectivo) + '</strong>' +
+        (efectivo === 0 ? ' — es solo una reprogramación, no entregás plata nueva.' : '')
+      : '<br>Escribí el monto del crédito nuevo para ver cuánto efectivo sale.');
+}
+// Cierra el crédito viejo con un traslado (no es plata que entró)
+function cerrarPorRefundicion(viejo, nuevo, traslado) {
+  if (!pagos[viejo.id]) pagos[viejo.id] = [];
+  pagos[viejo.id].push({
+    id: nuevoId(), _ts: ahora(), prestamo_id: viejo.id, fecha: nuevo.fecha_inicio,
+    descripcion: 'Refundido en el crédito ' + (nuevo.codigo || ('#' + nuevo.id)),
+    monto_cuota: traslado, saldo_despues: 0, no_efectivo: true, refunde_a: nuevo.id
+  });
+  cargosDe(viejo).forEach(function (c) {
+    if (!c.pagado) { c.pagado = true; c.descripcion = (c.descripcion || 'Interés') + ' (refundido)'; marcar(c); }
+  });
+  viejo.saldo = 0;
+  viejo.estado = 'pagado';
+  viejo.cuotas_canceladas = viejo.num_cuotas;
+  viejo.proximo_pago = null;
+  viejo.refundido_en = nuevo.id;
+  marcar(viejo);
+}
 
 function abrirCargo(id) {
   const p = prestamos.find(x => x.id === id);
@@ -2383,7 +2992,19 @@ function eliminarPago(pid, pagoId) {
 }
 
 function eliminar(id) {
-  if (!confirm('¿Eliminar este crédito y todos sus pagos?')) return;
+  const cr = creditoPorId(id);
+  let aviso = '¿Eliminar este crédito y todos sus pagos?';
+  if (cr && montoRefundido(cr) > 0) {
+    const vs = refundeIds(cr).map(creditoPorId).filter(Boolean);
+    const cods = vs.map(v => v.codigo || ('#' + v.id)).join(', ');
+    aviso += '\n\nOJO: este crédito refundió ' + (vs.length ? (vs.length === 1 ? 'al ' : 'a los créditos ') + cods : 'otros créditos') +
+             '. Si lo borrás, ' + (vs.length === 1 ? 'ese crédito viejo queda cerrado igual' : 'esos créditos quedan cerrados igual') +
+             ' y vas a tener que reabrirlos a mano.';
+  }
+  if (cr && cr.refundido_en) {
+    aviso += '\n\nOJO: este crédito ya se refundió en otro. Si lo borrás, se pierde el rastro de esa refundición.';
+  }
+  if (!confirm(aviso)) return;
   prestamos = prestamos.filter(x => x.id !== id);
   delete pagos[id];
   enterrar('prestamos', String(id));
@@ -2415,6 +3036,17 @@ function abrirEditar(id) {
   document.getElementById('eNotas').value      = p.notas || '';
   document.getElementById('eCuota').value      = p.cuota;
   document.getElementById('ePrev').style.display = 'none';
+  const nota = document.getElementById('eNotaPlan');
+  if (esPlanInteres(p)) {
+    const nInt = pagosDeInteres(p);
+    nota.innerHTML = `📅 Este crédito es de <b>solo intereses + capital al final</b>: ${nInt} pago${nInt === 1 ? '' : 's'} de
+      <b>${fmt(cuotaInteresDe(p))}</b> y el capital de <b>${fmt(capitalFinalDe(p))}</b> al vencimiento.
+      El campo <b>Cuota</b> es el interés de cada pago y <b>N° de cuotas</b> incluye el pago del capital (${p.num_cuotas}).`;
+    nota.style.display = 'block';
+  } else {
+    nota.style.display = 'none';
+    nota.innerHTML = '';
+  }
   document.getElementById('ovEditar').dataset.id = id;
   prevEditar();
   document.getElementById('ovEditar').classList.add('open');
@@ -2450,6 +3082,11 @@ function guardarEdicion() {
   p.total             = total;
   const cuotaManual   = parseFloat(document.getElementById('eCuota').value);
   p.cuota             = cuotaManual > 0 ? cuotaManual : Math.round(total / num);
+  if (esPlanInteres(p)) {                       // en este plan la cuota es el interés de cada pago
+    p.cuota_interes = cuotaManual > 0 ? cuotaManual : cuotaInteresDe(p);
+    p.cuota         = p.cuota_interes;
+    p.cuota_final   = mnt;
+  }
   p.num_cuotas        = num;
   p.cuotas_canceladas = parseInt(document.getElementById('eCanceladas').value) || 0;
   p.saldo             = parseFloat(document.getElementById('eSaldo').value) || 0;
@@ -2690,6 +3327,355 @@ function escTxt(s) {
   return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 }
 
+// ══════════════════════════════════════════════════════════════════════
+// ── CLIENTES: filtro por persona y cuánto debe cada quien ──
+// ══════════════════════════════════════════════════════════════════════
+// "Lo que debe" una persona = el saldo de sus créditos activos + los
+// intereses por posponer cuota que todavía no ha pagado. Los créditos ya
+// pagados no suman deuda (sí suman en "total prestado" y "ya pagó").
+
+var cliTexto = '';        // lo que está escrito en el buscador
+var cliExacto = '';       // cliente elegido de la lista (clave normalizada)
+var deuSolo = true;       // en la tarjeta: mostrar solo los que deben
+var deuOrden = 'debe';    // debe | nombre | prox
+
+// Compara nombres sin tildes, sin mayúsculas y sin espacios de más,
+// para que "José  Pérez" y "jose perez" sean la misma persona.
+function normNombre(s) {
+  return String(s == null ? '' : s)
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/\s+/g, ' ').trim();
+}
+function claveCliente(p) { return normNombre(p && p.cliente) || '(sin nombre)'; }
+
+// Junta todos los créditos de cada persona en una sola ficha
+function resumenClientes() {
+  var m = {};
+  var hoyStr = ymdLocal(new Date());
+  prestamos.forEach(function (p) {
+    var k = claveCliente(p);
+    if (!m[k]) m[k] = {
+      clave: k, nombre: ((p.cliente || '').trim() || '(sin nombre)'),
+      activos: 0, pagados: 0, prestado: 0, aCobrar: 0,
+      saldo: 0, intPend: 0, debe: 0, pagado: 0, nPagos: 0,
+      refundido: 0, refundidas: 0, entregado: 0,
+      codigos: [], proxima: null, vencidos: 0, ultimoPago: null
+    };
+    var c = m[k];
+    if (p.estado === 'activo') {
+      c.activos++;
+      c.saldo += Number(p.saldo) || 0;
+      c.intPend += cargosPendientes(p);
+      if (p.vencimiento && p.vencimiento < hoyStr) c.vencidos++;
+      var prox = proxPagoDe(p);
+      if (prox && (!c.proxima || prox < c.proxima)) c.proxima = prox;
+    } else {
+      c.pagados++;
+    }
+    c.prestado  += Number(p.monto) || 0;
+    c.aCobrar   += Number(p.total) || 0;
+    c.entregado += efectivoEntregado(p);
+    c.refundido += montoRefundido(p);
+    if (montoRefundido(p) > 0) c.refundidas++;
+    if (p.codigo && c.codigos.indexOf(p.codigo) < 0) c.codigos.push(p.codigo);
+    (pagos[p.id] || []).forEach(function (g) {
+      if (!esEfectivo(g)) return;                    // un traslado no es plata que pagó
+      c.pagado += Number(g.monto_cuota) || 0;
+      c.nPagos++;
+      if (g.fecha && (!c.ultimoPago || g.fecha > c.ultimoPago)) c.ultimoPago = g.fecha;
+    });
+  });
+  Object.keys(m).forEach(function (k) { m[k].debe = m[k].saldo + m[k].intPend; });
+  return m;
+}
+function listaClientes() {
+  var m = resumenClientes();
+  return Object.keys(m).map(function (k) { return m[k]; });
+}
+// Suma varias fichas en una sola (para cuando el texto coincide con varios)
+function sumarClientes(sel) {
+  var t = { nombre: '', activos: 0, pagados: 0, prestado: 0, aCobrar: 0, saldo: 0,
+            intPend: 0, debe: 0, pagado: 0, nPagos: 0, refundido: 0, refundidas: 0,
+            entregado: 0, codigos: [], proxima: null, vencidos: 0, ultimoPago: null };
+  sel.forEach(function (c) {
+    ['activos','pagados','prestado','aCobrar','saldo','intPend','debe','pagado','nPagos',
+     'refundido','refundidas','entregado','vencidos']
+      .forEach(function (f) { t[f] += c[f]; });
+    c.codigos.forEach(function (x) { if (t.codigos.indexOf(x) < 0) t.codigos.push(x); });
+    if (c.proxima && (!t.proxima || c.proxima < t.proxima)) t.proxima = c.proxima;
+    if (c.ultimoPago && (!t.ultimoPago || c.ultimoPago > t.ultimoPago)) t.ultimoPago = c.ultimoPago;
+  });
+  return t;
+}
+
+// Claves de cliente que pasan el filtro: null = sin filtro, [] = no coincide nadie
+function clavesFiltradas() {
+  if (cliExacto) return [cliExacto];
+  var t = normNombre(cliTexto);
+  if (!t) return null;
+  return Object.keys(resumenClientes()).filter(function (k) { return k.indexOf(t) >= 0; });
+}
+function hayFiltroCliente() { return !!(cliExacto || normNombre(cliTexto)); }
+
+// ── Buscador ──
+function abrirSugerencias(abrir) {
+  var box = document.getElementById('cliSug');
+  if (!box) return;
+  if (abrir) renderSugerencias();
+  box.classList.toggle('open', !!abrir);
+}
+function cliInput() {
+  var i = document.getElementById('cliBuscar');
+  cliTexto = i ? i.value : '';
+  cliExacto = '';
+  abrirSugerencias(true);
+  render();
+}
+function cliTecla(e) {
+  if (e.key === 'Escape') { limpiarCliente(); return; }
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    var b = document.querySelector('#cliSug button[data-k]');
+    if (b) elegirCliente(b.dataset.k, b.dataset.n);
+  }
+}
+function elegirCliente(clave, nombre) {
+  cliExacto = clave;
+  cliTexto = nombre;
+  var i = document.getElementById('cliBuscar');
+  if (i) i.value = nombre;
+  abrirSugerencias(false);
+  cerrarDetalle();
+  render();
+}
+function limpiarCliente() {
+  cliExacto = ''; cliTexto = '';
+  var i = document.getElementById('cliBuscar');
+  if (i) i.value = '';
+  abrirSugerencias(false);
+  render();
+}
+// Desde la tarjeta de deuda: filtra la tabla por esa persona y sube a verla
+function filtrarPorCliente(clave) {
+  var c = resumenClientes()[clave];
+  if (!c) return;
+  elegirCliente(c.clave, c.nombre);
+  var card = document.getElementById('cliFicha');
+  if (card && card.scrollIntoView) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function verTodosDelCliente() {
+  var f = document.getElementById('filtro');
+  if (f) f.value = '';
+  render();
+}
+
+function renderSugerencias() {
+  var box = document.getElementById('cliSug');
+  if (!box) return;
+  var t = cliExacto ? '' : normNombre(cliTexto);
+  var lista = listaClientes();
+  if (t) lista = lista.filter(function (c) { return c.clave.indexOf(t) >= 0; });
+  lista.sort(function (a, b) { return (b.debe - a.debe) || a.nombre.localeCompare(b.nombre); });
+  if (!lista.length) {
+    box.innerHTML = '<div class="vacio">' +
+      (listaClientes().length ? 'Ningún cliente con ese nombre.' : 'Todavía no hay clientes registrados.') +
+      '</div>';
+    return;
+  }
+  box.innerHTML = lista.slice(0, 60).map(function (c) {
+    var sub = c.activos ? c.activos + (c.activos === 1 ? ' crédito activo' : ' créditos activos') : 'sin créditos activos';
+    if (c.vencidos) sub += ' · ' + c.vencidos + ' vencido' + (c.vencidos === 1 ? '' : 's');
+    return '<button type="button" data-k="' + escTxt(c.clave) + '" data-n="' + escTxt(c.nombre) + '">' +
+      '<span class="col"><span class="sn">' + escTxt(c.nombre) + '</span>' +
+      '<span class="ss">' + escTxt(sub) + '</span></span>' +
+      '<span class="sm ' + (c.debe > 0 ? '' : 'cero') + '">' + (c.debe > 0 ? fmt(c.debe) : 'al día') + '</span>' +
+      '</button>';
+  }).join('');
+}
+
+// ── Ficha de la persona filtrada, arriba de la tabla ──
+function renderFichaCliente() {
+  var box = document.getElementById('cliFicha');
+  if (!box) return;
+  var ks = clavesFiltradas();
+  if (!ks || !ks.length) { box.classList.remove('open'); box.innerHTML = ''; return; }
+  var todos = resumenClientes();
+  var sel = ks.map(function (k) { return todos[k]; }).filter(Boolean);
+  if (!sel.length) { box.classList.remove('open'); box.innerHTML = ''; return; }
+
+  var c = sel.length === 1 ? sel[0] : sumarClientes(sel);
+  var titulo = sel.length === 1 ? sel[0].nombre : sel.length + ' clientes coinciden con «' + cliTexto.trim() + '»';
+  var partes = [];
+  partes.push(c.activos + (c.activos === 1 ? ' crédito activo' : ' créditos activos'));
+  if (c.pagados) partes.push(c.pagados + (c.pagados === 1 ? ' pagado' : ' pagados'));
+  if (c.vencidos) partes.push('<span class="alerta">' + c.vencidos + ' vencido' + (c.vencidos === 1 ? '' : 's') + '</span>');
+  if (c.refundidas) partes.push('<span style="color:var(--yellow);font-weight:700">' + c.refundidas +
+    (c.refundidas === 1 ? ' refundición' : ' refundiciones') + '</span>');
+  if (sel.length === 1 && c.codigos.length) partes.push('código ' + escTxt(c.codigos.join(', ')));
+
+  var hoyStr = ymdLocal(new Date());
+  var proxTxt = c.proxima ? fd(c.proxima) : '—';
+  var proxSub = !c.proxima ? 'sin fecha registrada'
+    : (c.proxima <= hoyStr ? '<span class="alerta">⚠ toca cobrar</span>' : 'próxima cuota');
+  var f = document.getElementById('filtro');
+  var filtroEstado = f ? f.value : '';
+
+  box.innerHTML =
+    '<div class="cf-top">' +
+      '<div><div class="cf-nom">' + escTxt(titulo) + '</div>' +
+      '<div class="cf-sub">' + partes.join(' · ') + '</div></div>' +
+      '<div class="cf-acc">' +
+        (filtroEstado ? '<button class="btn btn-sm" onclick="verTodosDelCliente()">Ver todos sus créditos</button>' : '') +
+        '<button class="btn btn-sm" onclick="limpiarCliente()">Quitar filtro</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="cf-grid">' +
+      '<div class="cf-box ' + (c.debe > 0 ? 'debe' : 'ok') + '">' +
+        '<div class="l">Debe ahora</div><div class="v">' + fmt(c.debe) + '</div>' +
+        '<div class="s">' + (c.debe > 0
+          ? 'saldo ' + fmt(c.saldo) + (c.intPend > 0 ? ' + interés ' + fmt(c.intPend) : '')
+          : 'está al día') + '</div>' +
+      '</div>' +
+      '<div class="cf-box"><div class="l">Saldo de créditos</div><div class="v">' + fmt(c.saldo) + '</div>' +
+        '<div class="s">de ' + fmt(c.aCobrar) + ' a cobrar</div></div>' +
+      '<div class="cf-box amar"><div class="l">Interés por posponer</div><div class="v">' + fmt(c.intPend) + '</div>' +
+        '<div class="s">' + (c.intPend > 0 ? 'sin pagar' : 'nada pendiente') + '</div></div>' +
+      '<div class="cf-box green"><div class="l">Ya pagó</div><div class="v">' + fmt(c.pagado) + '</div>' +
+        '<div class="s">' + c.nPagos + (c.nPagos === 1 ? ' pago' : ' pagos') +
+        (c.ultimoPago ? ' · último ' + fd(c.ultimoPago) : '') + '</div></div>' +
+      '<div class="cf-box"><div class="l">Total prestado</div><div class="v">' + fmt(c.prestado) + '</div>' +
+        '<div class="s">en ' + (c.activos + c.pagados) + (c.activos + c.pagados === 1 ? ' crédito' : ' créditos') +
+        (c.refundido > 0 ? '<br>efectivo entregado ' + fmt(c.entregado) + ' · ' + fmt(c.refundido) + ' refundidos' : '') +
+        '</div></div>' +
+      '<div class="cf-box"><div class="l">Próximo pago</div><div class="v" style="font-size:.95rem">' + proxTxt + '</div>' +
+        '<div class="s">' + proxSub + '</div></div>' +
+    '</div>';
+  box.classList.add('open');
+}
+
+// ── Tarjeta: cuánto debe cada cliente ──
+function toggleDeuda() {
+  document.getElementById('deuHdr').classList.toggle('open');
+  document.getElementById('deuBody').classList.toggle('open');
+}
+function deuVer(solo) { deuSolo = solo; renderDeuda(); }
+function deuOrdenar(o) { deuOrden = o; renderDeuda(); }
+
+function renderDeuda() {
+  var cont = document.getElementById('deuBody');
+  var res  = document.getElementById('deuHdrResumen');
+  if (!cont) return;
+  var todos = listaClientes();
+  var conDeuda = todos.filter(function (c) { return c.debe > 0; });
+  var totalDebe = conDeuda.reduce(function (a, c) { return a + c.debe; }, 0);
+  var totalInt  = conDeuda.reduce(function (a, c) { return a + c.intPend; }, 0);
+  var atrasados = conDeuda.filter(function (c) { return c.vencidos > 0; });
+  var atrasadoMonto = atrasados.reduce(function (a, c) { return a + c.debe; }, 0);
+
+  if (res) res.textContent = conDeuda.length
+    ? conDeuda.length + (conDeuda.length === 1 ? ' cliente debe ' : ' clientes deben ') + fmt(totalDebe)
+    : 'Nadie tiene saldo pendiente';
+
+  if (!todos.length) {
+    cont.innerHTML = '<div class="pag-vacio">Todavía no hay clientes registrados.<br>Agregá un crédito con <strong>Nuevo Crédito</strong>.</div>';
+    return;
+  }
+
+  var lista = (deuSolo ? conDeuda : todos).slice();
+  lista.sort(function (a, b) {
+    if (deuOrden === 'nombre') return a.nombre.localeCompare(b.nombre);
+    if (deuOrden === 'prox') {
+      if (!a.proxima && !b.proxima) return b.debe - a.debe;
+      if (!a.proxima) return 1;
+      if (!b.proxima) return -1;
+      if (a.proxima !== b.proxima) return a.proxima < b.proxima ? -1 : 1;
+      return b.debe - a.debe;
+    }
+    return (b.debe - a.debe) || a.nombre.localeCompare(b.nombre);
+  });
+
+  var prom = conDeuda.length ? totalDebe / conDeuda.length : 0;
+  var hoyStr = ymdLocal(new Date());
+
+  var html =
+    '<div class="pag-stats">' +
+      '<div class="pag-stat red"><div class="l">Total por cobrar</div><div class="v">' + fmt(totalDebe) + '</div>' +
+        '<div class="s">' + conDeuda.length + (conDeuda.length === 1 ? ' cliente debe' : ' clientes deben') +
+        (totalInt > 0 ? ' · incluye ' + fmt(totalInt) + ' de intereses por posponer' : '') + '</div></div>' +
+      '<div class="pag-stat"><div class="l">Deuda promedio</div><div class="v">' + fmt(prom) + '</div>' +
+        '<div class="s">por cliente con saldo</div></div>' +
+      '<div class="pag-stat ' + (atrasados.length ? 'red' : 'green') + '"><div class="l">Con atrasos</div><div class="v">' +
+        atrasados.length + '</div><div class="s">' +
+        (atrasados.length ? fmt(atrasadoMonto) + ' en clientes con créditos vencidos' : 'ningún crédito vencido') +
+        '</div></div>' +
+    '</div>' +
+    '<div class="deu-tools">' +
+      '<button type="button" class="rng-tab ' + (deuSolo ? 'active' : '') + '" onclick="deuVer(true)">Solo los que deben</button>' +
+      '<button type="button" class="rng-tab ' + (!deuSolo ? 'active' : '') + '" onclick="deuVer(false)">Todos los clientes</button>' +
+      '<span style="width:10px"></span>' +
+      '<button type="button" class="rng-tab ' + (deuOrden === 'debe' ? 'active' : '') + '" onclick="deuOrdenar(\'debe\')">Por monto</button>' +
+      '<button type="button" class="rng-tab ' + (deuOrden === 'nombre' ? 'active' : '') + '" onclick="deuOrdenar(\'nombre\')">Por nombre</button>' +
+      '<button type="button" class="rng-tab ' + (deuOrden === 'prox' ? 'active' : '') + '" onclick="deuOrdenar(\'prox\')">Por próximo pago</button>' +
+      '<div class="der"><button type="button" class="btn btn-sm" onclick="exportarDeudaExcel()">Excel por cliente</button></div>' +
+    '</div>';
+
+  if (!lista.length) {
+    html += '<div class="pag-vacio">Ningún cliente tiene saldo pendiente. 🎉<br>Tocá <strong>Todos los clientes</strong> para ver el historial.</div>';
+    cont.innerHTML = html;
+    return;
+  }
+
+  html += '<div class="deu-tbl"><table><thead><tr>' +
+    '<th>Cliente</th><th>Créditos</th><th class="num col-menos">Saldo</th><th class="num">Debe</th>' +
+    '<th>Próximo pago</th><th class="num col-menos">Ya pagó</th>' +
+    '</tr></thead><tbody>' +
+    lista.map(function (c) {
+      var vence = c.proxima && c.proxima <= hoyStr;
+      return '<tr class="datarow" data-k="' + escTxt(c.clave) + '">' +
+        '<td class="cliente-cell">' + escTxt(c.nombre) +
+          (c.codigos.length ? '<span class="cod">' + escTxt(c.codigos.join(', ')) + '</span>' : '') + '</td>' +
+        '<td style="font-size:.76rem">' + c.activos + (c.activos === 1 ? ' activo' : ' activos') +
+          (c.pagados ? '<div class="ult-pago">' + c.pagados + ' pagado' + (c.pagados === 1 ? '' : 's') + '</div>' : '') +
+          (c.vencidos ? '<div class="tag-venc">⚠ ' + c.vencidos + ' VENCIDO' + (c.vencidos === 1 ? '' : 'S') + '</div>' : '') +
+          (c.refundidas ? '<div class="ref-tag">🔁 ' + c.refundidas + (c.refundidas === 1 ? ' refundición' : ' refundiciones') + '</div>' : '') + '</td>' +
+        '<td class="num col-menos">' + fmt(c.saldo) + '</td>' +
+        '<td class="num"><span class="deu-debe ' + (c.debe > 0 ? '' : 'cero') + '">' + fmt(c.debe) + '</span>' +
+          (c.intPend > 0 ? '<div class="deu-int">+ ' + fmt(c.intPend) + ' interés</div>' : '') + '</td>' +
+        '<td style="font-size:.76rem">' + (c.proxima ? fd(c.proxima) : '—') +
+          (vence ? '<br><span class="tag-venc">⚠ COBRAR</span>' : '') + '</td>' +
+        '<td class="num col-menos" style="color:var(--green)">' + fmt(c.pagado) + '</td>' +
+      '</tr>';
+    }).join('') +
+    '</tbody></table></div>';
+
+  cont.innerHTML = html;
+}
+
+// Excel con la deuda de cada cliente
+function exportarDeudaExcel() {
+  var lista = listaClientes().sort(function (a, b) { return (b.debe - a.debe) || a.nombre.localeCompare(b.nombre); });
+  if (!lista.length) { toast('No hay clientes para exportar', false); return; }
+  var sum = function (f) { return lista.reduce(function (a, c) { return a + c[f]; }, 0); };
+  var filas = [['Cliente', 'Créditos activos', 'Créditos pagados', 'Saldo', 'Interés por posponer',
+                'DEBE HOY', 'Próximo pago', 'Créditos vencidos', 'Total prestado', 'Efectivo entregado',
+                'Refundido', 'Refundiciones', 'Total pagado', 'Códigos']];
+  lista.forEach(function (c) {
+    filas.push([c.nombre, c.activos, c.pagados, c.saldo, c.intPend, c.debe,
+                c.proxima || '', c.vencidos, c.prestado, c.entregado, c.refundido, c.refundidas,
+                c.pagado, c.codigos.join(', ')]);
+  });
+  filas.push([]);
+  filas.push(['TOTAL (' + lista.filter(function (c) { return c.debe > 0; }).length + ' con deuda)', '', '',
+              sum('saldo'), sum('intPend'), sum('debe'), '', sum('vencidos'), sum('prestado'),
+              sum('entregado'), sum('refundido'), sum('refundidas'), sum('pagado'), '']);
+  var ws = XLSX.utils.aoa_to_sheet(filas);
+  ws['!cols'] = [22, 10, 10, 14, 14, 15, 13, 10, 14, 15, 14, 12, 14, 16].map(function (w) { return { wch: w }; });
+  var wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Deuda por cliente');
+  XLSX.writeFile(wb, 'deuda_por_cliente_' + today() + '.xlsx');
+  toast('Excel por cliente exportado ✓');
+}
+
 function renderPagos() {
   const tabs = document.getElementById('rngTabs');
   if (!tabs) return;
@@ -2698,9 +3684,12 @@ function renderPagos() {
   });
 
   const lista = pagosDelRango();
-  const total = lista.reduce((a, x) => a + (Number(x.g.monto_cuota) || 0), 0);
+  const efec  = lista.filter(x => esEfectivo(x.g));            // plata que entró de verdad
+  const traslados = lista.filter(x => !esEfectivo(x.g));       // refundiciones: no entró nada
+  const total = efec.reduce((a, x) => a + (Number(x.g.monto_cuota) || 0), 0);
+  const totalTras = traslados.reduce((a, x) => a + (Number(x.g.monto_cuota) || 0), 0);
   const clientes = {};
-  lista.forEach(x => {
+  efec.forEach(x => {
     const k = x.p.cliente || '—';
     if (!clientes[k]) clientes[k] = { n: 0, monto: 0, codigos: {} };
     clientes[k].n++;
@@ -2708,20 +3697,23 @@ function renderPagos() {
     if (x.p.codigo) clientes[k].codigos[x.p.codigo] = 1;
   });
   const nClientes = Object.keys(clientes).length;
-  const prom = lista.length ? total / lista.length : 0;
+  const prom = efec.length ? total / efec.length : 0;
 
   const desem = desembolsosDelRango();
-  const totalDes = desem.reduce((a, p) => a + (Number(p.monto) || 0), 0);
+  const totalDes = desem.reduce((a, p) => a + efectivoEntregado(p), 0);
+  const refDes   = desem.reduce((a, p) => a + montoRefundido(p), 0);
   const balance = total - totalDes;
 
   document.getElementById('pagStats').innerHTML = `
     <div class="pag-stat green">
       <div class="l">Recaudado (entró)</div><div class="v">${fmt(total)}</div>
-      <div class="s">${lista.length} ${lista.length === 1 ? 'pago' : 'pagos'} de ${nClientes} ${nClientes === 1 ? 'cliente' : 'clientes'}${lista.length ? ' · promedio ' + fmt(prom) : ''}</div>
+      <div class="s">${efec.length} ${efec.length === 1 ? 'pago' : 'pagos'} de ${nClientes} ${nClientes === 1 ? 'cliente' : 'clientes'}${efec.length ? ' · promedio ' + fmt(prom) : ''}</div>
+      ${totalTras > 0 ? `<div class="s" style="color:var(--yellow)">+ ${fmt(totalTras)} refundidos — no entró efectivo</div>` : ''}
     </div>
     <div class="pag-stat red">
       <div class="l">Desembolsado (salió)</div><div class="v">${fmt(totalDes)}</div>
       <div class="s">${desem.length} ${desem.length === 1 ? 'crédito nuevo' : 'créditos nuevos'}</div>
+      ${refDes > 0 ? `<div class="s" style="color:var(--yellow)">+ ${fmt(refDes)} refundidos — no salió efectivo</div>` : ''}
     </div>
     <div class="pag-stat ${balance >= 0 ? 'green' : 'red'}">
       <div class="l">Balance del período</div><div class="v">${(balance > 0 ? '+' : balance < 0 ? '−' : '') + fmt(Math.abs(balance))}</div>
@@ -2730,7 +3722,7 @@ function renderPagos() {
 
   document.getElementById('pagPeriodo').textContent = 'Período: ' + textoPeriodo();
   document.getElementById('pagosHdrResumen').textContent =
-    lista.length + (lista.length === 1 ? ' pago · ' : ' pagos · ') + fmt(total) +
+    efec.length + (efec.length === 1 ? ' pago · ' : ' pagos · ') + fmt(total) +
     ' · desembolsado ' + fmt(totalDes);
 
   renderDesembolsos(desem, totalDes);
@@ -2770,7 +3762,9 @@ function renderPagos() {
               <td style="font-size:.78rem;white-space:nowrap">${fd(x.g.fecha)}</td>
               <td class="cliente-cell">${escTxt(x.p.cliente)}<span class="cod">${escTxt(x.p.codigo || '')}</span></td>
               <td style="font-size:.78rem">${escTxt(x.g.descripcion || 'Pago')}</td>
-              <td class="num"><strong style="color:var(--green)">${fmt(x.g.monto_cuota)}</strong></td>
+              <td class="num">${esEfectivo(x.g)
+                ? `<strong style="color:var(--green)">${fmt(x.g.monto_cuota)}</strong>`
+                : `<strong style="color:var(--muted-2)">${fmt(x.g.monto_cuota)}</strong><div class="ref-tag">🔁 no entró</div>`}</td>
               <td class="num">${fmt(x.g.saldo_despues)}</td>
             </tr>`).join('')}
         </tbody>
@@ -2788,7 +3782,7 @@ function renderDesembolsos(desem, totalDes) {
     return;
   }
   cont.innerHTML = `
-    <div class="sec-title">Créditos entregados en el período · ${desem.length} por ${fmt(totalDes)}</div>
+    <div class="sec-title">Créditos entregados en el período · ${desem.length} por ${fmt(totalDes)} en efectivo</div>
     <div class="pag-tbl">
       <table>
         <thead><tr>
@@ -2800,7 +3794,8 @@ function renderDesembolsos(desem, totalDes) {
             <tr class="datarow" onclick="verDetalle(${p.id})">
               <td style="font-size:.78rem;white-space:nowrap">${fd(p.fecha_inicio)}</td>
               <td class="cliente-cell">${escTxt(p.cliente)}<span class="cod">${escTxt(p.codigo || '')}</span></td>
-              <td class="num"><strong>${fmt(p.monto)}</strong></td>
+              <td class="num"><strong>${fmt(p.monto)}</strong>${montoRefundido(p) > 0
+                ? `<div class="ref-tag">🔁 ${fmt(montoRefundido(p))} refundidos</div><div class="ult-pago">efectivo ${fmt(efectivoEntregado(p))}</div>` : ''}</td>
               <td class="num">${fmt(p.total)}<div class="cargo-tag" style="color:var(--muted)">+ ${fmt((Number(p.total) || 0) - (Number(p.monto) || 0))} interés</div></td>
               <td class="num">${fmt(p.saldo)}</td>
               <td><span class="badge badge-${p.estado}">${p.estado}</span></td>
@@ -2816,45 +3811,54 @@ function exportarPagosExcel() {
   const desem = desembolsosDelRango();
   if (!lista.length && !desem.length) { toast('No hay movimientos en ese período', false); return; }
   const r = rangoActual();
-  const total = lista.reduce((a, x) => a + (Number(x.g.monto_cuota) || 0), 0);
-  const totalDes = desem.reduce((a, p) => a + (Number(p.monto) || 0), 0);
+  const efec = lista.filter(x => esEfectivo(x.g));
+  const total = efec.reduce((a, x) => a + (Number(x.g.monto_cuota) || 0), 0);
+  const totalTras = lista.reduce((a, x) => a + (esEfectivo(x.g) ? 0 : (Number(x.g.monto_cuota) || 0)), 0);
+  const totalDes = desem.reduce((a, p) => a + efectivoEntregado(p), 0);
+  const refDes = desem.reduce((a, p) => a + montoRefundido(p), 0);
 
-  const filas = [['Fecha', 'Cliente', 'Código', 'Concepto', 'Monto Pagado', 'Saldo Después']];
+  const filas = [['Fecha', 'Cliente', 'Código', 'Concepto', 'Tipo', 'Monto Pagado', 'Saldo Después']];
   lista.slice().reverse().forEach(x => {
     filas.push([x.g.fecha, x.p.cliente, x.p.codigo || '', x.g.descripcion || 'Pago',
+                esEfectivo(x.g) ? 'Efectivo' : 'Refundición (no entró)',
                 x.g.monto_cuota, x.g.saldo_despues]);
   });
   filas.push([]);
-  filas.push(['', '', '', 'TOTAL (' + lista.length + ' pagos)', total, '']);
+  filas.push(['', '', '', 'TOTAL EN EFECTIVO (' + efec.length + ' pagos)', '', total, '']);
+  if (totalTras > 0) filas.push(['', '', '', 'Refundido (no entró efectivo)', '', totalTras, '']);
 
   const ws = XLSX.utils.aoa_to_sheet(filas);
-  ws['!cols'] = [13, 16, 9, 26, 14, 14].map(w => ({ wch: w }));
+  ws['!cols'] = [13, 16, 9, 26, 20, 14, 14].map(w => ({ wch: w }));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Pagos');
 
-  const filasDes = [['Fecha', 'Cliente', 'Código', 'Prestado', 'A Cobrar', 'Interés', 'Cuotas', 'Saldo Hoy', 'Estado']];
+  const filasDes = [['Fecha', 'Cliente', 'Código', 'Prestado', 'Refundido', 'Efectivo entregado',
+                     'A Cobrar', 'Interés', 'Cuotas', 'Saldo Hoy', 'Estado']];
   desem.slice().reverse().forEach(p => {
-    filasDes.push([p.fecha_inicio, p.cliente, p.codigo || '', p.monto, p.total,
+    filasDes.push([p.fecha_inicio, p.cliente, p.codigo || '', p.monto, montoRefundido(p),
+                   efectivoEntregado(p), p.total,
                    (Number(p.total) || 0) - (Number(p.monto) || 0), p.num_cuotas, p.saldo,
                    (p.estado || '').toUpperCase()]);
   });
   filasDes.push([]);
-  filasDes.push(['', '', 'TOTAL (' + desem.length + ' créditos)', totalDes, '', '', '', '', '']);
+  filasDes.push(['', '', 'TOTAL (' + desem.length + ' créditos)', totalDes + refDes, refDes, totalDes, '', '', '', '', '']);
   const wsDes = XLSX.utils.aoa_to_sheet(filasDes);
-  wsDes['!cols'] = [13, 16, 9, 14, 14, 12, 9, 13, 11].map(w => ({ wch: w }));
+  wsDes['!cols'] = [13, 16, 9, 14, 14, 17, 14, 12, 9, 13, 11].map(w => ({ wch: w }));
   XLSX.utils.book_append_sheet(wb, wsDes, 'Desembolsos');
 
   const porCli = {};
-  lista.forEach(x => {
+  efec.forEach(x => {
     const k = x.p.cliente || '—';
     if (!porCli[k]) porCli[k] = { n: 0, monto: 0 };
     porCli[k].n++; porCli[k].monto += Number(x.g.monto_cuota) || 0;
   });
   const res = [['MOVIMIENTOS DEL PERÍODO'], ['Período', textoPeriodo()], [],
-               ['Cantidad de pagos', lista.length], ['Total recaudado (entró)', total],
-               ['Promedio por pago', lista.length ? Math.round(total / lista.length) : 0],
-               ['Clientes que pagaron', Object.keys(porCli).length], [],
+               ['Cantidad de pagos', efec.length], ['Total recaudado (entró)', total],
+               ['Promedio por pago', efec.length ? Math.round(total / efec.length) : 0],
+               ['Clientes que pagaron', Object.keys(porCli).length],
+               ['Refundido (no entró efectivo)', totalTras], [],
                ['Créditos entregados', desem.length], ['Total desembolsado (salió)', totalDes],
+               ['Refundido en créditos nuevos (no salió)', refDes],
                ['Balance del período', total - totalDes], [],
                ['Cliente', 'N° de pagos', 'Monto']];
   Object.entries(porCli).sort((a, b) => b[1].monto - a[1].monto)
@@ -2871,6 +3875,24 @@ function exportarPagosExcel() {
 // Iniciar
 fijarRango('mes', true);
 render();
+
+// Un solo escuchador para la lista de sugerencias y para las filas de la tarjeta
+// de deuda (el contenido se vuelve a dibujar, los contenedores no).
+(function () {
+  var sug = document.getElementById('cliSug');
+  if (sug) sug.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('button[data-k]') : null;
+    if (b) elegirCliente(b.getAttribute('data-k'), b.getAttribute('data-n'));
+  });
+  var deu = document.getElementById('deuBody');
+  if (deu) deu.addEventListener('click', function (e) {
+    var tr = e.target.closest ? e.target.closest('tr[data-k]') : null;
+    if (tr) filtrarPorCliente(tr.getAttribute('data-k'));
+  });
+  document.addEventListener('click', function (e) {
+    if (!(e.target.closest && e.target.closest('.cli-buscar'))) abrirSugerencias(false);
+  });
+})();
 
 // ── Ver / ocultar el código en la pantalla de ingreso ──
 function verCodigo() {
