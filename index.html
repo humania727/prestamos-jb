@@ -291,6 +291,18 @@
   .pfecha { font-size: .7rem; color: var(--muted); margin-top: 1px; }
   .pmonto { font-size: .84rem; font-weight: 700; color: var(--green); font-family: var(--mono); }
   .psaldo { font-size: .68rem; color: var(--muted); text-align: right; font-family: var(--mono); }
+  .pparte { font-size: .66rem; margin-top: 2px; font-family: var(--mono); white-space: nowrap; }
+  .pparte .i { color: var(--yellow); }
+  .pparte .k { color: var(--accent-2); }
+  .pend .pparte { margin-top: 0; }
+  .rep-resumen {
+    display: flex; flex-wrap: wrap; gap: 8px 18px; padding: 10px 13px; margin-bottom: 8px;
+    background: var(--bg-soft); border: 1px solid var(--border); border-radius: 10px;
+  }
+  .rep-resumen div { font-size: .7rem; color: var(--muted); }
+  .rep-resumen strong { display: block; font-size: .92rem; font-variant-numeric: tabular-nums; margin-top: 2px; color: var(--text); }
+  .rep-resumen .i strong { color: var(--yellow); }
+  .rep-resumen .k strong { color: var(--accent-2); }
   .pend {
     padding: 9px 14px; border-radius: 10px; background: transparent;
     border: 1px dashed var(--border-2); font-size: .76rem; color: var(--muted-2);
@@ -588,7 +600,7 @@
     .cli-buscar input { width: 100%; }
     .cli-sug { width: 100%; max-width: none; }
     .cli-ficha .cf-acc { margin-left: 0; width: 100%; }
-    .deu-tbl .col-menos { display: none; }   /* en el celular manda lo que debe */
+    .deu-tbl .col-menos, .pag-tbl .col-menos { display: none; }   /* en el celular manda lo importante */
     .sel-bar { bottom: 10px; padding: 10px 13px; gap: 6px 14px; }
     .sel-bar .sb-nums { gap: 6px 14px; }
     .sel-bar .sb-i .v { font-size: .88rem; }
@@ -1080,6 +1092,23 @@
 </div>
 
 <!-- Modal Pago -->
+<div class="overlay" id="ovCobroCargo">
+  <div class="modal" style="max-width:440px">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Cobrar el interés
+    </h2>
+    <div class="fg">
+      <label class="s2">Fecha en que le pagaron <input type="date" id="kFec" required/></label>
+      <div class="s2 ref-prev" id="kPrev"></div>
+    </div>
+    <div class="fa">
+      <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarCobroCargo()">Registrar el cobro</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="ovPago">
   <div class="modal">
     <h2 id="pagoTit">Registrar Pago</h2>
@@ -1927,20 +1956,23 @@ function exportarExcel() {
   wsPrest['!cols'] = [14,8,13,13,12,12,16,12,12,12,10,14,12,10,28,12,13,20].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb, wsPrest, 'Préstamos');
 
-  const filaPagos = [['Cliente','Código','N° Pago','Fecha','Descripción','Tipo','Monto Pagado','Saldo Después']];
+  const filaPagos = [['Cliente','Código','N° Pago','Fecha','Descripción','Tipo','Monto Pagado','Interés','Capital','Saldo Después']];
   prestamos.forEach(p => {
     const ps = pagos[p.id] || [];
+    const rp = repartoDePagos(p);
     ps.forEach(pg => {
+      const r = rp[pg.id] || { interes: 0, capital: 0 };
       filaPagos.push([
         p.cliente, p.codigo,
         pg.id, pg.fecha, pg.descripcion,
         esEfectivo(pg) ? 'Efectivo' : 'Refundición (no entró)',
-        pg.monto_cuota, pg.saldo_despues
+        pg.monto_cuota, esEfectivo(pg) ? r.interes : '', esEfectivo(pg) ? r.capital : '',
+        pg.saldo_despues
       ]);
     });
   });
   const wsPagos = XLSX.utils.aoa_to_sheet(filaPagos);
-  wsPagos['!cols'] = [14,8,8,13,20,20,14,14].map(w=>({wch:w}));
+  wsPagos['!cols'] = [14,8,8,13,20,20,14,13,13,14].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb, wsPagos, 'Pagos');
 
   // ── Hoja: Intereses por posponer ──
@@ -2075,14 +2107,19 @@ function cobradoEsteMes() {
   const hoy = new Date();
   const ini = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth(), 1));
   const fin = ymdLocal(new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0));
-  let total = 0, n = 0;
+  let total = 0, n = 0, interes = 0;
   prestamos.forEach(p => {
+    const rep = repartoDePagos(p);
     (pagos[p.id] || []).forEach(g => {
       const f = g.fecha || '';
-      if (f >= ini && f <= fin && esEfectivo(g)) { total += Number(g.monto_cuota) || 0; n++; }
+      if (f >= ini && f <= fin && esEfectivo(g)) {
+        total += Number(g.monto_cuota) || 0;
+        interes += (rep[g.id] || { interes: 0 }).interes;
+        n++;
+      }
     });
   });
-  return { total, n, mes: hoy.toLocaleDateString('es-CR', { month: 'long' }) };
+  return { total, n, interes, mes: hoy.toLocaleDateString('es-CR', { month: 'long' }) };
 }
 
 // Plata que salió en el mes: créditos nuevos entregados en el mes en curso
@@ -2126,7 +2163,7 @@ function renderStats() {
       <div>
         <div class="lbl">Cobrado en ${mes.mes}</div>
         <div class="val">${fmt(mes.total)}</div>
-        <div class="sub">${mes.n} ${mes.n === 1 ? 'pago recibido' : 'pagos recibidos'}</div>
+        <div class="sub">${mes.n} ${mes.n === 1 ? 'pago recibido' : 'pagos recibidos'}${mes.total > 0 ? ` · <strong style="color:var(--yellow)">${fmt(mes.interes)}</strong> de ganancia` : ''}</div>
         <div class="sub out">Desembolsado: <strong>${fmt(des.total)}</strong> · ${des.n} ${des.n === 1 ? 'crédito' : 'créditos'}${des.ref > 0 ? ` · <strong>${fmt(des.ref)}</strong> refundidos` : ''}</div>
       </div>
     </div>
@@ -2230,7 +2267,7 @@ function proxPagoDe(p) {
 
 // ── Último pago registrado de un crédito ──
 function ultimoPago(id) {
-  const ps = pagos[id] || [];
+  const ps = (pagos[id] || []).filter(g => !esPagoDeCargo(g));
   if (!ps.length) return null;
   return ps.reduce((a, b) => (b.fecha > a.fecha ? b : a));
 }
@@ -2305,6 +2342,74 @@ function renderBarraSel() {
     '</div>' +
     '<div class="sb-acc"><button class="btn btn-sm" onclick="limpiarSeleccion()">Quitar marcas</button></div>';
   bar.classList.add('open');
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ── CUÁNTO DE CADA PAGO ES INTERÉS Y CUÁNTO ABONA AL CAPITAL ──
+// ══════════════════════════════════════════════════════════════════════
+// Los créditos son de interés fijo pactado (no de saldo insoluto), así que
+// cada cuota trae la misma tajada: interés = pago × (interés ÷ total).
+// Dos excepciones exactas, sin supuestos:
+//   · Plan "solo intereses": los primeros pagos son 100% interés hasta
+//     completar el interés pactado; de ahí en adelante todo es capital.
+//   · El cobro de un interés por posponer es 100% ganancia.
+
+function tasaParteInteres(p) {
+  var t = Number(p && p.total) || 0;
+  return t ? (Number(p.interes) || 0) / t : 0;
+}
+// Reparte todos los pagos de un crédito: { idPago: {interes, capital} }
+function repartoDePagos(p) {
+  var res = {};
+  if (!p) return res;
+  var todos = pagos[p.id] || [];
+  var cuotas = todos.filter(function (g) { return !esPagoDeCargo(g); })
+                    .slice().sort(function (a, b) {
+                      return (a.fecha || '').localeCompare(b.fecha || '') || (a.id || 0) - (b.id || 0);
+                    });
+  if (esPlanInteres(p)) {
+    var falta = Number(p.interes) || 0;          // primero se cubre el interés pactado
+    cuotas.forEach(function (g) {
+      var m = Number(g.monto_cuota) || 0;
+      var i = Math.min(m, Math.max(falta, 0));
+      falta -= i;
+      res[g.id] = { interes: i, capital: m - i };
+    });
+  } else {
+    var r = tasaParteInteres(p);
+    cuotas.forEach(function (g) {
+      var m = Number(g.monto_cuota) || 0;
+      var i = Math.round(m * r);
+      res[g.id] = { interes: i, capital: m - i };
+    });
+  }
+  todos.filter(esPagoDeCargo).forEach(function (g) {
+    res[g.id] = { interes: Number(g.monto_cuota) || 0, capital: 0 };   // interés puro
+  });
+  return res;
+}
+// Mapa de todos los créditos, para los reportes
+function mapaReparto() {
+  var m = {};
+  prestamos.forEach(function (p) {
+    var r = repartoDePagos(p);
+    Object.keys(r).forEach(function (k) { m[k] = r[k]; });
+  });
+  return m;
+}
+// Lo que traería la cuota n.º i si todavía no se ha pagado
+function repartoCuotaPendiente(p, i) {
+  if (esPlanInteres(p)) {
+    return i <= pagosDeInteres(p)
+      ? { interes: cuotaInteresDe(p), capital: 0 }
+      : { interes: 0, capital: capitalFinalDe(p) };
+  }
+  var c = Number(p.cuota) || 0;
+  var inte = Math.round(c * tasaParteInteres(p));
+  return { interes: inte, capital: c - inte };
+}
+function textoReparto(rp) {
+  return '<span class="i">Interés ' + fmt(rp.interes) + '</span> · <span class="k">Capital ' + fmt(rp.capital) + '</span>';
 }
 
 // ── Tabla ──
@@ -2384,7 +2489,7 @@ function verDetalle(id, scroll=true) {
   selId = id;
   const p = prestamos.find(x => x.id === id);
   if (!p) return;
-  const ps = pagos[id] || [];
+  const ps = (pagos[id] || []).filter(g => !esPagoDeCargo(g));   // las cuotas, sin los cobros de intereses
   const pct = Math.round((p.cuotas_canceladas / p.num_cuotas) * 100);
   const up  = ultimoPago(id);
   const prox = proxPagoDe(p);
@@ -2453,7 +2558,9 @@ function verDetalle(id, scroll=true) {
         <div class="pnum cargo-ico">%</div>
         <div style="flex:1">
           <div class="pdesc">${c.descripcion}</div>
-          <div class="pfecha">${fd(c.fecha)}${c.pagado ? ' · Cobrado' : ' · Pendiente'}</div>
+          <div class="pfecha">${fd(c.fecha)}${c.pagado
+            ? ' · Cobrado' + (c.fecha_cobro ? ' el ' + fd(c.fecha_cobro) : '')
+            : ' · Pendiente'}</div>
         </div>
         <div style="text-align:right;margin-right:8px">
           <div class="pmonto" style="color:${c.pagado ? 'var(--green)' : 'var(--yellow)'}">${fmt(c.monto)}</div>
@@ -2463,21 +2570,37 @@ function verDetalle(id, scroll=true) {
       </div>`;
     });
   }
-  html += `<div class="sec-title">Historial de pagos</div>`;
+  // ── Historial de pagos, con cuánto de cada uno es interés y cuánto capital ──
+  const repP = repartoDePagos(p);
+  const cobInt = ps.reduce((a, g) => a + (repP[g.id] || {interes:0}).interes, 0);
+  const cobCap = ps.reduce((a, g) => a + (repP[g.id] || {capital:0}).capital, 0);
+  const intCargos = (pagos[id] || []).filter(esPagoDeCargo)
+                      .reduce((a, g) => a + (Number(g.monto_cuota) || 0), 0);
+  html += `<div class="sec-title">Historial de pagos</div>
+    <div class="rep-resumen">
+      <div class="i">De lo cobrado, interés${intCargos > 0 ? ' (+ posponer)' : ''}<strong>${fmt(cobInt + intCargos)}</strong></div>
+      <div class="k">Abonado al capital<strong>${fmt(cobCap)}</strong></div>
+      <div>Falta de interés<strong>${fmt(Math.max((Number(p.interes)||0) - cobInt, 0))}</strong></div>
+      <div>Falta de capital<strong>${fmt(Math.max((Number(p.monto)||0) - cobCap, 0))}</strong></div>
+    </div>`;
   for (let i = 1; i <= p.num_cuotas; i++) {
     const pg = ps[i-1];
     if (pg) {
+      const rp = repP[pg.id] || { interes: 0, capital: 0 };
       html += `<div class="prow">
         <div class="pnum">${i}</div>
         <div style="flex:1"><div class="pdesc">${pg.descripcion || 'Pago '+i}</div><div class="pfecha">${fd(pg.fecha)}</div></div>
         <div style="text-align:right;margin-right:8px">
           <div class="pmonto">${fmt(pg.monto_cuota)}</div>
+          <div class="pparte">${textoReparto(rp)}</div>
           <div class="psaldo">Saldo: ${fmt(pg.saldo_despues)}</div>
         </div>
         <button class="btn btn-danger-ghost btn-sm" onclick="eliminarPago(${p.id},${pg.id})" title="Eliminar pago">✕</button>
       </div>`;
     } else {
-      html += `<div class="pend"><span>Pago ${i}</span><span>Pendiente</span></div>`;
+      const rp = repartoCuotaPendiente(p, i);
+      html += `<div class="pend"><span>Pago ${i}</span>
+        <span>Pendiente <span class="pparte" style="display:inline">· ${textoReparto(rp)}</span></span></div>`;
     }
   }
   if (p.notas) html += `<div class="sec-title">Notas</div><div class="nota">${p.notas}</div>`;
@@ -2936,11 +3059,14 @@ function guardarCargo() {
   const desc = document.getElementById('gDesc').value.trim();
   if (!fec || !mnt) { toast('Completa fecha y monto del interés', false); return; }
   if (!p.cargos) p.cargos = [];
-  p.cargos.push({
+  const yaPagado = document.getElementById('gPagado').checked;
+  const nuevoCargo = {
     id: nuevoId(), _ts: ahora(), fecha: fec, monto: mnt,
     descripcion: desc || 'Interés por posponer cuota',
-    pagado: document.getElementById('gPagado').checked
-  });
+    pagado: false
+  };
+  p.cargos.push(nuevoCargo);
+  if (yaPagado) registrarCobroCargo(p, nuevoCargo, fec);   // entra como plata cobrada
   // Si se indicó nueva fecha de cobro, se corre el próximo pago
   const nuevaProx = document.getElementById('gProx').value;
   if (nuevaProx) p.proximo_pago = nuevaProx;
@@ -2952,13 +3078,85 @@ function guardarCargo() {
   verDetalle(p.id, false);
 }
 
+// ── Cobrar un interés por posponer ──────────────────────────────────
+// Marcarlo como cobrado ya no solo apaga la deuda: registra la plata que
+// entró, con su fecha, para que aparezca en "Cobrado del mes" y en los
+// movimientos del período. NO toca el saldo del crédito: ese interés es
+// aparte de las cuotas.
+var cobroTarget = null;   // { pid, cid }
+
+function pagoDelCargo(pid, cid) {
+  return (pagos[pid] || []).find(function (g) { return g.cargo_id === cid; });
+}
+function esPagoDeCargo(g) { return !!(g && g.cargo_id); }
+
 function toggleCargoPagado(pid, cid) {
   const p = prestamos.find(x => x.id === pid);
   const c = cargosDe(p).find(x => x.id === cid);
   if (!c) return;
-  c.pagado = !c.pagado;
+  if (c.pagado) { descobrarCargo(pid, cid); return; }
+  abrirCobroCargo(pid, cid);
+}
+
+function abrirCobroCargo(pid, cid) {
+  const p = prestamos.find(x => x.id === pid);
+  const c = cargosDe(p).find(x => x.id === cid);
+  if (!c) return;
+  cobroTarget = { pid: pid, cid: cid };
+  document.getElementById('kFec').value = today();
+  document.getElementById('kPrev').innerHTML =
+    'Se registran <strong>' + fmt(c.monto) + '</strong> de <strong>' + escTxt(p.cliente) + '</strong> como plata que entró.' +
+    '<br>El saldo del crédito <strong>no cambia</strong>: este interés es aparte de las cuotas.';
+  document.getElementById('ovCobroCargo').classList.add('open');
+}
+
+function guardarCobroCargo() {
+  if (!cobroTarget) return;
+  const p = prestamos.find(x => x.id === cobroTarget.pid);
+  const c = p && cargosDe(p).find(x => x.id === cobroTarget.cid);
+  const fec = document.getElementById('kFec').value;
+  if (!p || !c) { cerrar(); return; }
+  if (!fec) { toast('Poné la fecha del cobro', false); return; }
+  registrarCobroCargo(p, c, fec);
+  marcar(p);
+  guardar();
+  cerrar();
+  toast('Interés cobrado ✓');
+  render();
+  verDetalle(p.id, false);
+}
+
+// Deja el cargo como cobrado y anota el ingreso (sin tocar el saldo)
+function registrarCobroCargo(p, c, fecha) {
+  c.pagado = true;
+  c.fecha_cobro = fecha;
+  marcar(c);
+  if (pagoDelCargo(p.id, c.id)) return;              // no duplicar
+  if (!pagos[p.id]) pagos[p.id] = [];
+  pagos[p.id].push({
+    id: nuevoId(), _ts: ahora(), prestamo_id: p.id, fecha: fecha,
+    descripcion: c.descripcion || 'Interés por posponer cuota',
+    monto_cuota: Number(c.monto) || 0,
+    saldo_despues: p.saldo,
+    cargo_id: c.id
+  });
+}
+
+// Volver a dejarlo pendiente: se borra el ingreso que se había anotado
+function descobrarCargo(pid, cid) {
+  const p = prestamos.find(x => x.id === pid);
+  const c = p && cargosDe(p).find(x => x.id === cid);
+  if (!c) return;
+  const pg = pagoDelCargo(pid, cid);
+  if (pg) {
+    pagos[pid] = (pagos[pid] || []).filter(function (g) { return g.id !== pg.id; });
+    enterrar('pagos', pid + ':' + pg.id);
+  }
+  c.pagado = false;
+  delete c.fecha_cobro;
   marcar(c); marcar(p);
   guardar();
+  toast('Interés de nuevo como pendiente');
   render();
   verDetalle(pid, false);
 }
@@ -2966,6 +3164,11 @@ function toggleCargoPagado(pid, cid) {
 function eliminarCargo(pid, cid) {
   if (!confirm('¿Eliminar este cargo?')) return;
   const p = prestamos.find(x => x.id === pid);
+  const pg = pagoDelCargo(pid, cid);
+  if (pg) {                                   // si ya estaba cobrado, se va el ingreso también
+    pagos[pid] = (pagos[pid] || []).filter(x => x.id !== pg.id);
+    enterrar('pagos', pid + ':' + pg.id);
+  }
   p.cargos = cargosDe(p).filter(x => x.id !== cid);
   enterrar('cargos', pid + ':' + cid);
   marcar(p);
@@ -2981,9 +3184,14 @@ function eliminarPago(pid, pagoId) {
   const pg = (pagos[pid] || []).find(x => x.id === pagoId);
   if (!pg) return;
   pagos[pid] = pagos[pid].filter(x => x.id !== pagoId);
-  p.saldo = Math.round(p.saldo + pg.monto_cuota);
-  p.cuotas_canceladas = Math.max(p.cuotas_canceladas - 1, 0);
-  p.estado = 'activo';
+  if (esPagoDeCargo(pg)) {                    // era el cobro de un interés: el saldo no se movió
+    const c = cargosDe(p).find(x => x.id === pg.cargo_id);
+    if (c) { c.pagado = false; delete c.fecha_cobro; marcar(c); }
+  } else {
+    p.saldo = Math.round(p.saldo + pg.monto_cuota);
+    p.cuotas_canceladas = Math.max(p.cuotas_canceladas - 1, 0);
+    p.estado = 'activo';
+  }
   enterrar('pagos', pid + ':' + pagoId);
   marcar(p);
   guardar();
@@ -3699,6 +3907,10 @@ function renderPagos() {
   const nClientes = Object.keys(clientes).length;
   const prom = efec.length ? total / efec.length : 0;
 
+  const rep = mapaReparto();
+  const gInteres = efec.reduce((a, x) => a + ((rep[x.g.id] || { interes: 0 }).interes), 0);
+  const gCapital = total - gInteres;
+
   const desem = desembolsosDelRango();
   const totalDes = desem.reduce((a, p) => a + efectivoEntregado(p), 0);
   const refDes   = desem.reduce((a, p) => a + montoRefundido(p), 0);
@@ -3718,6 +3930,10 @@ function renderPagos() {
     <div class="pag-stat ${balance >= 0 ? 'green' : 'red'}">
       <div class="l">Balance del período</div><div class="v">${(balance > 0 ? '+' : balance < 0 ? '−' : '') + fmt(Math.abs(balance))}</div>
       <div class="s">${balance >= 0 ? 'entró más de lo que salió' : 'salió más de lo que entró'}</div>
+    </div>
+    <div class="pag-stat">
+      <div class="l">Ganancia del período</div><div class="v" style="color:var(--yellow)">${fmt(gInteres)}</div>
+      <div class="s">interés cobrado · el resto (${fmt(gCapital)}) es capital que le devolvieron</div>
     </div>`;
 
   document.getElementById('pagPeriodo').textContent = 'Período: ' + textoPeriodo();
@@ -3754,7 +3970,8 @@ function renderPagos() {
       <table>
         <thead><tr>
           <th>Fecha</th><th>Cliente</th><th>Concepto</th>
-          <th class="num">Monto</th><th class="num">Saldo después</th>
+          <th class="num">Monto</th><th class="num">Interés</th>
+          <th class="num col-menos">Capital</th><th class="num col-menos">Saldo después</th>
         </tr></thead>
         <tbody>
           ${lista.map(x => `
@@ -3763,9 +3980,12 @@ function renderPagos() {
               <td class="cliente-cell">${escTxt(x.p.cliente)}<span class="cod">${escTxt(x.p.codigo || '')}</span></td>
               <td style="font-size:.78rem">${escTxt(x.g.descripcion || 'Pago')}</td>
               <td class="num">${esEfectivo(x.g)
-                ? `<strong style="color:var(--green)">${fmt(x.g.monto_cuota)}</strong>`
+                ? `<strong style="color:var(--green)">${fmt(x.g.monto_cuota)}</strong>${esPagoDeCargo(x.g)
+                    ? `<div class="ref-tag">% interés por posponer</div>` : ''}`
                 : `<strong style="color:var(--muted-2)">${fmt(x.g.monto_cuota)}</strong><div class="ref-tag">🔁 no entró</div>`}</td>
-              <td class="num">${fmt(x.g.saldo_despues)}</td>
+              <td class="num" style="color:var(--yellow)">${esEfectivo(x.g) ? fmt((rep[x.g.id] || {interes:0}).interes) : '—'}</td>
+              <td class="num col-menos" style="color:var(--accent-2)">${esEfectivo(x.g) ? fmt((rep[x.g.id] || {capital:0}).capital) : '—'}</td>
+              <td class="num col-menos">${fmt(x.g.saldo_despues)}</td>
             </tr>`).join('')}
         </tbody>
       </table>
@@ -3817,18 +4037,23 @@ function exportarPagosExcel() {
   const totalDes = desem.reduce((a, p) => a + efectivoEntregado(p), 0);
   const refDes = desem.reduce((a, p) => a + montoRefundido(p), 0);
 
-  const filas = [['Fecha', 'Cliente', 'Código', 'Concepto', 'Tipo', 'Monto Pagado', 'Saldo Después']];
+  const repX = mapaReparto();
+  const gInt = efec.reduce((a, x) => a + ((repX[x.g.id] || {interes:0}).interes), 0);
+  const filas = [['Fecha', 'Cliente', 'Código', 'Concepto', 'Tipo', 'Monto Pagado', 'Interés', 'Capital', 'Saldo Después']];
   lista.slice().reverse().forEach(x => {
+    const rp = repX[x.g.id] || { interes: 0, capital: 0 };
     filas.push([x.g.fecha, x.p.cliente, x.p.codigo || '', x.g.descripcion || 'Pago',
                 esEfectivo(x.g) ? 'Efectivo' : 'Refundición (no entró)',
-                x.g.monto_cuota, x.g.saldo_despues]);
+                x.g.monto_cuota,
+                esEfectivo(x.g) ? rp.interes : '', esEfectivo(x.g) ? rp.capital : '',
+                x.g.saldo_despues]);
   });
   filas.push([]);
-  filas.push(['', '', '', 'TOTAL EN EFECTIVO (' + efec.length + ' pagos)', '', total, '']);
-  if (totalTras > 0) filas.push(['', '', '', 'Refundido (no entró efectivo)', '', totalTras, '']);
+  filas.push(['', '', '', 'TOTAL EN EFECTIVO (' + efec.length + ' pagos)', '', total, gInt, total - gInt, '']);
+  if (totalTras > 0) filas.push(['', '', '', 'Refundido (no entró efectivo)', '', totalTras, '', '', '']);
 
   const ws = XLSX.utils.aoa_to_sheet(filas);
-  ws['!cols'] = [13, 16, 9, 26, 20, 14, 14].map(w => ({ wch: w }));
+  ws['!cols'] = [13, 16, 9, 26, 20, 14, 13, 13, 14].map(w => ({ wch: w }));
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Pagos');
 
@@ -3856,6 +4081,8 @@ function exportarPagosExcel() {
                ['Cantidad de pagos', efec.length], ['Total recaudado (entró)', total],
                ['Promedio por pago', efec.length ? Math.round(total / efec.length) : 0],
                ['Clientes que pagaron', Object.keys(porCli).length],
+               ['GANANCIA del período (interés cobrado)', gInt],
+               ['Capital devuelto', total - gInt],
                ['Refundido (no entró efectivo)', totalTras], [],
                ['Créditos entregados', desem.length], ['Total desembolsado (salió)', totalDes],
                ['Refundido en créditos nuevos (no salió)', refDes],
