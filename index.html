@@ -245,6 +245,7 @@
   .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
   .badge-activo  { background: var(--green-soft); color: var(--green); }
   .badge-pagado  { background: rgba(139,155,189,.12); color: var(--muted); }
+  .badge-cancelado { background: var(--accent-soft); color: var(--accent-2); }
   .badge-vencido { background: var(--red-soft); color: var(--red); }
   .prog-bg { background: var(--border); border-radius: 99px; height: 4px; margin-top: 5px; min-width: 70px; overflow: hidden; }
   .prog { background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 99px; height: 4px; }
@@ -532,6 +533,15 @@
     border: 1px solid rgba(59,130,246,.3); font-size: .76rem; color: var(--text); line-height: 1.6;
   }
   .d-plan b { font-variant-numeric: tabular-nums; }
+  .d-cancel {
+    margin: 10px 0 4px; padding: 10px 13px; border-radius: 10px; background: var(--green-soft);
+    border: 1px solid rgba(52,211,153,.32); font-size: .76rem; color: var(--text); line-height: 1.6;
+  }
+  .d-cancel b { font-variant-numeric: tabular-nums; }
+  .x-linea { display: flex; justify-content: space-between; gap: 14px; padding: 3px 0; }
+  .x-linea span:last-child { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  .x-linea.tot { border-top: 1px solid var(--border-2); margin-top: 5px; padding-top: 7px; font-weight: 700; color: var(--text); }
+  .x-borra { color: var(--yellow); font-weight: 700; }
   .plan-tabs { display: flex; gap: 3px; background: var(--bg-soft); border: 1px solid var(--border);
     border-radius: 10px; padding: 3px; margin-bottom: 2px; }
   .plan-tabs .mode-tab { flex: 1; padding: 8px 10px; font-size: .74rem; line-height: 1.25; }
@@ -1092,6 +1102,36 @@
 </div>
 
 <!-- Modal Pago -->
+<div class="overlay" id="ovCancelar">
+  <div class="modal" style="max-width:520px">
+    <h2>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+      Cancelación anticipada
+    </h2>
+    <div class="fg">
+      <div class="s2 ref-prev" id="xResumen"></div>
+      <label>Fecha <input type="date" id="xFec" required/></label>
+      <label>Lo que le paga (₡)
+        <input type="number" id="xMnt" min="0" step="500" placeholder="0" oninput="prevCancelar()"/>
+      </label>
+      <div class="s2 rng-tabs" style="margin-bottom:0">
+        <button type="button" class="rng-tab" onclick="montoCancelar('capital')">Solo el capital</button>
+        <button type="button" class="rng-tab" onclick="montoCancelar('todo')">Todo el saldo</button>
+        <button type="button" class="rng-tab" onclick="montoCancelar('cero')">No paga nada</button>
+      </div>
+      <label class="s2 ref-chk" id="xCargosFila" style="display:none">
+        <input type="checkbox" id="xCargos" onchange="prevCancelar()"/>
+        <span id="xCargosTxt"></span>
+      </label>
+      <div class="s2 ref-prev" id="xPrev"></div>
+    </div>
+    <div class="fa">
+      <button class="btn btn-ghost" onclick="cerrar()">Volver</button>
+      <button class="btn btn-primary" onclick="guardarCancelacion()">Cancelar el crédito</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="ovCobroCargo">
   <div class="modal" style="max-width:440px">
     <h2>
@@ -1940,20 +1980,22 @@ function exportarExcel() {
   const wb = XLSX.utils.book_new();
 
   const hoy = new Date(); hoy.setHours(0,0,0,0);
-  const filaPrest = [['Cliente','Código','Fecha Inicio','Vencimiento','Monto','Refundido','Efectivo Entregado','Interés','Total','Cuota','N° Cuotas','Cuotas Pagadas','Saldo','Estado','Plan','Frecuencia','Próximo Pago','Notas']];
+  const filaPrest = [['Cliente','Código','Fecha Inicio','Vencimiento','Monto','Refundido','Efectivo Entregado','Interés','Total','Cuota','N° Cuotas','Cuotas Pagadas','Saldo','Estado','Interés Perdonado','Plan','Frecuencia','Próximo Pago','Notas']];
   prestamos.forEach(p => {
     const venc = p.vencimiento ? new Date(p.vencimiento+'T12:00') : null;
-    const estado = p.estado === 'activo' && venc && venc < hoy ? 'VENCIDO' : p.estado.toUpperCase();
+    const estado = p.estado === 'activo' && venc && venc < hoy ? 'VENCIDO'
+      : (p.estado === 'pagado' && p.cancelado_anticipado ? 'CANCELADO' : p.estado.toUpperCase());
     filaPrest.push([
       p.cliente, p.codigo, p.fecha_inicio, p.vencimiento || '',
       p.monto, montoRefundido(p), efectivoEntregado(p), p.interes, p.total, p.cuota,
       p.num_cuotas, p.cuotas_canceladas, p.saldo,
-      estado, esPlanInteres(p) ? 'Solo intereses + capital al final' : 'Cuotas iguales',
+      estado, Number(p.condonado) || 0,
+      esPlanInteres(p) ? 'Solo intereses + capital al final' : 'Cuotas iguales',
       FREC_TXT[p.frecuencia] || '', proxPagoDe(p) || '', p.notas || ''
     ]);
   });
   const wsPrest = XLSX.utils.aoa_to_sheet(filaPrest);
-  wsPrest['!cols'] = [14,8,13,13,12,12,16,12,12,12,10,14,12,10,28,12,13,20].map(w=>({wch:w}));
+  wsPrest['!cols'] = [14,8,13,13,12,12,16,12,12,12,10,14,12,10,16,28,12,13,20].map(w=>({wch:w}));
   XLSX.utils.book_append_sheet(wb, wsPrest, 'Préstamos');
 
   const filaPagos = [['Cliente','Código','N° Pago','Fecha','Descripción','Tipo','Monto Pagado','Interés','Capital','Saldo Después']];
@@ -2367,22 +2409,28 @@ function repartoDePagos(p) {
                     .slice().sort(function (a, b) {
                       return (a.fecha || '').localeCompare(b.fecha || '') || (a.id || 0) - (b.id || 0);
                     });
-  if (esPlanInteres(p)) {
-    var falta = Number(p.interes) || 0;          // primero se cubre el interés pactado
-    cuotas.forEach(function (g) {
-      var m = Number(g.monto_cuota) || 0;
-      var i = Math.min(m, Math.max(falta, 0));
-      falta -= i;
-      res[g.id] = { interes: i, capital: m - i };
-    });
-  } else {
-    var r = tasaParteInteres(p);
-    cuotas.forEach(function (g) {
-      var m = Number(g.monto_cuota) || 0;
-      var i = Math.round(m * r);
-      res[g.id] = { interes: i, capital: m - i };
-    });
-  }
+  var esInt = esPlanInteres(p);
+  var r = tasaParteInteres(p);
+  var intTotal = Number(p.interes) || 0;
+  var capTotal = Number(p.monto) || 0;
+  var intPagado = 0, capPagado = 0;
+  cuotas.forEach(function (g) {
+    var m = Number(g.monto_cuota) || 0, inte, cap;
+    if (g.cancelacion) {
+      // Cancelación anticipada: lo que entra tapa primero el capital; el
+      // interés que no se cobró queda borrado, no repartido.
+      cap = Math.min(m, Math.max(capTotal - capPagado, 0));
+      inte = m - cap;
+    } else if (esInt) {
+      inte = Math.min(m, Math.max(intTotal - intPagado, 0));   // primero el interés pactado
+      cap = m - inte;
+    } else {
+      inte = Math.round(m * r);                                 // interés fijo: proporción pareja
+      cap = m - inte;
+    }
+    intPagado += inte; capPagado += cap;
+    res[g.id] = { interes: inte, capital: cap };
+  });
   todos.filter(esPagoDeCargo).forEach(function (g) {
     res[g.id] = { interes: Number(g.monto_cuota) || 0, capital: 0 };   // interés puro
   });
@@ -2447,7 +2495,7 @@ function render() {
   document.getElementById('tbody').innerHTML = list.map(p => {
     const v   = p.vencimiento ? new Date(p.vencimiento+'T12:00') : null;
     const ven = p.estado === 'activo' && v && v < hoy;
-    const badge = ven ? 'vencido' : p.estado;
+    const badge = ven ? 'vencido' : (p.estado === 'pagado' && p.cancelado_anticipado ? 'cancelado' : p.estado);
     const pct = Math.round((p.cuotas_canceladas / p.num_cuotas) * 100);
     const up  = ultimoPago(p.id);
     const prox = proxPagoDe(p);
@@ -2520,6 +2568,11 @@ function verDetalle(id, scroll=true) {
       </div>
       <div class="prog-bg" style="height:7px"><div class="prog" style="width:${pct}%;height:7px"></div></div>
       <div class="pct-txt">${pct}% pagado</div>`;
+  // ── Cancelado antes de tiempo ──
+  if (p.cancelado_anticipado) {
+    html += `<div class="d-cancel">✓ <b>Crédito cancelado anticipadamente</b>${p.fecha_cancelacion ? ' el ' + fd(p.fecha_cancelacion) : ''}.
+      ${(Number(p.condonado) || 0) > 0 ? `Se le borraron <b>${fmt(p.condonado)}</b> de intereses que ya no se cobran.` : 'No quedó nada pendiente.'}</div>`;
+  }
   // ── Plan de solo intereses ──
   if (esPlanInteres(p)) {
     const nInt = pagosDeInteres(p);
@@ -2546,6 +2599,7 @@ function verDetalle(id, scroll=true) {
   html += `<div style="display:flex;gap:9px;margin-bottom:6px;flex-wrap:wrap">
     ${p.estado === 'activo' ? `<button class="btn btn-primary" style="flex:1;justify-content:center" onclick="abrirPago(${p.id})">+ Registrar Pago</button>` : ''}
     ${p.estado === 'activo' ? `<button class="btn" style="flex:1;justify-content:center" onclick="abrirCargo(${p.id})">% Interés por posponer</button>` : ''}
+    ${p.estado === 'activo' ? `<button class="btn" style="flex:1;justify-content:center" onclick="abrirCancelacion(${p.id})">✓ Cancelación anticipada</button>` : ''}
     <button class="btn" style="flex:1;justify-content:center" onclick="abrirEditar(${p.id})">Editar crédito</button>
   </div>`;
   // ── Cargos por posponer cuota ──
@@ -2560,10 +2614,10 @@ function verDetalle(id, scroll=true) {
           <div class="pdesc">${c.descripcion}</div>
           <div class="pfecha">${fd(c.fecha)}${c.pagado
             ? ' · Cobrado' + (c.fecha_cobro ? ' el ' + fd(c.fecha_cobro) : '')
-            : ' · Pendiente'}</div>
+            : (c.condonado ? ' · Perdonado' : ' · Pendiente')}</div>
         </div>
         <div style="text-align:right;margin-right:8px">
-          <div class="pmonto" style="color:${c.pagado ? 'var(--green)' : 'var(--yellow)'}">${fmt(c.monto)}</div>
+          <div class="pmonto" style="color:${c.pagado ? 'var(--green)' : c.condonado ? 'var(--muted-2)' : 'var(--yellow)'}${c.condonado ? ';text-decoration:line-through' : ''}">${fmt(c.monto)}</div>
         </div>
         <button class="btn btn-sm" onclick="toggleCargoPagado(${p.id},${c.id})" title="Marcar como cobrado/pendiente">${c.pagado ? '↩' : '✓'}</button>
         <button class="btn btn-danger-ghost btn-sm" onclick="eliminarCargo(${p.id},${c.id})" title="Eliminar cargo">✕</button>
@@ -2580,8 +2634,8 @@ function verDetalle(id, scroll=true) {
     <div class="rep-resumen">
       <div class="i">De lo cobrado, interés${intCargos > 0 ? ' (+ posponer)' : ''}<strong>${fmt(cobInt + intCargos)}</strong></div>
       <div class="k">Abonado al capital<strong>${fmt(cobCap)}</strong></div>
-      <div>Falta de interés<strong>${fmt(Math.max((Number(p.interes)||0) - cobInt, 0))}</strong></div>
-      <div>Falta de capital<strong>${fmt(Math.max((Number(p.monto)||0) - cobCap, 0))}</strong></div>
+      <div>${p.cancelado_anticipado ? 'Interés perdonado' : 'Falta de interés'}<strong>${fmt(Math.max((Number(p.interes)||0) - cobInt, 0))}</strong></div>
+      <div>${p.cancelado_anticipado ? 'Capital sin recuperar' : 'Falta de capital'}<strong>${fmt(Math.max((Number(p.monto)||0) - cobCap, 0))}</strong></div>
     </div>`;
   for (let i = 1; i <= p.num_cuotas; i++) {
     const pg = ps[i-1];
@@ -2892,7 +2946,7 @@ function recalcNextCid() {
 }
 
 function cargosDe(p) { return (p && p.cargos) || []; }
-function cargosPendientes(p) { return cargosDe(p).filter(c => !c.pagado).reduce((a,c)=>a+c.monto, 0); }
+function cargosPendientes(p) { return cargosDe(p).filter(c => !c.pagado && !c.condonado).reduce((a,c)=>a+c.monto, 0); }
 
 // ══════════════════════════════════════════════════════════════════════
 // ── REFUNDICIONES: plata que se traslada, no plata que se mueve ──
@@ -3074,6 +3128,128 @@ function guardarCargo() {
   guardar();
   cerrar();
   toast('Cargo registrado ✓');
+  render();
+  verDetalle(p.id, false);
+}
+
+// ══════════════════════════════════════════════════════════════════════
+// ── CANCELACIÓN ANTICIPADA: paga el capital y se le borra el interés ──
+// ══════════════════════════════════════════════════════════════════════
+// El cliente cancela antes de tiempo: se registra lo que de verdad paga,
+// el interés que faltaba se BORRA (no se cobra ni se cuenta como ganancia)
+// y el crédito queda como CANCELADO. Lo perdonado se guarda en `condonado`
+// para saber cuánto cuestan esos descuentos.
+
+var cancelTarget = null;
+
+function capitalPagadoDe(p) {
+  var rep = repartoDePagos(p);
+  return Object.keys(rep).reduce(function (a, k) { return a + rep[k].capital; }, 0);
+}
+function capitalPendienteDe(p) {
+  return Math.max((Number(p.monto) || 0) - capitalPagadoDe(p), 0);
+}
+function interesPendienteDe(p) {
+  return Math.max((Number(p.saldo) || 0) - capitalPendienteDe(p), 0);
+}
+
+function abrirCancelacion(id) {
+  var p = prestamos.find(function (x) { return x.id === id; });
+  if (!p || p.estado !== 'activo') return;
+  cancelTarget = id;
+  var cap = capitalPendienteDe(p);
+  var inte = interesPendienteDe(p);
+  var cg = cargosPendientes(p);
+  document.getElementById('xResumen').innerHTML =
+    '<div class="x-linea"><span>' + escTxt(p.cliente) + ' · crédito ' + escTxt(p.codigo || '') + '</span><span></span></div>' +
+    '<div class="x-linea"><span>Capital que le falta pagar</span><span>' + fmt(cap) + '</span></div>' +
+    '<div class="x-linea"><span>Interés que le falta</span><span>' + fmt(inte) + '</span></div>' +
+    '<div class="x-linea tot"><span>Saldo hoy</span><span>' + fmt(p.saldo) + '</span></div>';
+  document.getElementById('xFec').value = today();
+  document.getElementById('xMnt').value = cap;
+  var fila = document.getElementById('xCargosFila');
+  if (cg > 0) {
+    fila.style.display = 'flex';
+    document.getElementById('xCargos').checked = true;
+    document.getElementById('xCargosTxt').innerHTML =
+      'Además me paga los <strong>' + fmt(cg) + '</strong> de intereses por posponer (si lo destilda, se le perdonan)';
+  } else {
+    fila.style.display = 'none';
+    document.getElementById('xCargos').checked = false;
+  }
+  prevCancelar();
+  document.getElementById('ovCancelar').classList.add('open');
+}
+
+function montoCancelar(cual) {
+  var p = prestamos.find(function (x) { return x.id === cancelTarget; });
+  if (!p) return;
+  document.getElementById('xMnt').value =
+    cual === 'todo' ? p.saldo : cual === 'cero' ? 0 : capitalPendienteDe(p);
+  prevCancelar();
+}
+
+function prevCancelar() {
+  var el = document.getElementById('xPrev');
+  var p = prestamos.find(function (x) { return x.id === cancelTarget; });
+  if (!el || !p) return;
+  var monto = parseFloat(document.getElementById('xMnt').value) || 0;
+  var cap = capitalPendienteDe(p);
+  var cg = cargosPendientes(p);
+  var cobraCargos = cg > 0 && document.getElementById('xCargos').checked;
+  if (monto > p.saldo) {
+    el.className = 's2 ref-prev mal';
+    el.innerHTML = 'Está poniendo más que el saldo (<strong>' + fmt(p.saldo) + '</strong>). Bajalo o usá <em>Todo el saldo</em>.';
+    return;
+  }
+  var borrado = Math.max(p.saldo - monto, 0) + (cobraCargos ? 0 : cg);
+  var recibe = monto + (cobraCargos ? cg : 0);
+  el.className = 's2 ref-prev';
+  el.innerHTML =
+    '<div class="x-linea"><span>Recibe hoy</span><span>' + fmt(recibe) + '</span></div>' +
+    '<div class="x-linea"><span class="x-borra">Se le borra de interés</span><span class="x-borra">' + fmt(borrado) + '</span></div>' +
+    '<div class="x-linea tot"><span>El crédito queda</span><span>CANCELADO</span></div>' +
+    (monto < cap
+      ? '<div style="color:var(--yellow);margin-top:7px">⚠ Está recibiendo <strong>' + fmt(cap - monto) +
+        '</strong> menos que el capital que le prestó: esa parte la pierde de su propia plata, no es solo interés.'
+      : '');
+}
+
+function guardarCancelacion() {
+  var p = prestamos.find(function (x) { return x.id === cancelTarget; });
+  if (!p) { cerrar(); return; }
+  var fec = document.getElementById('xFec').value;
+  var monto = parseFloat(document.getElementById('xMnt').value) || 0;
+  if (!fec) { toast('Poné la fecha de la cancelación', false); return; }
+  if (monto > p.saldo) { toast('El monto no puede ser mayor que el saldo', false); return; }
+  var cg = cargosPendientes(p);
+  var cobraCargos = cg > 0 && document.getElementById('xCargos').checked;
+  var borrado = Math.max(p.saldo - monto, 0) + (cobraCargos ? 0 : cg);
+
+  if (monto > 0) {
+    if (!pagos[p.id]) pagos[p.id] = [];
+    pagos[p.id].push({
+      id: nuevoId(), _ts: ahora(), prestamo_id: p.id, fecha: fec,
+      descripcion: 'Cancelación anticipada',
+      monto_cuota: monto, saldo_despues: 0, cancelacion: true
+    });
+  }
+  cargosDe(p).forEach(function (c) {
+    if (c.pagado || c.condonado) return;
+    if (cobraCargos) registrarCobroCargo(p, c, fec);
+    else { c.condonado = true; marcar(c); }        // perdonado: ni se cobra ni se debe
+  });
+  p.saldo = 0;
+  p.estado = 'pagado';
+  p.cuotas_canceladas = p.num_cuotas;
+  p.proximo_pago = null;
+  p.cancelado_anticipado = true;
+  p.fecha_cancelacion = fec;
+  p.condonado = (Number(p.condonado) || 0) + borrado;
+  marcar(p);
+  guardar();
+  cerrar();
+  toast('Crédito cancelado ✓' + (borrado > 0 ? ' · se borraron ' + fmt(borrado) : ''));
   render();
   verDetalle(p.id, false);
 }
@@ -3566,7 +3742,7 @@ function resumenClientes() {
       clave: k, nombre: ((p.cliente || '').trim() || '(sin nombre)'),
       activos: 0, pagados: 0, prestado: 0, aCobrar: 0,
       saldo: 0, intPend: 0, debe: 0, pagado: 0, nPagos: 0,
-      refundido: 0, refundidas: 0, entregado: 0,
+      refundido: 0, refundidas: 0, entregado: 0, condonado: 0, cancelados: 0,
       codigos: [], proxima: null, vencidos: 0, ultimoPago: null
     };
     var c = m[k];
@@ -3585,6 +3761,8 @@ function resumenClientes() {
     c.entregado += efectivoEntregado(p);
     c.refundido += montoRefundido(p);
     if (montoRefundido(p) > 0) c.refundidas++;
+    c.condonado += Number(p.condonado) || 0;
+    if (p.cancelado_anticipado) c.cancelados++;
     if (p.codigo && c.codigos.indexOf(p.codigo) < 0) c.codigos.push(p.codigo);
     (pagos[p.id] || []).forEach(function (g) {
       if (!esEfectivo(g)) return;                    // un traslado no es plata que pagó
@@ -3604,10 +3782,11 @@ function listaClientes() {
 function sumarClientes(sel) {
   var t = { nombre: '', activos: 0, pagados: 0, prestado: 0, aCobrar: 0, saldo: 0,
             intPend: 0, debe: 0, pagado: 0, nPagos: 0, refundido: 0, refundidas: 0,
-            entregado: 0, codigos: [], proxima: null, vencidos: 0, ultimoPago: null };
+            entregado: 0, condonado: 0, cancelados: 0, codigos: [], proxima: null,
+            vencidos: 0, ultimoPago: null };
   sel.forEach(function (c) {
     ['activos','pagados','prestado','aCobrar','saldo','intPend','debe','pagado','nPagos',
-     'refundido','refundidas','entregado','vencidos']
+     'refundido','refundidas','entregado','condonado','cancelados','vencidos']
       .forEach(function (f) { t[f] += c[f]; });
     c.codigos.forEach(function (x) { if (t.codigos.indexOf(x) < 0) t.codigos.push(x); });
     if (c.proxima && (!t.proxima || c.proxima < t.proxima)) t.proxima = c.proxima;
@@ -3719,6 +3898,8 @@ function renderFichaCliente() {
   if (c.vencidos) partes.push('<span class="alerta">' + c.vencidos + ' vencido' + (c.vencidos === 1 ? '' : 's') + '</span>');
   if (c.refundidas) partes.push('<span style="color:var(--yellow);font-weight:700">' + c.refundidas +
     (c.refundidas === 1 ? ' refundición' : ' refundiciones') + '</span>');
+  if (c.cancelados) partes.push('<span style="color:var(--accent-2);font-weight:700">' + c.cancelados +
+    (c.cancelados === 1 ? ' cancelado anticipado' : ' cancelados anticipados') + '</span>');
   if (sel.length === 1 && c.codigos.length) partes.push('código ' + escTxt(c.codigos.join(', ')));
 
   var hoyStr = ymdLocal(new Date());
@@ -3748,6 +3929,10 @@ function renderFichaCliente() {
         '<div class="s">de ' + fmt(c.aCobrar) + ' a cobrar</div></div>' +
       '<div class="cf-box amar"><div class="l">Interés por posponer</div><div class="v">' + fmt(c.intPend) + '</div>' +
         '<div class="s">' + (c.intPend > 0 ? 'sin pagar' : 'nada pendiente') + '</div></div>' +
+      (c.condonado > 0
+        ? '<div class="cf-box"><div class="l">Interés perdonado</div><div class="v" style="color:var(--accent-2)">' +
+          fmt(c.condonado) + '</div><div class="s">por cancelar antes de tiempo</div></div>'
+        : '') +
       '<div class="cf-box green"><div class="l">Ya pagó</div><div class="v">' + fmt(c.pagado) + '</div>' +
         '<div class="s">' + c.nPagos + (c.nPagos === 1 ? ' pago' : ' pagos') +
         (c.ultimoPago ? ' · último ' + fd(c.ultimoPago) : '') + '</div></div>' +
