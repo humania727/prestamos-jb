@@ -494,6 +494,9 @@
   .ref-comp th { color: var(--muted); font-weight: 600; font-family: inherit; }
   .ref-comp td:first-child, .ref-comp th:first-child { text-align: left; }
   .ref-comp input { width: 78px; padding: 3px 6px; font-size: .74rem; }
+  .ref-comp.ampliado { position: fixed; inset: 4vh 3vw; z-index: 9999; background: var(--bg-soft, #111827); border: 1px solid var(--border-2); border-radius: 12px; padding: 16px; overflow: auto; font-size: 1rem; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+  .ref-comp.ampliado td, .ref-comp.ampliado th { font-size: .95rem; padding: 8px 10px; }
+  .ref-comp.ampliado input { width: 130px; font-size: .95rem; padding: 6px 8px; }
   .marca-rec { color: var(--yellow); font-size: .68rem; font-weight: 700; margin-left: 4px; white-space: nowrap; }
   .marca-req { color: var(--red); font-size: .68rem; font-weight: 700; margin-left: 4px; white-space: nowrap; }
   .hist-ev { border-left: 3px solid var(--border-2); padding: 7px 10px; margin: 6px 0; background: var(--bg-soft); border-radius: 0 9px 9px 0; font-size: .78rem; }
@@ -3581,7 +3584,7 @@ function abrirNuevo() {
   if (document.getElementById('nEfConf')) document.getElementById('nEfConf').checked = false;
   document.getElementById('nPrev').style.display = 'none';
   document.getElementById('nRefunde').checked = false;
-  document.getElementById('nRefDet').style.display = 'none';
+  document.getElementById('nRefDet').style.display = 'none'; window.refCompAmpliado = false;
   document.getElementById('nRefPrev').innerHTML = '';
   document.getElementById('nRefLista').innerHTML = '';
   document.getElementById('nRefTodos').textContent = 'Marcar todos';
@@ -4106,7 +4109,7 @@ function refrescarRefundibles() {
   if (!lista.length) {
     box.style.display = 'none';
     chk.checked = false;
-    document.getElementById('nRefDet').style.display = 'none';
+    document.getElementById('nRefDet').style.display = 'none'; window.refCompAmpliado = false;
     cont.innerHTML = '';
     return;
   }
@@ -4192,6 +4195,7 @@ function partesViejo(v, fecha, qdevEscrito, ac) {
     traslado: saldo + ccap - anul - cond,
     metodoQdev: (qdevEscrito === undefined || qdevEscrito === null || qdevEscrito === '') ? 'sugerencia método B aceptada' : 'registrado por Jero' };
 }
+function ampliarRefComp() { window.refCompAmpliado = !window.refCompAmpliado; prevCalc(); }
 function marcarQdev(i) { i.setAttribute('data-editado', '1'); prevCalc(); }
 function qdevEscritos() {   // solo los que Jero cambió a mano; los demás siguen la sugerencia (se recalcula si cambia la fecha)
   var r = {};
@@ -4226,10 +4230,10 @@ function prevRefunde(mnt) {
   var filas = partes.map(function (x) {
     var k = x.K.P + x.K.Q + x.K.U; tK += k; tQd += x.Q_dev || 0; tC += x.C_cap; tI += x.IFR || 0; tA += x.IF_anulado + x.condonado;
     return '<tr><td>' + escTxt(x.codigo || ('#' + x.id)) + '</td><td>' + fmt(k) + '</td>' +
-      '<td><input type="number" min="0" data-qdev="' + x.id + '"' + (escritos[x.id] !== undefined ? ' data-editado="1"' : '') + ' value="' + (escritos[x.id] !== undefined ? escritos[x.id] : (x.Q_dev === null ? '' : x.Q_dev)) + '" oninput="marcarQdev(this)" title="Sugerencia método B: ' + (x.Q_dev_sugerido === null ? 'sin vencimiento' : fmt(x.Q_dev_sugerido)) + '"/></td>' +
+      '<td><input type="number" min="0" data-qdev="' + x.id + '"' + (escritos[x.id] !== undefined ? ' data-editado="1"' : '') + ' value="' + (escritos[x.id] !== undefined ? escritos[x.id] : (x.Q_dev === null ? '' : x.Q_dev)) + '" onchange="marcarQdev(this)" title="Sugerencia método B: ' + (x.Q_dev_sugerido === null ? 'sin vencimiento' : fmt(x.Q_dev_sugerido)) + '"/></td>' +
       '<td>' + (x.IFR === null ? '—' : (x.IFR < 0 ? '<b style="color:var(--red)">' + fmt(x.IFR) + '</b>' : fmt(x.IFR))) + '</td>' +
-      '<td><input type="number" min="0" data-anul="' + x.id + '" value="' + x.IF_anulado + '" oninput="prevCalc()" title="Interés futuro que NO pasa al nuevo (RD-4)"/></td>' +
-      '<td><input type="number" min="0" data-cond="' + x.id + '" value="' + x.condonado + '" oninput="prevCalc()" title="Interés que perdonás expresamente"/></td>' +
+      '<td><input type="number" min="0" data-anul="' + x.id + '" value="' + x.IF_anulado + '" onchange="prevCalc()" title="Interés futuro que NO pasa al nuevo (RD-4)"/></td>' +
+      '<td><input type="number" min="0" data-cond="' + x.id + '" value="' + x.condonado + '" onchange="prevCalc()" title="Interés que perdonás expresamente"/></td>' +
       '<td>' + fmt(x.C_cap) + '</td></tr>' + (x.cuadra ? '' : '<tr><td colspan="7" style="color:var(--red);text-align:left">⚠ ' + escTxt(x.codigo || '') + ': las partes no cuadran con el saldo viejo (control FAIL)</td></tr>');
   }).join('');
   var efTxt = document.getElementById('nRefEf').value, efNum = efTxt === '' ? null : Math.round(Number(efTxt) || 0);
@@ -4237,13 +4241,14 @@ function prevRefunde(mnt) {
   var comp = document.getElementById('nRefComp');
   if (comp) {
     var foco = document.activeElement && document.activeElement.getAttribute && document.activeElement.getAttribute('data-qdev');
-    comp.innerHTML = '<div style="overflow-x:auto"><table><tr><th>Crédito</th><th>Capital</th><th>Int. devengado</th><th>Int. futuro</th><th>Anulado</th><th>Condonado</th><th>Cargos</th></tr>' + filas +
+    var focoA = document.activeElement && document.activeElement.getAttribute && (document.activeElement.getAttribute('data-anul') ? ['data-anul', document.activeElement.getAttribute('data-anul')] : (document.activeElement.getAttribute('data-cond') ? ['data-cond', document.activeElement.getAttribute('data-cond')] : null));
+    comp.classList.toggle('ampliado', !!window.refCompAmpliado);
+    comp.innerHTML = '<div style="text-align:right;margin-bottom:4px"><button type="button" class="btn btn-sm" onclick="ampliarRefComp()">' + (window.refCompAmpliado ? '✕ Cerrar vista ampliada' : '⤢ Ampliar cuadro') + '</button></div><div style="overflow-x:auto"><table><tr><th>Crédito</th><th>Capital</th><th>Int. devengado</th><th>Int. futuro</th><th>Anulado</th><th>Condonado</th><th>Cargos</th></tr>' + filas +
       '<tr><th>Total</th><th>' + fmt(tK) + '</th><th>' + fmt(tQd) + '</th><th>' + fmt(tI) + '</th><th colspan="2">' + fmt(tA) + '</th><th>' + fmt(tC) + '</th></tr></table></div>' +
       '<div style="margin-top:6px">' + (efNum === null ? 'Escribí el efectivo (aunque sea 0) para conciliar.' :
         'Monto nuevo ' + fmt(mnt) + ' = efectivo ' + fmt(efNum) + ' + trasladado ' + fmt(tK + tQd + tC + tI) +
         (residuo === 0 ? ' ✓ cuadra' : ' → <b style="color:var(--red)">residuo ' + fmt(residuo) + '</b> (quedará REQUIERE EVIDENCIA)')) + '</div>' +
       '<div class="field-hint">El interés devengado viene sugerido por días (método B); podés cambiarlo. La sugerencia de efectivo (monto − trasladado = ' + fmt(mnt - traslado) + ') no se guarda sola.</div>';
-    var focoA = document.activeElement && document.activeElement.getAttribute && (document.activeElement.getAttribute('data-anul') ? ['data-anul', document.activeElement.getAttribute('data-anul')] : (document.activeElement.getAttribute('data-cond') ? ['data-cond', document.activeElement.getAttribute('data-cond')] : null));
     if (focoA) { var ia = comp.querySelector('input[' + focoA[0] + '="' + focoA[1] + '"]'); if (ia) { ia.focus(); try { ia.setSelectionRange(ia.value.length, ia.value.length); } catch (e) {} } }
     if (foco) { var inp = comp.querySelector('input[data-qdev="' + foco + '"]'); if (inp) { inp.focus(); var L = inp.value.length; try { inp.setSelectionRange(L, L); } catch (e) {} } }
   }
