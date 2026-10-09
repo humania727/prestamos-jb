@@ -507,6 +507,7 @@
   .cb-nom { flex: 1; min-width: 0; line-height: 1.2; } .cb-nom b { font-size: 1rem; }
   .cb-pill { flex: none; padding: 3px 9px; border-radius: 999px; font-size: .7rem; font-weight: 700; background: var(--bg); color: var(--muted); white-space: nowrap; }
   .cb-card.rojo .cb-pill { color: var(--red); background: rgba(239,68,68,.12); } .cb-card.am .cb-pill { color: var(--yellow); background: var(--yellow-soft); } .cb-card.az .cb-pill { color: var(--accent); background: var(--accent-soft); }
+  .cb-lbl { font-size: .72rem; color: var(--muted); margin-top: 4px; }
   .cb-mto { font-size: 1.45rem; font-weight: 800; font-variant-numeric: tabular-nums; margin-top: 2px; }
   .cb-fec { font-size: .8rem; color: var(--muted); } .cb-plazo { color: var(--red); font-weight: 700; }
   .cb-btn { margin-top: 6px; padding: 9px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; }
@@ -2795,7 +2796,7 @@ function renderAtencion(at) {
     return '<div class="cb-card ' + cls + '" onclick="verDetalle(' + p.id + ')" title="Ver el crédito">' +
       '<div class="cb-top"><div class="cb-av">' + escTxt(ini) + '</div><div class="cb-nom"><b>' + escTxt(p.cliente || '') + '</b>' + tagPara(p) + '</div>' +
       '<span class="cb-pill">' + est + '</span></div>' +
-      '<div class="cb-mto">' + fmt(p.cuota || 0) + '</div>' +
+      '<div class="cb-lbl">Próximo pago</div><div class="cb-mto">' + fmt(montoProxPago(p)) + '</div>' +
       '<div class="cb-fec">Pago del ' + fd(f) + (plazo ? ' · <span class="cb-plazo">plazo vencido</span>' : '') + '</div>' +
       '<button class="cb-btn" onclick="event.stopPropagation();abrirPago(' + p.id + ')">+ Registrar pago</button></div>';
   };
@@ -3152,6 +3153,9 @@ function cambiarFechaRefundicion(id, fNueva) {
   return { ok: true, id: n.id };
 }
 function irA(id, foco) { var e = document.getElementById(id); if (!e) return; e.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (foco) setTimeout(function () { e.focus(); toast('Escribe el nombre del cliente y toca su crédito'); }, 350); }
+// 7.1: monto del próximo pago = la cuota pendiente que sigue (misma regla de la ficha), sin pasar del saldo. Solo vista.
+function montoProxPago(p) { try { if (p.frecuencia === 'unico' || (p.vencimiento && p.vencimiento < today())) return Number(p.saldo) || 0;   // pago único o plazo terminado: se debe todo el saldo
+   var rp = repartoCuotaPendiente(p, (Number(p.cuotas_canceladas) || 0) + 1); var m = (Number(rp.interes) || 0) + (Number(rp.capital) || 0); var sal = Number(p.saldo) || 0; return sal > 0 && m > sal ? sal : (m || Number(p.cuota) || 0); } catch (e) { return Number(p.cuota) || 0; } }
 // ── Tabla ──
 function render() {
   invalidarModelo69();
@@ -3296,7 +3300,7 @@ function verDetalle(id, scroll=true) {
   if (esAnulado) html += `<div class="hist-alerta">⛔ <b>Crédito ANULADO</b> el ${fd(p.anulado.fecha)} · Motivo: ${escTxt(p.anulado.motivo)} · estado anterior: ${escTxt(p.anulado.estadoAnterior || '')}. No entra en ninguna cifra.</div>`;
   if (p.cancelacion) html += `<div class="d-cancel" style="margin-top:-4px">Clasificación (RD-4): interés futuro anulado <b>${fmt(p.cancelacion.interesFuturoAnulado)}</b> · interés condonado <b>${fmt(p.cancelacion.interesCondonado)}</b> · capital no recibido <b>${fmt(p.cancelacion.capitalPerdido)}</b> · cargos perdonados <b>${fmt(p.cancelacion.cargosCondonados)}</b>
       <button class="btn btn-sm" style="margin-left:6px" onclick="corregirCondonacion(${p.id})">Corregir condonación</button></div>`;
-  else if (p.cancelado_anticipado && (Number(p.condonado) || 0) > 0) html += `<div class="d-cancel" style="margin-top:-4px">Clasificación del monto borrado: <b>histórica, NO DETERMINABLE</b> (registrada antes del historial; P-3).</div>`;
+  else if (p.cancelado_anticipado && (Number(p.condonado) || 0) > 0) html += `<div class="d-cancel solo-tec" style="margin-top:-4px">Clasificación del monto borrado: <b>histórica, NO DETERMINABLE</b> (registrada antes del historial; P-3).</div>`;
   if (!esAnulado) html += `<div style="display:flex;gap:9px;margin-bottom:6px;flex-wrap:wrap">
     ${p.estado === 'activo' ? `<button class="btn btn-primary" style="flex:1;justify-content:center" onclick="abrirPago(${p.id})">+ Registrar Pago</button>` : ''}
     ${p.estado === 'activo' ? `<button class="btn" style="flex:1;justify-content:center" onclick="abrirCargo(${p.id})">% Interés por posponer</button>` : ''}
@@ -3315,7 +3319,7 @@ function verDetalle(id, scroll=true) {
       html += `<div class="prow${c.pagado ? ' cargo-pagado' : ''}">
         <div class="pnum cargo-ico">%</div>
         <div style="flex:1">
-          <div class="pdesc">${c.descripcion}${casoCargo(c.id) ? ' ' + casoCargo(c.id).estados.map(estTag).join(' ') + ' <span class="field-hint">' + casoCargo(c.id).regla + '</span>' : ''}${c.trasladado_a ? ' · trasladado al crédito ' + escTxt((creditoPorId(c.trasladado_a) || {}).codigo || ('#' + c.trasladado_a)) : ''}</div>
+          <div class="pdesc">${c.descripcion}${casoCargo(c.id) ? '<span class="solo-tec"> ' + casoCargo(c.id).estados.map(estTag).join(' ') + ' <span class="field-hint">' + casoCargo(c.id).regla + '</span></span>' : ''}${c.trasladado_a ? ' · trasladado al crédito ' + escTxt((creditoPorId(c.trasladado_a) || {}).codigo || ('#' + c.trasladado_a)) : ''}</div>
           <div class="pfecha">${fd(c.fecha)}${c.pagado
             ? ' · Cobrado' + (c.fecha_cobro ? ' el ' + fd(c.fecha_cobro) : '')
             : (c.condonado ? ' · Perdonado' : ' · Pendiente')}</div>
@@ -3377,7 +3381,7 @@ function verDetalle(id, scroll=true) {
     html += '</div>';
   }
   var ev69 = htmlEvidencia69(p);
-  html += (ev69 ? '<details class="tec solo-tec"><summary>Detalle técnico (evidencia y modelo 6.9)</summary>' + ev69 + '</details>' : '') + htmlAnulados(p) + htmlHistorial(p);
+  html += (ev69 ? '<details class="tec solo-tec"><summary>Detalle técnico (evidencia y modelo 6.9)</summary>' + ev69 + '</details>' : '') + '<div class="solo-tec">' + htmlAnulados(p) + htmlHistorial(p) + '</div>';
   html = htmlConflictos(p) + html;
   html += '</div>';
   const det = document.getElementById('detail');
@@ -6096,7 +6100,7 @@ function renderPagos() {
     <div class="pag-stat">
       <div class="l">Ganancia del período</div><div class="v" style="color:var(--yellow)">${fmt(gInteres)}</div>
       <div class="s">interés cobrado · el resto (${fmt(gCapital)}) es capital que le devolvieron</div>
-      <div class="s">${gInteresProv ? '<span class="est FIRME">FIRME</span> ' + fmt(gInteres - gInteresProv) + ' · <span class="est PROVISIONAL">PROVISIONAL</span> ' + fmt(gInteresProv) + ' (créditos con Q reconstruido)' : '<span class="est FIRME">FIRME</span>'}</div>
+      <div class="s solo-tec">${gInteresProv ? '<span class="est FIRME">FIRME</span> ' + fmt(gInteres - gInteresProv) + ' · <span class="est PROVISIONAL">PROVISIONAL</span> ' + fmt(gInteresProv) + ' (créditos con Q reconstruido)' : '<span class="est FIRME">FIRME</span>'}</div>
     </div>`;
 
   document.getElementById('pagPeriodo').textContent = 'Período: ' + textoPeriodo();
