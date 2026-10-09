@@ -6,7 +6,7 @@
 <title>PRUEBA · Control de Préstamos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root {
@@ -488,6 +488,135 @@
   /* ═══ Refundición ═══ */
   .ref-ef { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
   .ref-ef label { font-size: .78rem; }
+  .wz-x { display: none !important; }
+  .cb-head { margin-bottom: 10px; }
+  .cb-filtros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .cb-f { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border-2); background: var(--bg-soft); color: inherit; cursor: pointer; font: inherit; text-align: left; transition: transform .12s, border-color .12s, background .12s; }
+  .cb-f:hover { transform: translateY(-1px); border-color: var(--accent); }
+  .cb-f.on { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 1px var(--accent) inset; }
+  .cb-fn { font-size: 1.6rem; font-weight: 800; line-height: 1.1; } .cb-ft { font-size: .8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; } .cb-fm { font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .cb-f.rojo .cb-fn { color: var(--red); } .cb-f.az .cb-fn { color: var(--accent); } .cb-f.gr .cb-fn { color: var(--muted); }
+  .cb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .cb-card { position: relative; display: flex; flex-direction: column; gap: 6px; padding: 14px; border-radius: 16px; border: 1px solid var(--border-2); background: var(--bg-soft); cursor: pointer; overflow: hidden; transition: transform .12s, border-color .12s; }
+  .cb-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--border-2); }
+  .cb-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .cb-card.rojo::before { background: var(--red); } .cb-card.am::before { background: var(--yellow); } .cb-card.az::before { background: var(--accent); }
+  .cb-top { display: flex; align-items: center; gap: 10px; }
+  .cb-av { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: var(--accent-soft); color: var(--accent); }
+  .cb-card.rojo .cb-av { background: rgba(239,68,68,.15); color: var(--red); } .cb-card.am .cb-av { background: var(--yellow-soft); color: var(--yellow); }
+  .cb-nom { flex: 1; min-width: 0; line-height: 1.2; } .cb-nom b { font-size: 1rem; }
+  .cb-pill { flex: none; padding: 3px 9px; border-radius: 999px; font-size: .7rem; font-weight: 700; background: var(--bg); color: var(--muted); white-space: nowrap; }
+  .cb-card.rojo .cb-pill { color: var(--red); background: rgba(239,68,68,.12); } .cb-card.am .cb-pill { color: var(--yellow); background: var(--yellow-soft); } .cb-card.az .cb-pill { color: var(--accent); background: var(--accent-soft); }
+  .cb-mto { font-size: 1.45rem; font-weight: 800; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .cb-fec { font-size: .8rem; color: var(--muted); } .cb-plazo { color: var(--red); font-weight: 700; }
+  .cb-btn { margin-top: 6px; padding: 9px; border-radius: 10px; border: none; background: var(--accent); color: #fff; font: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; }
+  .cb-btn:hover { filter: brightness(1.1); }
+  .cb-f.verde .cb-fn { color: var(--green); }
+  .cb-card.verde::before { background: var(--green); } .cb-card.verde .cb-av { background: rgba(34,197,94,.15); color: var(--green); } .cb-card.verde .cb-pill { color: var(--green); background: rgba(34,197,94,.12); }
+  .cb-nom .para-tag { display: block; width: fit-content; margin: 2px 0 0; white-space: nowrap; text-transform: none; }
+  .cb-vacio { padding: 18px; text-align: center; color: var(--green); border: 1px dashed var(--border-2); border-radius: 14px; }
+  @media (max-width: 600px) { .cb-filtros { grid-template-columns: repeat(2, 1fr); } .cb-grid { grid-template-columns: 1fr; } }
+  .home-acc { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .ha-btn { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 16px; border: 1px solid var(--border-2); background: var(--bg-soft); color: inherit; cursor: pointer; text-align: left; font: inherit; transition: transform .12s, border-color .12s, box-shadow .12s; }
+  .ha-btn:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+  .ha-btn b { display: block; font-size: .98rem; } .ha-btn small { display: block; color: var(--muted); font-size: .76rem; margin-top: 2px; }
+  .ha-ic { width: 42px; height: 42px; flex: none; border-radius: 12px; display: grid; place-items: center; font-size: 1.3rem; background: var(--accent-soft); }
+  .ha-pri { background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent))); border-color: transparent; color: #fff; }
+  .ha-pri small { color: rgba(255,255,255,.85); } .ha-pri .ha-ic { background: rgba(255,255,255,.2); color: #fff; }
+  @media (max-width: 800px) { .home-acc { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 420px) { .ha-btn { padding: 12px; gap: 8px; } .ha-ic { width: 36px; height: 36px; } }
+  @media (max-width: 600px) { .stats { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; } .stats .stat { padding: 12px !important; } .stats .stat .ico { display: none !important; } .stats .stat .val { font-size: 1.15rem !important; } .stats .stat .lbl { font-size: .62rem !important; } }
+  #atencion.atn { padding: 20px 22px; }
+  .cp-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 14px; }
+  .cp-title { font-size: 1.15rem; font-weight: 800; letter-spacing: -.01em; }
+  .cp-sub { color: var(--muted); font-size: .8rem; margin-top: 2px; }
+  .cp-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px; }
+  .cp-kpi { padding: 12px 14px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border-2); position: relative; overflow: hidden; }
+  .cp-kpi::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--muted); }
+  .cp-kpi.rojo::before { background: var(--red); } .cp-kpi.az::before { background: var(--accent); }
+  .cp-kl { font-size: .7rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 700; }
+  .cp-kv { font-size: 1.25rem; font-weight: 800; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .cp-kpi.rojo .cp-kv { color: var(--red); } .cp-kpi.az .cp-kv { color: var(--accent); }
+  .cp-ks { font-size: .75rem; color: var(--muted); }
+  .cp-grp { margin-top: 14px; }
+  .cp-gh { display: flex; justify-content: space-between; align-items: center; font-size: .75rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+  .cp-gt { text-transform: none; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+  .cp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 10px; }
+  .cp-card { display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border-2); border-top: 3px solid var(--muted); cursor: pointer; transition: transform .12s, border-color .12s, box-shadow .12s; }
+  .cp-card:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(0,0,0,.25); }
+  .cp-card.rojo { border-top-color: var(--red); } .cp-card.am { border-top-color: var(--yellow); } .cp-card.az { border-top-color: var(--accent); }
+  .cp-top { display: flex; align-items: center; gap: 10px; }
+  .cp-av { width: 38px; height: 38px; flex: none; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: .85rem; background: var(--surface-3); color: var(--text); }
+  .cp-card.rojo .cp-av { background: var(--red-soft); color: var(--red); } .cp-card.am .cp-av { background: var(--yellow-soft); color: var(--yellow); } .cp-card.az .cp-av { background: var(--accent-soft); color: var(--accent); }
+  .cp-who { flex: 1; min-width: 0; } .cp-name { font-weight: 700; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cp-when { font-size: .78rem; color: var(--muted); }
+  .cp-pill { padding: 3px 9px; border-radius: 999px; font-size: .7rem; font-weight: 700; white-space: nowrap; background: var(--surface-3); color: var(--muted); }
+  .cp-card.rojo .cp-pill { background: var(--red-soft); color: var(--red); } .cp-card.am .cp-pill { background: var(--yellow-soft); color: var(--yellow); } .cp-card.az .cp-pill { background: var(--accent-soft); color: var(--accent); }
+  .cp-mid { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
+  .cp-lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 700; }
+  .cp-amt { font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .cp-plazo { color: var(--red); font-weight: 700; }
+  .cp-warn { font-size: .7rem; font-weight: 700; color: var(--red); background: var(--red-soft); padding: 3px 8px; border-radius: 6px; }
+  .cp-btn { width: 100%; padding: 9px; border-radius: 10px; border: 1px solid var(--border-2); background: var(--surface-3); color: var(--text); font: inherit; font-size: .85rem; font-weight: 700; cursor: pointer; }
+  .cp-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .cp-ok { display: flex; gap: 12px; align-items: center; padding: 16px; border-radius: 12px; background: var(--green-soft); color: var(--green); }
+  .cp-ok span { color: var(--muted); font-size: .85rem; } .cp-ok-i { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #052; font-weight: 900; }
+  @media (max-width: 600px) { #atencion.atn { padding: 16px; } .cp-kpis { gap: 6px; } .cp-kpi { padding: 10px; } .cp-kv { font-size: 1rem; } .cp-grid { grid-template-columns: 1fr; } }
+  .para-tag { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 999px; font-size: .7rem; font-weight: 600; background: var(--accent-soft); color: var(--accent); vertical-align: middle; }
+  .atn-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .atn-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .atn-chip { padding: 3px 10px; border-radius: 999px; font-size: .75rem; font-weight: 700; background: var(--bg-soft); color: var(--muted); }
+  .atn-chip.rojo { background: var(--red-soft, rgba(239,68,68,.15)); color: var(--red); } .atn-chip.az { background: var(--accent-soft); color: var(--accent); }
+  .atn-tbl { border: 1px solid var(--border-2); border-radius: 12px; overflow: hidden; }
+  .atn-row { display: grid; grid-template-columns: 1.6fr 1fr 1.1fr 1.3fr auto; gap: 10px; align-items: center; padding: 10px 14px; border-top: 1px solid var(--border-2); cursor: pointer; font-size: .9rem; }
+  .atn-row:hover { background: var(--bg-soft); }
+  .atn-th { border-top: none; cursor: default; font-size: .7rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; background: var(--bg-soft); }
+  .atn-cli { font-weight: 700; } .atn-mto { text-align: right; font-variant-numeric: tabular-nums; } .atn-fec { color: var(--muted); font-size: .85rem; }
+  .atn-tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .75rem; font-weight: 700; white-space: nowrap; }
+  .atn-tag.rojo { background: var(--red-soft, rgba(239,68,68,.15)); color: var(--red); } .atn-tag.am { background: var(--yellow-soft); color: var(--yellow); }
+  .atn-tag.az { background: var(--accent-soft); color: var(--accent); } .atn-tag.gr { background: var(--bg-soft); color: var(--muted); }
+  .atn-th .atn-fec { font-size: inherit; color: inherit; }
+  .atn-plazo { font-size: .68rem; font-weight: 700; color: var(--red); text-transform: uppercase; margin-left: 4px; }
+  @media (max-width: 600px) { .atn-row { grid-template-columns: 1fr auto; row-gap: 4px; } .atn-th { display: none; } .atn-mto { text-align: left; } .atn-fec { grid-column: 1; } .atn-est { grid-column: 2; grid-row: 2; justify-self: end; } .atn-acc { grid-column: 2; grid-row: 1; } }
+  body:not(.tec-on) .solo-tec { display: none !important; }
+  #ovNuevo #nRefPrev { display: none !important; }   /* el aviso técnico lo reemplaza el resumen del asistente */
+  .wz-pasos { display: flex; flex-wrap: wrap; gap: 6px; margin: -4px 0 12px; font-size: .72rem; }
+  .wz-pasos span { padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border-2); color: var(--muted); }
+  .wz-pasos span.act { border-color: var(--accent); color: var(--text, #fff); background: var(--accent-soft); font-weight: 700; }
+  .wz-pasos span.hecho { color: var(--green); }
+  .wz-tipo, .wz-clientes { display: grid; gap: 10px; }
+  .wz-preg { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+  .wz-preg2 { font-size: .9rem; font-weight: 700; margin-bottom: 6px; }
+  .wz-op, .wz-cli { display: grid; grid-template-columns: auto 1fr; column-gap: 12px; text-align: left; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border-2); background: var(--bg-soft); color: inherit; cursor: pointer; font: inherit; }
+  .wz-op:hover, .wz-cli:hover { border-color: var(--accent); }
+  .wz-op:disabled { opacity: .45; cursor: not-allowed; }
+  .wz-op .wz-ic { grid-row: span 2; font-size: 1.6rem; align-self: center; }
+  .wz-op span:not(.wz-ic), .wz-cli span { color: var(--muted); font-size: .8rem; }
+  .wz-cli { grid-template-columns: 1fr; }
+  .wz-sn { display: flex; gap: 8px; flex-wrap: wrap; }
+  .wz-sn button { padding: 8px 14px; border-radius: 9px; border: 1px solid var(--border-2); background: var(--bg-soft); color: inherit; cursor: pointer; font: inherit; font-size: .85rem; }
+  .wz-sn button.on { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .wz-perdon { margin: 12px 0 6px; }
+  .wz-fila { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; border-bottom: 1px dashed var(--border-2); font-size: .88rem; }
+  .wz-fila b { font-variant-numeric: tabular-nums; text-align: right; }
+  .wz-fila.tot { font-size: 1rem; border-bottom: none; }
+  .wz-conf { display: grid; gap: 2px; }
+  .wz-tabla { width: 100%; border-collapse: collapse; font-size: .8rem; margin-top: 6px; }
+  .wz-tabla th, .wz-tabla td { padding: 4px 6px; text-align: right; border-bottom: 1px dashed var(--border-2); font-variant-numeric: tabular-nums; }
+  .wz-tabla th:nth-child(-n+2), .wz-tabla td:nth-child(-n+2) { text-align: left; }
+  .wz-tabla tr.tot td { font-weight: 700; border-bottom: none; }
+  #nInt[readonly] { opacity: .7; }
+  .wz-prev { margin: 6px 0; font-size: .85rem; color: var(--muted); }
+  .wz-aviso { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--yellow-soft); color: var(--yellow); font-size: .85rem; font-weight: 600; }
+  .ref-resumen { margin: 0 0 10px; padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); }
+  .ref-resumen:empty { display: none; }
+  .atn-i { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 9px; margin-bottom: 6px; background: var(--bg-soft); border-left: 3px solid var(--border-2); font-size: .85rem; flex-wrap: wrap; }
+  .atn-i.rojo { border-left-color: var(--red); } .atn-i.am { border-left-color: var(--yellow); } .atn-i.az { border-left-color: var(--accent); } .atn-i.gr { border-left-color: var(--muted); }
+  .atn-b { display: flex; gap: 6px; } .atn-nota { color: var(--muted); font-size: .75rem; }
+  .atn-ok { color: var(--green); font-size: .9rem; }
+  details.avz > summary { cursor: pointer; padding: 4px 0; } .avz-sub { color: var(--muted); font-size: .78rem; font-weight: 500; }
+  details.tec { margin-top: 10px; } details.tec > summary { cursor: pointer; font-size: .8rem; color: var(--muted); font-weight: 600; }
+  @media (max-width: 600px) { .atn-i { flex-direction: column; align-items: flex-start; } .wz-fila { font-size: .82rem; } }
   .ref-comp { margin-top: 10px; font-size: .78rem; border-top: 1px dashed var(--border-2); padding-top: 8px; }
   .ref-comp table { width: 100%; border-collapse: collapse; }
   .ref-comp td, .ref-comp th { padding: 3px 4px; text-align: right; font-family: var(--mono); font-size: .74rem; }
@@ -719,6 +848,141 @@
 <link rel="apple-touch-icon" href="icon-192.png"/>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style id="tema-lean">
+:root{
+ --bg:#f6f5f2;--bg-soft:#f2f1ed;--surface:#ffffff;--surface-2:#fbfaf8;--surface-3:#efede8;
+ --border:#e6e3dc;--border-2:#d8d4cb;--text:#1c1b18;--muted:#68645b;--muted-2:#8e897e;
+ --accent:#2a4fb8;--accent-2:#2a4fb8;--accent-soft:rgba(42,79,184,.08);
+ --green:#1d7a4c;--green-soft:rgba(29,122,76,.09);
+ --red:#b3372d;--red-soft:rgba(179,55,45,.08);
+ --yellow:#9a6200;--yellow-soft:rgba(176,116,10,.10);
+ --radius:10px;--shadow:none;--mono:'Geist Mono',ui-monospace,monospace;
+}
+html{color-scheme:light}
+body{font-family:'Geist',system-ui,-apple-system,sans-serif;background:var(--bg);font-size:14.5px;letter-spacing:-.003em}
+::selection{background:rgba(42,79,184,.18)}
+a{color:var(--accent)} a:hover{color:#1d3a8a}
+.wrap,.hdr-inner{max-width:1320px}
+header{background:rgba(246,245,242,.9);border-bottom:1px solid var(--border)}
+.hdr-inner{padding:12px 22px;gap:8px}
+.brand-mark{background:var(--text);box-shadow:none;border-radius:8px;width:30px;height:30px}
+.brand-mark svg{width:16px;height:16px}
+.brand h1{font-size:.98rem;font-weight:600;letter-spacing:-.015em}
+.brand .sub{color:var(--muted-2)}
+.hdr-date{color:var(--muted-2);margin-right:6px}
+.sync-pill{background:var(--surface);border-color:var(--border);font-weight:500}
+.sync-pill:hover{background:var(--surface);border-color:var(--border-2)}
+.sync-dot.ok,.sync-dot.error{box-shadow:none}
+.btn{background:var(--surface);border-color:var(--border);border-radius:8px;font-weight:500;font-size:.78rem}
+.btn:hover{background:var(--surface-3);border-color:var(--border-2)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn-ghost:hover{background:var(--surface-3);border-color:transparent;color:var(--text)}
+.btn-primary,.btn-primary:hover{background:var(--text);color:#fff;box-shadow:none;border-color:transparent}
+.btn-primary:hover{background:#000}
+.btn-green{background:var(--green)} .btn-green:hover{background:#155e3a}
+.btn-danger-ghost:hover{background:var(--red-soft)}
+/* acciones de inicio */
+.home-acc{gap:10px;margin:26px 0 6px}
+.ha-btn{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;gap:12px}
+.ha-btn:hover{transform:none;box-shadow:none;border-color:var(--border-2);background:var(--surface-2)}
+.ha-btn b{font-size:.9rem;font-weight:600;letter-spacing:-.01em}
+.ha-btn small{color:var(--muted-2);font-size:.74rem}
+.ha-ic{width:34px;height:34px;border-radius:8px;background:var(--surface-3);color:var(--text)}
+.ha-ic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ha-pri,.ha-pri:hover{background:var(--text);border-color:var(--text);color:#fff}
+.ha-pri:hover{background:#000}
+.ha-pri small{color:rgba(255,255,255,.7)} .ha-pri .ha-ic{background:rgba(255,255,255,.12);color:#fff}
+/* KPIs */
+.stats{gap:0;padding:16px 0 4px;background:transparent}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:0;margin-left:-1px;padding:16px 18px;box-shadow:none}
+.stat:first-child{border-radius:10px 0 0 10px;margin-left:0}.stat:last-child{border-radius:0 10px 10px 0}
+.stat .ico{display:none}
+.stat .lbl{text-transform:none;letter-spacing:0;font-size:.74rem;font-weight:500;color:var(--muted)}
+.stat .val{font-size:1.4rem;font-weight:600;letter-spacing:-.025em}
+.stat .sub.out{border-top-style:solid;border-color:var(--border)}
+.stat.link:hover{transform:none;border-color:var(--border);background:var(--surface-2)}
+@media(max-width:900px){.stats{gap:8px}.stat,.stat:first-child,.stat:last-child{border-radius:10px;margin-left:0}}
+/* tarjetas */
+.card{background:var(--surface);border-color:var(--border);border-radius:10px;box-shadow:none;margin-top:14px}
+.card-hdr{padding:14px 18px}
+.card-hdr h2{font-size:.9rem;font-weight:600;letter-spacing:-.01em}
+.card-hdr h2 svg{stroke:var(--muted)}
+.chev{font-size:.8rem}
+label{text-transform:none;letter-spacing:0;font-size:.76rem;font-weight:500}
+input,select,textarea{background:var(--surface);border-color:var(--border-2);border-radius:8px}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(42,79,184,.12)}
+.mode-tabs,.sync-tabs,.plan-tabs{background:var(--surface-3);border-color:transparent;border-radius:8px}
+.mode-tab,.sync-tab{border-radius:6px;font-weight:500}
+.mode-tab.active,.sync-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.dias-info,.prev-box{border-color:transparent;color:var(--accent)}
+.formula-box{background:var(--surface-2)}
+.calc-btn,.calc-btn:hover{background:var(--text);box-shadow:none;border-radius:8px;font-weight:600;letter-spacing:0}
+.calc-btn:hover{background:#000}
+.calc-result{background:var(--surface-2);border:1px solid var(--border)}
+.calc-result .r-label,.calc-result .r-item .ri-l{text-transform:none;letter-spacing:0;opacity:1;color:var(--muted)}
+.calc-result .r-val{color:var(--text);font-weight:600}
+.calc-result .r-item{background:var(--surface);border-color:var(--border)}
+.calc-result .r-formula{border-color:var(--border);color:var(--muted);opacity:1}
+/* tabla */
+th{background:var(--surface-2);text-transform:none;letter-spacing:0;font-size:.74rem;font-weight:500;color:var(--muted)}
+td{border-color:var(--border)}
+tr.datarow:hover td{background:var(--surface-2)}
+tr.marcada>td{background:var(--accent-soft)}
+.cliente-cell{font-weight:600}
+.badge{text-transform:none;letter-spacing:0;font-size:.7rem;font-weight:500;padding:2px 9px}
+.badge-pagado{background:var(--surface-3);color:var(--muted)}
+.prog-bg{background:var(--surface-3);height:3px}.prog{background:var(--text);height:3px}
+/* detalle */
+.d-hdr{background:var(--surface-2)}
+.d-hdr .cls{background:var(--surface);border-color:var(--border)}
+.d-item,.prow,.rep-resumen,.cli-row,.ref-box,.wz-op,.wz-cli,.wz-sn button,.cb-f,.cb-card{background:var(--surface-2);border-color:var(--border)}
+.d-item .l,.pag-stat .l,.cf-box .l,.sel-bar .sb-i .l,.sec-title,.cp-kl,.cp-lbl,.cp-gh,.ref-lbl,.cb-ft,.atn-th,.sync-code-display .code-lbl{text-transform:none;letter-spacing:0;font-weight:500}
+.d-item.danger{border-color:rgba(179,55,45,.2)}
+.pnum{background:var(--surface-3);color:var(--text)}
+.nota,.alert-yellow{color:#6b4500;border-color:rgba(176,116,10,.25)}
+.sync-info-box,.alert-blue{color:#1e3570;border-color:rgba(42,79,184,.2)}
+.alert-green{border-color:rgba(29,122,76,.25)} .alert-red{border-color:rgba(179,55,45,.25)}
+.d-ref,.d-plan,.d-cancel{border-color:var(--border)}
+/* modales */
+.overlay{background:rgba(28,27,24,.32);backdrop-filter:blur(2px)}
+.modal{border-color:var(--border);border-radius:12px;box-shadow:0 20px 50px rgba(28,27,24,.18)}
+.modal h2{font-weight:600}.modal h2 svg{stroke:var(--muted)}
+.toast{background:var(--text);color:#fff;border:0;border-left:3px solid var(--green);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.sync-code-display{background:var(--surface-2)}
+/* pagos / deuda / ficha */
+.rng-tab{background:var(--surface);border-color:var(--border);font-weight:500}
+.rng-tab:hover{border-color:var(--border-2)}
+.rng-tab.active{background:var(--text);color:#fff;box-shadow:none}
+.pag-stat,.cf-box,.cf-box.debe,.cf-box.ok,.cp-kpi,.cp-card{background:var(--surface);border-color:var(--border)}
+.pag-stat .v,.cf-box .v,.cp-kv,.cp-amt,.cb-mto,.cb-fn{font-weight:600}
+.cli-ficha{background:var(--surface-2)}
+.cli-sug{background:var(--surface);border-color:var(--border);box-shadow:0 10px 30px rgba(28,27,24,.12)}
+.cli-sug button:hover{background:var(--surface-3)}
+.pag-tbl,.deu-tbl,.atn-tbl{border-color:var(--border)}
+.atn-row{border-color:var(--border)} .atn-row:hover{background:var(--surface-2)}
+.atn-th{background:var(--surface-2)}
+.atn-chip,.atn-tag.gr{background:var(--surface-3)}
+.cp-card{border-top-width:2px}
+.cp-card:hover,.cb-card:hover,.cb-f:hover{transform:none;box-shadow:none;border-color:var(--border-2)}
+.cp-av,.cp-btn{background:var(--surface-3);border-color:var(--border)}
+.cp-btn:hover{background:var(--text);border-color:var(--text)}
+.cp-ok-i{color:#fff}
+.cb-btn{background:var(--text);font-weight:600}
+.hist-ev,.atn-i{background:var(--surface-2)}
+.ref-item{background:var(--surface);border-color:var(--border)}
+.ref-prev{background:var(--surface-2)}
+.ref-comp.ampliado{background:var(--surface);box-shadow:0 20px 50px rgba(28,27,24,.2)}
+.sel-bar{background:var(--surface);border-color:var(--border-2);box-shadow:0 12px 36px rgba(28,27,24,.16)}
+.wz-pasos span.act{color:var(--text)}
+.est.CONFIRMADO,.est.FIRME{background:var(--green-soft)} .est.RECONSTRUIDO,.est.PROVISIONAL{background:var(--yellow-soft)}
+/* ingreso */
+.login-ov{background:var(--bg)}
+.login-card{border-color:var(--border);box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.login-mark{background:var(--text);border:0}.login-mark svg{stroke:#fff}
+.login-inp input{background:var(--surface)}
+footer{color:var(--muted-2)}
+
+</style>
 </head>
 <body class="bloqueada">
 
@@ -799,14 +1063,25 @@
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
       Importar<input type="file" accept=".json" onchange="importarDatos(event)" style="display:none"/>
     </label>
+    <button class="btn btn-ghost" id="btnTecnico" onclick="verTecnico()" title="Detalle técnico: auditoría y control interno">Técnico</button>
   </div>
 </header>
 
 <div class="wrap">
 
+<div class="home-acc">
+  <button class="ha-btn ha-pri" onclick="abrirNuevo()"><span class="ha-ic"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span><b>Nuevo crédito</b><small>Préstamo o refundición</small></span></button>
+  <button class="ha-btn" onclick="irA('cliBuscar', true)"><span class="ha-ic"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></svg></span><span><b>Registrar pago</b><small>Busca el cliente</small></span></button>
+  <button class="ha-btn" onclick="irA('deuHdr')"><span class="ha-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></span><span><b>Clientes</b><small>Quién debe y cuánto</small></span></button>
+  <button class="ha-btn" onclick="irA('pagosHdr')"><span class="ha-ic"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span><b>Movimientos</b><small>Cobrado y prestado</small></span></button>
+</div>
 <div class="stats" id="stats"></div>
-<div class="card" id="ind69" style="margin-bottom:18px"></div>
-<div class="card" id="control70" style="margin-bottom:18px"></div>
+<div class="card atn" id="atencion" style="margin-bottom:18px"></div>
+<details class="card avz" id="avanzado" style="margin-bottom:18px;display:none" open>
+  <summary><b>Detalle técnico</b> <span class="avz-sub">· no hace falta para el uso diario</span> <button type="button" class="btn btn-sm btn-ghost" style="float:right" onclick="event.preventDefault();verTecnico(false)">✕ Cerrar</button></summary>
+  <div id="ind69" style="margin-bottom:18px"></div>
+  <div id="control70"></div>
+</details>
 
 <!-- ══════════ CALCULADORA ══════════ -->
 <div class="card">
@@ -987,24 +1262,33 @@
   <div class="modal">
     <h2>
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
-      Nuevo Crédito
+      <span id="wizTit">Nuevo crédito</span>
     </h2>
-    <div class="fg">
-      <label class="s2">Cliente <input id="nCli" placeholder="Ej: Lorena" required oninput="refrescarRefundibles()"/></label>
-      <label>Código (ddmm) <input id="nCod" placeholder="Ej: 1010" maxlength="6"/></label>
-      <label>Fecha inicio <input type="date" id="nFec" required/></label>
-      <div class="s2 plan-tabs">
+    <div class="wz-pasos" id="wizPasos"></div>
+    <div id="wizTipo" class="wz-tipo">
+      <div class="wz-preg">¿Qué tipo de crédito es?</div>
+      <button type="button" class="wz-op" onclick="wizIr('nuevo')"><span class="wz-ic">🆕</span><b>Crédito nuevo</b><span>Le prestás dinero a un cliente</span></button>
+      <button type="button" class="wz-op" id="wizOpRef" onclick="wizIr('r1')"><span class="wz-ic">🔄</span><b>Refundición</b><span>Juntás o renovás créditos activos de un cliente en uno nuevo</span></button>
+    </div>
+    <div id="wizClientes" class="wz-clientes"></div>
+    <div id="wizRes" class="ref-resumen"></div>
+    <div id="wizConf" class="wz-conf"></div>
+    <div class="fg" id="wizForm">
+      <label class="s2" id="wCli">Cliente <input id="nCli" placeholder="Ej: Lorena" required oninput="refrescarRefundibles()"/></label>
+      <label id="wCod">Código (ddmm) <input id="nCod" placeholder="Ej: 1010" maxlength="6"/></label>
+      <label id="wFec">Fecha del préstamo <input type="date" id="nFec" required oninput="prevCalc()"/></label>
+      <div class="s2 plan-tabs" id="wPlan">
         <button type="button" class="mode-tab active" id="tabPlanIguales" onclick="setPlan('iguales')">Cuotas iguales<br><span style="font-weight:500;opacity:.8">capital + interés en cada cuota</span></button>
         <button type="button" class="mode-tab" id="tabPlanInteres" onclick="setPlan('interes')">Solo intereses<br><span style="font-weight:500;opacity:.8">y el capital al final</span></button>
       </div>
-      <label>Monto solicitado (₡) <input type="number" id="nMnt" min="0" step="1000" placeholder="0" oninput="prevCalc()"/></label>
+      <label id="wMnt"><span id="wMntTxt">Monto (₡)</span> <input type="number" id="nMnt" min="0" step="1000" placeholder="0" oninput="prevCalc()"/></label>
       <label id="nLblInt">Interés total (₡) <input type="number" id="nInt" min="0" step="1000" placeholder="0" oninput="prevCalc()"/></label>
-      <label id="nLblCuotas"><span class="lb">N° de cuotas</span> <input type="number" id="nCuotas" value="1" min="1" oninput="prevCalc()"/></label>
+      <label id="nLblCuotas"><span class="lb">Número de pagos</span> <input type="number" id="nCuotas" value="1" min="1" oninput="prevCalc()"/></label>
       <label id="nLblCuota"><span class="lb">Monto de cuota (₡)</span>
         <input type="number" id="nCuota" min="0" step="500" placeholder="Opcional" oninput="prevCalc()"/>
-        <span class="field-hint" id="nCuotaHint">Si la ingresás, el total y el interés se calculan solos (cuota × cuotas)</span>
+        <span class="field-hint" id="nCuotaHint">Si ponés la cuota, el interés se calcula solo: cuota × número de pagos − monto</span>
       </label>
-      <label>Frecuencia de pago
+      <label id="wFrec">Frecuencia de pago
         <select id="nFrec" onchange="cambioFrec()">
           <option value="unico">Pago único</option>
           <option value="semanal">Semanal</option>
@@ -1012,7 +1296,7 @@
           <option value="mensual">Mensual</option>
         </select>
       </label>
-      <label>Próximo pago
+      <label id="wProx">Primer pago
         <input type="date" id="nProx" onchange="prevCalc()"/>
         <span class="field-hint" id="nProxHint">En pago único se usa la fecha de vencimiento</span>
       </label>
@@ -1032,47 +1316,61 @@
         <span class="field-hint" id="nVencHint">Se calcula solo según la frecuencia y el n° de cuotas</span>
       </label>
       <div class="prev-box" id="nPrev"></div>
+      <div class="s2" id="wizPlan"></div>
       <div class="s2 ref-box" id="nRefBox" style="display:none">
-        <label class="ref-chk">
+        <label class="ref-chk" id="wRefChk">
           <input type="checkbox" id="nRefunde" onchange="cambioRefunde()"/>
           <span>Este crédito <strong>refunde</strong> uno o varios créditos del mismo cliente (ese saldo pasa al nuevo, no sale plata otra vez)</span>
         </label>
         <div class="ref-det" id="nRefDet" style="display:none">
-          <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;align-items:center;gap:10px" id="wRefHdr">
             <span class="ref-lbl">Créditos que se cierran</span>
             <button type="button" class="ref-todos" id="nRefTodos" onclick="marcarTodosRefundibles()">Marcar todos</button>
           </div>
           <div class="ref-lista" id="nRefLista"></div>
-          <div class="ref-ef">
-            <label>Efectivo que entregás hoy (₡) *
-              <input type="number" id="nRefEf" min="0" step="500" placeholder="Obligatorio — si no entregás nada, escribí 0" oninput="prevCalc()"/>
+          <div id="wizPerdon" class="wz-perdon">
+            <div class="wz-preg2">¿Quieres perdonar los intereses pendientes?</div>
+            <div class="wz-sn"><button type="button" id="wizPerNo" onclick="wizPerdon(false)">No</button><button type="button" id="wizPerSi" onclick="wizPerdon(true)">Sí</button></div>
+            <div id="wizPerTxt" class="field-hint"></div>
+          </div>
+          <div class="ref-ef" id="wRefEf">
+            <label class="s2">¿Cuánto dinero NUEVO vas a entregar? (₡)
+              <input type="number" id="nRefEf" min="0" step="500" placeholder="0 si no entregás dinero nuevo" oninput="wizRefrescar()"/>
             </label>
-            <label>Fecha del efectivo
-              <input type="date" id="nRefEfFec" oninput="prevCalc()"/>
-              <span class="field-hint">Si la dejás vacía, se usa la fecha del crédito</span>
+            <label>Fecha en que lo entregás
+              <input type="date" id="nRefEfFec" oninput="wizRefrescar()"/>
+              <span class="field-hint">Si la dejás vacía, es hoy</span>
             </label>
-            <label>Evidencia
+            <label id="wRefNivel">Evidencia
               <select id="nRefNivel" onchange="prevCalc()">
                 <option value="E2">E2 — lo registro ahora, en el momento</option>
                 <option value="E1">E1 — tengo comprobante (SINPE, recibo)</option>
                 <option value="E3">E3 — declaración mía de algo ya pasado</option>
               </select>
             </label>
-            <label>Referencia (opcional)
-              <input id="nRefRef" placeholder="N.º SINPE, nota…"/>
+            <label>Comprobante (opcional)
+              <input id="nRefRef" placeholder="N.º SINPE o recibo, si tenés" oninput="wizRefrescar()"/>
             </label>
           </div>
-          <div class="ref-comp" id="nRefComp"></div>
+          <details class="tec" id="wRefAvz"><summary>Ajuste avanzado (opcional): detalle técnico por crédito</summary><div class="ref-comp" id="nRefComp"></div></details>
           <div class="ref-prev" id="nRefPrev"></div>
         </div>
       </div>
-      <label class="s2">Notas <textarea id="nNotas" rows="2" placeholder="Opcional…"></textarea></label>
+      <label class="s2" id="wPara">¿Para quién es? <span class="field-hint" style="display:inline">(opcional: si lo pidió para un familiar)</span><input id="nPara" placeholder="Ej.: primo, prima, hija" oninput="syncPara('nNotas', this.value)"/></label>
+      <label class="s2" id="wNotas">Notas <textarea id="nNotas" rows="2" placeholder="Opcional…"></textarea></label>
+      <div class="s2 wz-perdon" id="wizEntregado">
+        <div class="wz-preg2">¿Ya entregaste el dinero?</div>
+        <div class="wz-sn"><button type="button" id="wizEntSi" onclick="wizEntregado(true)">✓ Sí, ya lo entregué</button><button type="button" id="wizEntNo" onclick="wizEntregado(false)">No, todavía no</button></div>
+      </div>
+      <div class="s2" id="wizMas"><button type="button" class="btn btn-sm btn-ghost" onclick="window.WZ.mas=!window.WZ.mas;wizMostrar()" id="wizMasBtn">Más opciones ▾</button></div>
       <label class="s2" id="nEfConfBox" style="font-size:.8rem"><input type="checkbox" id="nEfConf"> Registro de evidencia: confirmo que entregué en efectivo el monto de este crédito
         <span class="field-hint">(si la fecha del crédito es hoy queda <b>E2</b>, registro contemporáneo; si es otra fecha queda <b>E3</b>, declaración de Jero; sin marcar no se registra evidencia)</span></label>
     </div>
     <div class="fa">
       <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardarCredito()">Guardar Crédito</button>
+      <button class="btn btn-ghost" id="wizAtras" onclick="wizAtras()">← Atrás</button>
+      <button class="btn btn-primary" id="wizSig" onclick="wizSiguiente()">Siguiente →</button>
+      <button class="btn btn-primary" id="wizOk" onclick="guardarCredito()">CONFIRMAR CRÉDITO</button>
     </div>
   </div>
 </div>
@@ -1124,6 +1422,7 @@
         </select>
       </label>
       <div class="s2 d-plan" id="eNotaPlan" style="display:none"></div>
+      <label class="s2">¿Para quién es? <span class="field-hint" style="display:inline">(opcional: si lo pidió para un familiar)</span><input id="ePara" placeholder="Ej.: primo, prima, hija" oninput="syncPara('eNotas', this.value)"/></label>
       <label class="s2">Notas <textarea id="eNotas" rows="2" placeholder="Opcional…"></textarea></label>
       <label class="s2">Motivo del cambio * <input id="eMotivo" placeholder="Obligatorio: por qué se modifica (queda en el historial)"/></label>
     </div>
@@ -1182,9 +1481,9 @@
         <button type="button" class="rng-tab" onclick="montoCancelar('todo')">Todo el saldo</button>
         <button type="button" class="rng-tab" onclick="montoCancelar('cero')">No paga nada</button>
       </div>
-      <label>Interés condonado (₡)
+      <label>Interés que le perdonás (₡)
         <input type="number" id="xCond" min="0" step="500" value="0" oninput="prevCancelar()"/>
-        <span class="field-hint">Solo si lo perdonás expresamente. El resto del interés que no se cobra queda como «interés futuro anulado».</span>
+        <span class="field-hint">Solo si lo perdonás expresamente. El interés que ya no se cobra por terminar antes se registra aparte, de forma automática.</span>
       </label>
       <label>Motivo (opcional)
         <input id="xMotivo" placeholder="Por qué se cancela antes"/>
@@ -1228,10 +1527,10 @@
       <label class="s2">Descripción <input id="pDesc" placeholder="Ej: Pago 5 (opcional)"/></label>
       <label class="s2 ref-chk">
         <input type="checkbox" id="pNoEfectivo" onchange="cambioNoEfectivo()"/>
-        <span>No entró efectivo — es un traslado o refundición (no suma en lo recaudado)</span>
+        <span>No recibí dinero: es un traslado (no suma a lo cobrado)</span>
       </label>
       <div class="s2" id="pNoEfBox" style="display:none">
-        <div class="field-hint" style="margin-bottom:6px">Si es una refundición, usá <b>Nuevo crédito → refunde</b>: ahí se registra el efectivo y se cierra este crédito solo.</div>
+        <div class="field-hint" style="margin-bottom:6px">Si es una refundición, usá <b>+ Nuevo crédito → Refundición</b>: ahí se cierra este crédito solo.</div>
         <label>A qué crédito pasó (si aplica)
           <select id="pDestino"><option value="">— ninguno —</option></select>
         </label>
@@ -2434,34 +2733,88 @@ function verCobradoDelMes() {
   if (hdr && hdr.scrollIntoView) hdr.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function atencionPagos() {      // solo lectura: usa proxPagoDe() y las fechas guardadas
+  var hoy = today(), en7 = ymdLocal(new Date(Date.now() + 7 * 86400000));
+  var r = { vencidos: [], hoy: [], semana: [] };
+  prestamos.filter(function (p) { return p.estado === 'activo'; }).forEach(function (p) {
+    var f = proxPagoDe(p); if (!f) return;
+    if (f < hoy) r.vencidos.push(p); else if (f === hoy) r.hoy.push(p); else if (f <= en7) r.semana.push(p);
+  });
+  var o = function (a, b) { return (proxPagoDe(a) || '') < (proxPagoDe(b) || '') ? -1 : 1; };
+  r.vencidos.sort(o); r.semana.sort(o);
+  r.total = r.vencidos.length + r.hoy.length + r.semana.length;
+  return r;
+}
 function renderStats() {
   const act = prestamos.filter(p => p.estado === 'activo');
-  const pag = prestamos.filter(p => p.estado === 'pagado');
   const mes = cobradoEsteMes();
-  const des = desembolsadoEsteMes();
+  const at = atencionPagos();
   document.getElementById('stats').innerHTML = `
+    <div class="stat red">
+      <div class="ico">${icoSaldo}</div>
+      <div><div class="lbl">Por cobrar</div><div class="val">${fmt(act.reduce((a,p)=>a+p.saldo,0))}</div><div class="sub">Saldo de los créditos activos</div></div>
+    </div>
     <div class="stat blue">
       <div class="ico">${icoActivos}</div>
       <div><div class="lbl">Créditos activos</div><div class="val">${act.length}</div></div>
     </div>
-    <div class="stat red">
-      <div class="ico">${icoSaldo}</div>
-      <div><div class="lbl">Saldo por cobrar</div><div class="val">${fmt(act.reduce((a,p)=>a+p.saldo,0))}</div></div>
+    <div class="stat yellow link" onclick="document.getElementById('atencion').scrollIntoView({behavior:'smooth'})" title="Ver la lista">
+      <div class="ico">${icoActivos}</div>
+      <div><div class="lbl">Pagos que requieren atención</div><div class="val">${at.total}</div>
+        <div class="sub">${at.vencidos.length} vencidos · ${at.hoy.length} hoy · ${at.semana.length} próximos 7 días</div></div>
     </div>
     <div class="stat green link" onclick="verCobradoDelMes()" title="Ver los pagos de este mes">
       <div class="ico">${icoCobrado}</div>
-      <div>
-        <div class="lbl">Cobrado en ${mes.mes}</div>
-        <div class="val">${fmt(mes.total)}</div>
-        <div class="sub">${mes.n} ${mes.n === 1 ? 'pago recibido' : 'pagos recibidos'}${mes.total > 0 ? ` · <strong style="color:var(--yellow)">${fmt(mes.interes)}</strong> de ganancia ${mes.interesProv ? '(<span class="est PROVISIONAL">PROVISIONAL</span> ' + fmt(mes.interesProv) + ')' : '<span class="est FIRME">FIRME</span>'}` : ''}</div>
-        <div class="sub out">Desembolsado: <strong>${fmt(des.total)}</strong>${des.prov ? ' ' + estTag('RECONSTRUIDO') + ' incluye ' + fmt(des.prov) + ' reconstruido' : ''} · ${des.n} ${des.n === 1 ? 'crédito' : 'créditos'}${des.ref > 0 ? ` · <strong>${fmt(des.ref)}</strong> refundidos` : ''}</div>
-      </div>
-    </div>
-    <div class="stat gray">
-      <div class="ico">${icoPagados}</div>
-      <div><div class="lbl">Créditos pagados</div><div class="val">${pag.length}</div></div>
+      <div><div class="lbl">Cobrado este mes</div><div class="val">${fmt(mes.total)}</div>
+        <div class="sub">${mes.n} ${mes.n === 1 ? 'pago recibido' : 'pagos recibidos'} en ${mes.mes}</div></div>
     </div>
   `;
+  try { renderAtencion(at); } catch (e) { console.error(e); }
+}
+// «Requiere atención»: solo cosas accionables. Solo lectura (no cambia datos).
+function renderAtencion(at) {
+  var el = document.getElementById('atencion'); if (!el) return;
+  at = at || atencionPagos();
+  var it = [], nom = function (p) { return '<b>' + escTxt(p.cliente || '') + '</b> ' + escTxt(p.codigo || ''); };
+  var btn = function (p) { return '<span class="atn-b"><button class="btn btn-sm btn-ghost" onclick="verDetalle(' + p.id + ')">Ver</button></span>'; };
+  todosLosPrestamos().forEach(function (p) {
+    if (conflictosPendientes(p).length) it.push('<div class="atn-i rojo"><span>Conflicto de sincronización en ' + nom(p) + ': elegí qué versión mantener</span>' + btn(p) + '</div>');
+    if (verificarHistorial(p).length) it.push('<div class="atn-i rojo"><span>Alerta en el historial de ' + nom(p) + ': revisalo antes de modificarlo</span>' + btn(p) + '</div>');
+  });
+  prestamos.forEach(function (p) {
+    var r = p.refundicion; if (!r || r.version !== '7.0') return;
+    if ((r.residuo && r.residuo !== 0) || r.controlLadoViejo === 'FAIL') it.push('<div class="atn-i am"><span>' + nom(p) + ' · la refundición quedó con una diferencia sin explicar: revisá el comprobante</span>' + btn(p) + '</div>');
+  });
+  var hoyS = today(), dias = function (f) { return Math.round((new Date(hoyS + 'T12:00') - new Date(f + 'T12:00')) / 86400000); };
+  var tarjeta = function (p, tipo) {
+    var f = proxPagoDe(p), d = dias(f), plazo = p.vencimiento && p.vencimiento < hoyS, cls, est;
+    if (tipo === 'v') { cls = 'rojo'; est = 'Atrasado ' + d + (d === 1 ? ' día' : ' días'); }
+    else if (tipo === 'h') { cls = 'verde'; est = 'Al día · paga hoy'; }
+    else { cls = 'verde'; est = 'Al día · en ' + (-d) + (d === -1 ? ' día' : ' días'); }
+    var ini = String(p.cliente || '?').trim().charAt(0).toUpperCase();
+    return '<div class="cb-card ' + cls + '" onclick="verDetalle(' + p.id + ')" title="Ver el crédito">' +
+      '<div class="cb-top"><div class="cb-av">' + escTxt(ini) + '</div><div class="cb-nom"><b>' + escTxt(p.cliente || '') + '</b>' + tagPara(p) + '</div>' +
+      '<span class="cb-pill">' + est + '</span></div>' +
+      '<div class="cb-mto">' + fmt(p.cuota || 0) + '</div>' +
+      '<div class="cb-fec">Pago del ' + fd(f) + (plazo ? ' · <span class="cb-plazo">plazo vencido</span>' : '') + '</div>' +
+      '<button class="cb-btn" onclick="event.stopPropagation();abrirPago(' + p.id + ')">+ Registrar pago</button></div>';
+  };
+  prestamos.forEach(function (p) {
+    var r = p.refundicion; if (!r || r.version !== '7.0') return;
+    if ((r.residuo && r.residuo !== 0) || r.controlLadoViejo === 'FAIL') it.push('<div class="atn-i am"><span>' + nom(p) + ' · la refundición quedó con una diferencia sin explicar: revisá el comprobante</span>' + btn(p, false) + '</div>');
+  });
+  var fil = window.cbFiltro || 'todos';
+  var grupos = [['v', 'Atrasados', at.vencidos], ['h', 'Hoy', at.hoy], ['s', 'Esta semana', at.semana]];
+  var montoDe = function (a) { return a.reduce(function (x, p) { return x + (Number(p.cuota) || 0); }, 0); };
+  var boton = function (k, t, n, m, cls) { return '<button type="button" class="cb-f ' + cls + (fil === k ? ' on' : '') + '" onclick="window.cbFiltro=\'' + k + '\';renderAtencion()"><span class="cb-fn">' + n + '</span><span class="cb-ft">' + t + '</span>' + (m != null ? '<span class="cb-fm">' + fmt(m) + '</span>' : '') + '</button>'; };
+  var html = '<div class="cb-head"><div class="sec-title" style="margin:0">Cobros pendientes</div></div>' +
+    '<div class="cb-filtros">' + boton('v', 'Atrasados', at.vencidos.length, montoDe(at.vencidos), 'rojo') + boton('h', 'Hoy', at.hoy.length, montoDe(at.hoy), 'verde') +
+    boton('s', 'Esta semana', at.semana.length, montoDe(at.semana), 'verde') + boton('todos', 'Todos', at.total, null, '') + '</div>' + it.join('');
+  var cards = [];
+  grupos.forEach(function (g) { if (fil !== 'todos' && fil !== g[0]) return; g[2].forEach(function (p) { cards.push(tarjeta(p, g[0])); }); });
+  html += cards.length ? '<div class="cb-grid">' + cards.join('') + '</div>' + (at.vencidos.length ? '<div class="atn-nota" style="margin-top:8px">Si alguien ya pagó, regístralo con «+ Registrar pago».</div>' : '')
+    : '<div class="cb-vacio">✓ Nada pendiente aquí.</div>';
+  el.innerHTML = html;
 }
 
 // ── Frecuencia de pago ──
@@ -2720,6 +3073,85 @@ function textoReparto(rp) {
   return '<span class="i">Interés ' + fmt(rp.interes) + '</span> · <span class="k">Capital ' + fmt(rp.capital) + '</span>';
 }
 
+// 7.1: después de cada vista previa se dibuja el plan de pagos; con cuota fija el interés lo calcula la app (solo vista)
+(function () { var base = prevCalc; prevCalc = function () { base.apply(this, arguments);
+  var ni = document.getElementById('nInt'), cu = parseFloat((document.getElementById('nCuota') || {}).value) || 0;
+  if (ni) ni.readOnly = cu > 0 && planNuevo() !== 'interes';
+  var w = document.getElementById('wizPlan'); if (w) w.innerHTML = wizPlanPagos(); }; })();
+function verTecnico(mostrar) {
+  var d = document.getElementById('avanzado'); if (!d) return;
+  var ver = mostrar === undefined ? d.style.display === 'none' : !!mostrar;
+  d.style.display = ver ? '' : 'none'; d.open = true;
+  document.getElementById('btnTecnico').classList.toggle('on', ver); document.body.classList.toggle('tec-on', ver);
+  if (ver) d.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+// 7.1: «Para quién»: referencia guardada como primera línea de Notas («Para: primo»). No es un dato económico; el crédito sigue siendo del cliente.
+function paraDe(p) { var m = String((p && p.notas) || '').match(/^\s*Para:\s*([^\n]+)/i); return m ? m[1].trim() : ''; }
+function tagPara(p) { var r = paraDe(p); return r ? ' <span class="para-tag">para ' + escTxt(r) + '</span>' : ''; }
+function syncPara(idNotas, val) { var el = document.getElementById(idNotas); if (!el) return; var t = el.value.replace(/^\s*Para:[^\n]*\n?/i, ''); val = String(val || '').trim(); el.value = val ? 'Para: ' + val + (t ? '\n' + t : '') : t; }
+(function () {
+  var _ab = window.abrirEditar; if (_ab) window.abrirEditar = function (id) { var r = _ab.apply(this, arguments); var e = document.getElementById('ePara'), p = creditoPorId(id); if (e) e.value = paraDe(p); return r; };
+  var _an = window.abrirNuevo; if (_an) window.abrirNuevo = function () { var r = _an.apply(this, arguments); var e = document.getElementById('nPara'); if (e) e.value = paraDe({ notas: (document.getElementById('nNotas') || {}).value }); return r; };
+})();
+function abrirCambioFecha(id) {
+  var b = creditoPorId(id); if (!b) return;
+  var ov = document.getElementById('ovFechaRef');
+  if (!ov) { ov = document.createElement('div'); ov.id = 'ovFechaRef'; ov.className = 'overlay'; document.body.appendChild(ov); }
+  ov.innerHTML = '<div class="modal" style="max-width:440px"><h2>📅 Cambiar fecha de la refundición</h2>' +
+    '<p style="font-size:.9rem;color:var(--muted);margin:6px 0 14px">Crédito <b>' + escTxt(b.codigo || '') + '</b> de <b>' + escTxt(b.cliente) + '</b>. Hoy dice <b>' + fd(b.fecha_inicio) + '</b>.<br>Los montos, la cuota y el dinero entregado quedan iguales; solo cambia la fecha.</p>' +
+    '<label>Fecha correcta<input type="date" id="cfFecha" value="' + (b.fecha_inicio || '') + '" max="' + today() + '"/></label>' +
+    '<div class="field-hint" style="margin-top:8px">Queda registrado en el historial de los créditos.</div>' +
+    '<div class="modal-foot" style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="btn" onclick="document.getElementById(\'ovFechaRef\').classList.remove(\'open\')">Cancelar</button>' +
+    '<button class="btn btn-primary" onclick="cambiarFechaRefundicion(' + id + ', document.getElementById(\'cfFecha\').value)">Guardar fecha</button></div></div>';
+  ov.classList.add('open');
+}
+function cambiarFechaRefundicion(id, fNueva) {
+  var b = creditoPorId(id); var ov = document.getElementById('ovFechaRef');
+  if (!b || !fNueva) { toast('Elegí la fecha', false); return { ok: false }; }
+  if (fNueva === b.fecha_inicio) { toast('Es la misma fecha', false); return { ok: false }; }
+  if (fNueva > today()) { toast('La fecha no puede ser futura', false); return { ok: false }; }
+  if ((pagos[id] || []).length || esPlanInteres(b) || !(b.refundicion && b.refundicion.viejos)) { toast('Este crédito no se puede cambiar de fecha automáticamente', false); return { ok: false }; }
+  var r0 = JSON.parse(JSON.stringify(b.refundicion)), fViejo = b.fecha_inicio;
+  var antes = { cliente: b.cliente, monto: b.monto, interes: b.interes, total: b.total, cuota: b.cuota, num: b.num_cuotas, frec: b.frecuencia, dias: b.dias_pago, prox: b.proximo_pago, venc: b.vencimiento, notas: b.notas };
+  var fEf = (r0.fechaEfectivo && r0.fechaEfectivo !== fViejo) ? r0.fechaEfectivo : fNueva;
+  var nivel = r0.nivelEvidencia === 'E2' && fEf !== today() ? 'E3' : (r0.nivelEvidencia || 'E3');
+  var motivo = 'Cambio de fecha de la refundición: ' + fd(fViejo) + ' → ' + fd(fNueva);
+  var rv = revertirRefundicion(id, { motivo: motivo, evidenciaEfectivo: { nivel: 'E3', detalle: 'El efectivo sí se entregó; se revierte solo para registrar la misma refundición con fecha ' + fd(fNueva) + '.' } });
+  if (!rv.ok) { toast('No se pudo cambiar la fecha: ' + rv.error, false); return rv; }
+  try {
+    abrirNuevo(); var S = function (i, v) { document.getElementById(i).value = v; };
+    S('nCli', antes.cliente); refrescarRefundibles(); document.getElementById('nRefunde').checked = true; cambioRefunde();
+    var ids = r0.viejos.map(function (v) { return String(v.id); });
+    document.querySelectorAll('#nRefLista input[data-id]').forEach(function (i) { i.checked = ids.indexOf(i.getAttribute('data-id')) >= 0; marcarRefItem(i); });
+    S('nFec', fNueva); S('nRefEf', String(r0.efectivo || 0)); S('nRefEfFec', fEf); S('nRefNivel', nivel); S('nRefRef', r0.referenciaEvidencia || '');
+    if (window.WZ) { window.WZ.perdon = false; window.WZ.avanzadoManual = true; }
+    prevCalc();
+    r0.viejos.forEach(function (v) {
+      var q = document.querySelector('#nRefComp input[data-qdev="' + v.id + '"]'), co = document.querySelector('#nRefComp input[data-cond="' + v.id + '"]'), an = document.querySelector('#nRefComp input[data-anul="' + v.id + '"]');
+      if (v.metodoQdev === 'registrado por Jero' && q) { q.value = String(v.Q_dev); q.setAttribute('data-editado', '1'); }
+      if (co) co.value = String(v.condonado || 0); if (an) an.value = String(v.IF_anulado || 0);
+    });
+    if (window.WZ) window.WZ.avanzadoManual = true;
+    S('nMnt', String(antes.monto)); S('nCuotas', String(antes.num)); S('nFrec', antes.frec); cambioFrec();
+    if (antes.frec === 'quincenal' && antes.dias) { S('nDia1', String(antes.dias[0])); S('nDia2', String(antes.dias[1])); }
+    if (Math.round(antes.cuota * antes.num) === antes.total) { S('nCuota', String(antes.cuota)); } else { S('nCuota', ''); S('nInt', String(antes.interes)); }
+    S('nProx', antes.prox || ''); S('nVenc', antes.venc || ''); S('nNotas', antes.notas || ''); S('nCod', '');
+    prevCalc(); guardarCredito();
+  } catch (e) { console.error(e); }
+  if (ov) ov.classList.remove('open');
+  var n = todosLosPrestamos().filter(function (x) { return x.id !== id && x.refunde_ids && x.estado !== 'anulado' && !x.anulado && String(x.refunde_ids) === String(r0.viejos.map(function (v) { return v.id; })); }).pop();
+  var dif = [];
+  if (!n) dif.push('no se creó el crédito nuevo');
+  else {
+    [['monto', n.monto, antes.monto], ['total', n.total, antes.total], ['cuota', n.cuota, antes.cuota], ['pagos', n.num_cuotas, antes.num], ['dinero entregado', n.refundicion.efectivo, r0.efectivo],
+     ['interés perdonado', n.refundicion.condonado, r0.condonado], ['interés anulado', n.refundicion.IF_anulado, r0.IF_anulado], ['capital', JSON.stringify(n.refundicion.K), JSON.stringify(r0.K)], ['fecha', n.fecha_inicio, fNueva]]
+      .forEach(function (x) { if (x[1] !== x[2]) dif.push(x[0] + ': ' + x[1] + ' (antes ' + x[2] + ')'); });
+  }
+  if (dif.length) { alert('Revisá el crédito de ' + antes.cliente + ': la fecha se cambió pero hay diferencias:\n' + dif.join('\n')); return { ok: false, dif: dif }; }
+  toast('Fecha cambiada a ' + fd(fNueva) + ' ✓'); verDetalle(n.id);
+  return { ok: true, id: n.id };
+}
+function irA(id, foco) { var e = document.getElementById(id); if (!e) return; e.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (foco) setTimeout(function () { e.focus(); toast('Escribe el nombre del cliente y toca su crédito'); }, 350); }
 // ── Tabla ──
 function render() {
   invalidarModelo69();
@@ -2768,7 +3200,7 @@ function render() {
       <td class="chk-col" onclick="event.stopPropagation()">
         <input type="checkbox" ${selCreditos[p.id] ? 'checked' : ''} onclick="toggleSelFila(event, ${p.id})" title="Marcar este crédito para sumarlo aparte"/>
       </td>
-      <td class="cliente-cell">${p.cliente}<span class="cod">${p.codigo}</span></td>
+      <td class="cliente-cell">${p.cliente}${tagPara(p)}<span class="cod">${p.codigo}</span></td>
       <td class="num">${fmt(p.monto)}</td>
       <td class="num">${fmt(p.total)}</td>
       <td class="num">${fmt(p.cuota)}${esPlanInteres(p)
@@ -2809,7 +3241,7 @@ function verDetalle(id, scroll=true) {
   let html = `
     <div class="d-hdr">
       <div>
-        <h3>${p.cliente} <span style="font-family:var(--mono);font-size:.8rem;color:var(--muted)">${p.codigo}</span></h3>
+        <h3>${p.cliente}${tagPara(p)} <span style="font-family:var(--mono);font-size:.8rem;color:var(--muted)">${p.codigo}</span></h3>
         <div class="meta">Inicio: ${fd(p.fecha_inicio)} · Vence: ${fd(p.vencimiento)}</div>
         ${(() => { const rc = resumenClientes()[claveCliente(p)];
            return rc && (rc.activos + rc.pagados) > 1
@@ -2870,7 +3302,8 @@ function verDetalle(id, scroll=true) {
     ${p.estado === 'activo' ? `<button class="btn" style="flex:1;justify-content:center" onclick="abrirCargo(${p.id})">% Interés por posponer</button>` : ''}
     ${p.estado === 'activo' ? `<button class="btn" style="flex:1;justify-content:center" onclick="abrirCancelacion(${p.id})">✓ Cancelación anticipada</button>` : ''}
     <button class="btn" style="flex:1;justify-content:center" onclick="abrirEditar(${p.id})">Editar crédito</button>
-    ${esDestinoDeRefundicion(p) && p.refunde_ids ? `<button class="btn btn-danger-ghost" style="flex:1;justify-content:center" onclick="revertirRefundicionUI(${p.id})">↺ Revertir refundición</button>` : ''}
+    ${esDestinoDeRefundicion(p) && p.refunde_ids && !(pagos[p.id] || []).length ? `<button class="btn" style="flex:1;justify-content:center" onclick="abrirCambioFecha(${p.id})">📅 Cambiar fecha</button>` : ''}
+    ${esDestinoDeRefundicion(p) && p.refunde_ids ? `<button class="btn btn-danger-ghost solo-tec" style="flex:1;justify-content:center" onclick="revertirRefundicionUI(${p.id})">↺ Revertir refundición</button>` : ''}
     ${p.refundido_en ? `<button class="btn" style="flex:1;justify-content:center" onclick="registrarVencimientoDocumentadoUI(${p.id})">Fecha documentada (P-5)</button>` : ''}
   </div>`;
   // ── Cargos por posponer cuota ──
@@ -2934,15 +3367,17 @@ function verDetalle(id, scroll=true) {
   }
   if (p.notas) html += `<div class="sec-title">Notas</div><div class="nota">${p.notas}</div>`;
   if (movSinEf.length) {
-    html += '<div class="sec-title">Movimientos sin efectivo (no son cobros; no cambian el saldo)</div>';
+    html += '<div class="solo-tec"><div class="sec-title">Movimientos sin efectivo (no son cobros; no cambian el saldo)</div>';
     movSinEf.forEach(function (g) { var inc = g.incidencia || {};
       html += '<div class="prow"><div class="pnum">≠</div><div style="flex:1"><div class="pdesc">' + escTxt(g.descripcion || '') + '</div><div class="pfecha">' + fd(g.fecha) +
         ' · motivo: ' + escTxt(inc.motivo || '—') + ' · destino: ' + escTxt(inc.destinoId ? ((creditoPorId(inc.destinoId) || {}).codigo || inc.destinoId) : '—') + '</div></div>' +
         '<div style="text-align:right;margin-right:8px"><div class="pmonto">' + fmt(g.monto_cuota) + '</div><div>' + estTag(inc.estadoEvidencia) + '</div></div>' +
         '<button class="btn btn-danger-ghost btn-sm" onclick="eliminarPago(' + p.id + ',' + g.id + ')" title="Anular">✕</button></div>';
     });
+    html += '</div>';
   }
-  html += htmlEvidencia69(p) + htmlAnulados(p) + htmlHistorial(p);
+  var ev69 = htmlEvidencia69(p);
+  html += (ev69 ? '<details class="tec solo-tec"><summary>Detalle técnico (evidencia y modelo 6.9)</summary>' + ev69 + '</details>' : '') + htmlAnulados(p) + htmlHistorial(p);
   html = htmlConflictos(p) + html;
   html += '</div>';
   const det = document.getElementById('detail');
@@ -3057,18 +3492,21 @@ function renderIndicadores69() {
     '<div class="field-hint">«Sin marca» = crédito sin refundición, efectivo igual al monto (HT-3 pendiente).</div>' +
     (function () { var cs = todosLosPrestamos().filter(function (p) { return conflictosPendientes(p).length; }); return cs.length ? '<div class="field-hint" style="color:var(--red)"><b>⚠ Conflictos de sincronización pendientes:</b> ' + cs.map(function (p) { return escTxt((p.cliente || '') + ' ' + (p.codigo || '')); }).join(', ') + '</div>' : ''; })();
 }
+function sinDineroNuevo(p, c) { return !!(p && p.refundicion && c && Number(c.efectivo) === 0 && ['E1', 'E2', 'E3'].indexOf(c.efectivoNivel) >= 0); }   // solo presentación
 function htmlEvidencia69(p) {
   var m = modelo69(), c = m && m.creditos[String(p.id)];
   if (!c) return '';
   var o = p.refundicion || p.desembolso || {};
   var h = '<div class="sec-title">Evidencia y modelo 6.9</div><div class="ev69">' +
-    '<div class="fila"><span>Efectivo entregado</span><span><b>' + fmt(c.efectivo) + '</b> ' + estTag(c.efectivoEstado) + ' ' + (c.efectivoNivel ? 'nivel ' + c.efectivoNivel : '') +
+    (sinDineroNuevo(p, c) ? '<div class="fila"><span>Efectivo entregado</span><span><b>' + fmt(0) + '</b> · Sin dinero nuevo' :
+    '<div class="fila"><span>Efectivo entregado</span><span><b>' + fmt(c.efectivo) + '</b> ' + estTag(c.efectivoEstado) + ' ' + (c.efectivoNivel ? 'nivel ' + c.efectivoNivel : '')) +
       (o.referenciaEvidencia ? ' · ref. ' + escTxt(o.referenciaEvidencia) : '') + (!c.efectivoExplicito && c.efectivoNivel === 'E4' ? ' · método: monto − trasladado (reconstrucción)' : '') + '</span></div>' +
     '<div class="fila"><span>P inicial</span><span>' + fmt(c.P_ini) + (c.P_ini_alto !== c.P_ini ? ' a ' + fmt(c.P_ini_alto) + ' (rango)' : '') + ' ' + estTag(c.estados.P) + '</span></div>' +
     '<div class="fila"><span>CPR (capital propio pendiente)</span><span>' + fmt(c.CPR) + ' ' + estTag(c.estados.CPR) + ' · CPR + U ' + fmt(c.CPR_mas_U) + (c.U_pend ? ' (U ' + fmt(c.U_pend) + ')' : '') + '</span></div>' +
     (c.EXC ? '<div class="fila"><span>Excedente del cliente (no es G)</span><span>' + fmt(c.EXC) + '</span></div>' : '') +
     (conflictosPendientes(p).length ? '<div class="fila"><span>Estado del crédito</span><span>' + estTag('REQUIERE_EVIDENCIA') + ' <b style="color:var(--red)">CONFLICTO pendiente</b>: cifras PROVISIONALES hasta resolverlo</span></div>' : '') +
-    (c.efectivoNivel ? '<div class="fila"><span>Nivel de evidencia</span><span><b>' + c.efectivoNivel + '</b>' + (c.efectivoNivel === 'E4' ? ' (diferencia matemática; nunca confirmado)' : '') + '</span></div>' : '') +
+    (sinDineroNuevo(p, c) ? '<div class="fila"><span>Dinero nuevo</span><span><b>Sin dinero nuevo</b></span></div>' : '') +
+    (c.efectivoNivel && !sinDineroNuevo(p, c) ? '<div class="fila"><span>Nivel de evidencia</span><span><b>' + c.efectivoNivel + '</b>' + (c.efectivoNivel === 'E4' ? ' (diferencia matemática; nunca confirmado)' : '') + '</span></div>' : '') +
     '<div class="fila"><span>ENA del crédito</span><span>' + fmt(c.ENA) + ' ' + estTag(c.estados.ENA) + '</span></div>' +
     '<div class="fila"><span>G cobrada</span><span>' + fmt(c.G) + ' (interés ' + fmt(c.G_interes) + ' · G de Q ' + fmt(c.G_Q) + ' · cargos ' + fmt(c.G_cargos) + ') ' + (c.G_Q ? estTag(c.estados.G) : '') + '</span></div>';
   if (c.partes) {
@@ -3521,12 +3959,12 @@ function setPlan(plan) {
   var esInt = plan === 'interes';
   document.getElementById('tabPlanIguales').classList.toggle('active', !esInt);
   document.getElementById('tabPlanInteres').classList.toggle('active', esInt);
-  ponerEtiqueta('nLblCuotas', esInt ? 'N° de pagos de interés' : 'N° de cuotas');
+  ponerEtiqueta('nLblCuotas', esInt ? 'Número de pagos de interés' : 'Número de pagos');
   ponerEtiqueta('nLblCuota', esInt ? 'Interés por pago (₡)' : 'Monto de cuota (₡)');
   ponerEtiqueta('nLblVenc', esInt ? 'Fecha en que le paga el capital' : 'Vencimiento (fin del crédito)');
   document.getElementById('nCuotaHint').textContent = esInt
     ? 'Lo que le cobra en cada pago (ej: 20.000). El interés total se calcula solo.'
-    : 'Si la ingresás, el total y el interés se calculan solos (cuota × cuotas)';
+    : 'Si ponés la cuota, el interés se calcula solo: cuota × número de pagos − monto';
   document.getElementById('nVencHint').textContent = esInt
     ? 'Ej: cuando reciba el aguinaldo. Esta fecha no se calcula sola.'
     : 'Se calcula solo según la frecuencia y el n° de cuotas';
@@ -3584,7 +4022,7 @@ function abrirNuevo() {
   if (document.getElementById('nEfConf')) document.getElementById('nEfConf').checked = false;
   document.getElementById('nPrev').style.display = 'none';
   document.getElementById('nRefunde').checked = false;
-  document.getElementById('nRefDet').style.display = 'none'; window.refCompAmpliado = false;
+  document.getElementById('nRefDet').style.display = 'none'; window.refCompAmpliado = false; if (window.WZ) window.WZ.avanzadoManual = false;
   document.getElementById('nRefPrev').innerHTML = '';
   document.getElementById('nRefLista').innerHTML = '';
   document.getElementById('nRefTodos').textContent = 'Marcar todos';
@@ -3597,8 +4035,188 @@ function abrirNuevo() {
   document.getElementById('nPrev').style.display = 'none';
   refrescarRefundibles();
   document.getElementById('ovNuevo').classList.add('open');
+  wizInicio();
 }
 
+// ── Asistente 7.1: navegación por pasos. No calcula ni guarda nada propio: llena los mismos campos y termina en guardarCredito().
+window.WZ = { paso: 'tipo', mas: false, perdon: false, cli: null };
+var WZ_IDS = ['wizTipo','wizClientes','wizRes','wizConf','wCli','wCod','wFec','wPlan','wMnt','nLblInt','nLblCuotas','nLblCuota','wFrec','wProx','nQuincenaBox',
+  'nLblVenc','nPrev','wizPlan','nRefBox','wRefChk','wRefHdr','nRefLista','wizPerdon','wRefEf','wRefNivel','wRefAvz','nRefPrev','wPara','wNotas','wizEntregado','wizMas','nEfConfBox'];
+var WZ_MAS = ['wCod','wFec','wPlan','nLblVenc'];
+var WZ_VIS = {
+  tipo: ['wizTipo'],
+  nuevo: ['wCli','wMnt','nLblCuotas','nLblCuota','nLblInt','wFrec','wProx','nQuincenaBox','nPrev','wizPlan','wPara','wNotas','wizEntregado','wizMas'],
+  nuevoConf: ['wizConf'],
+  r1: ['wizClientes'],
+  r2: ['wizRes','nRefBox','wRefHdr','nRefLista','wizPerdon','wRefAvz'],
+  r3: ['wizRes','nRefBox','wRefEf'],
+  r4: ['wizRes','wMnt','nLblCuotas','nLblCuota','nLblInt','wFrec','wProx','nQuincenaBox','nPrev','wizPlan','wPara','wNotas','wizMas'],
+  r5: ['wizConf']
+};
+function wizInicio() {
+  window.WZ = { paso: 'tipo', mas: false, perdon: false, cli: null };
+  document.getElementById('nRefEf').value = '0';
+  wizEntregado(true);
+  var hay = prestamos.some(function (p) { return p.estado === 'activo'; });
+  document.getElementById('wizOpRef').disabled = !hay;
+  wizMostrar();
+}
+function wizMostrar() {
+  var W = window.WZ, vis = (WZ_VIS[W.paso] || []).slice();
+  if (W.mas && (W.paso === 'nuevo' || W.paso === 'r4')) vis = vis.concat(WZ_MAS.filter(function (k) { return !(W.paso === 'r4' && k === 'wPlan' && false); }));
+  WZ_IDS.forEach(function (id) { var e = document.getElementById(id); if (e) e.classList.toggle('wz-x', vis.indexOf(id) < 0); });
+  var esRef = /^r/.test(W.paso), n = esRef ? Number(W.paso.slice(1)) : 0;
+  document.getElementById('wizPasos').innerHTML = esRef ? ['Cliente', 'Créditos a cerrar', 'Dinero nuevo', 'Condiciones', 'Confirmar'].map(function (t, i) {
+    return '<span class="' + (i + 1 === n ? 'act' : (i + 1 < n ? 'hecho' : '')) + '">' + (i + 1) + ' · ' + t + '</span>'; }).join('') : '';
+  document.getElementById('wizTit').textContent = esRef ? 'Refundición' : (W.paso === 'tipo' ? 'Nuevo crédito' : 'Crédito nuevo');
+  document.getElementById('wizAtras').style.display = W.paso === 'tipo' ? 'none' : '';
+  var conf = W.paso === 'nuevoConf' || W.paso === 'r5';
+  document.getElementById('wizSig').style.display = (W.paso === 'tipo' || W.paso === 'r1' || conf) ? 'none' : '';
+  document.getElementById('wizSig').textContent = (W.paso === 'nuevo' || W.paso === 'r4') ? 'Revisar →' : 'Siguiente →';
+  document.getElementById('wizOk').style.display = conf ? '' : 'none';
+  document.getElementById('wizMasBtn').textContent = W.mas ? 'Menos opciones ▴' : 'Más opciones ▾';
+  var m = document.getElementById('nMnt'); m.readOnly = esRef;
+  document.getElementById('wMntTxt').textContent = esRef ? 'Monto del nuevo crédito (₡) — se calcula solo' : 'Monto (₡)';
+  if (W.paso === 'r1') wizClientes();
+  if (esRef && n >= 2 && n <= 4) wizRefrescar();
+  if (conf) wizConfirmacion();
+}
+function wizIr(p) {
+  var W = window.WZ;
+  if (p === 'nuevo') { document.getElementById('nRefunde').checked = false; cambioRefunde(); document.getElementById('nRefEf').value = '0'; }
+  if (p === 'r1') { wizEntregado(false); }
+  W.paso = p; wizMostrar();
+  var c = document.querySelector('#ovNuevo .modal'); if (c) c.scrollTop = 0;
+}
+function wizAtras() {
+  var W = window.WZ, prev = { nuevo: 'tipo', nuevoConf: 'nuevo', r1: 'tipo', r2: 'r1', r3: 'r2', r4: 'r3', r5: 'r4' }[W.paso] || 'tipo';
+  if (prev === 'tipo') { document.getElementById('nRefunde').checked = false; cambioRefunde(); }
+  wizIr(prev);
+}
+function wizSiguiente() {
+  var W = window.WZ, v = function (id) { return document.getElementById(id).value; };
+  if ((W.paso === 'nuevo' || W.paso === 'r4') && v('nFrec') === 'unico' && v('nProx')) document.getElementById('nVenc').value = v('nProx');   // pago único: la fecha de pago es el vencimiento
+  if (W.paso === 'nuevo') {
+    if (!v('nCli').trim() || !(parseFloat(v('nMnt')) > 0)) { toast('Escribí el cliente y el monto', false); return; }
+    prevCalc(); return wizIr('nuevoConf');
+  }
+  if (W.paso === 'r2') { if (!refundeElegidos().length) { toast('Marcá al menos un crédito', false); return; } return wizIr('r3'); }
+  if (W.paso === 'r3') { if (!(Number(v('nRefEf')) >= 0) || v('nRefEf') === '') { toast('Escribí el dinero nuevo (0 si no entregás nada)', false); return; } return wizIr('r4'); }
+  if (W.paso === 'r4') { wizRefrescar(); prevCalc(); return wizIr('r5'); }
+}
+function wizEntregado(si) {
+  document.getElementById('nEfConf').checked = !!si;        // misma casilla de evidencia de siempre (E2 hoy / E3 otra fecha)
+  document.getElementById('wizEntSi').classList.toggle('on', !!si);
+  document.getElementById('wizEntNo').classList.toggle('on', !si);
+}
+// Paso 1: clientes con créditos activos
+function wizClientes() {
+  var g = {};
+  prestamos.filter(function (p) { return p.estado === 'activo'; }).forEach(function (p) {
+    var k = claveCliente(p); (g[k] = g[k] || { nombre: p.cliente, n: 0, deuda: 0 }); g[k].n++; g[k].deuda += deudaTraslado(p); });
+  var ks = Object.keys(g).sort(function (a, b) { return g[a].nombre.localeCompare(g[b].nombre); });
+  document.getElementById('wizClientes').innerHTML = '<div class="wz-preg">¿De qué cliente es la refundición?</div>' + ks.map(function (k) {
+    return '<button type="button" class="wz-cli" onclick="wizElegirCliente(\'' + encodeURIComponent(g[k].nombre).replace(/'/g, '%27') + '\')"><b>' + escTxt(g[k].nombre) + '</b><span>' +
+      g[k].n + ' crédito' + (g[k].n === 1 ? '' : 's') + ' activo' + (g[k].n === 1 ? '' : 's') + ' · debe ' + fmt(g[k].deuda) + '</span></button>'; }).join('');
+}
+function wizElegirCliente(nomEnc) {
+  var nom = decodeURIComponent(nomEnc);
+  document.getElementById('nCli').value = nom;
+  refrescarRefundibles();
+  document.getElementById('nRefunde').checked = true; cambioRefunde();
+  window.WZ.cli = nom; window.WZ.perdon = false;
+  wizIr('r2');
+}
+// Perdonar intereses: usa la división que YA calcula el motor (partesViejo): interés ganado a la fecha (sugerencia método B)
+// → «condonado»; interés futuro aún no ganado → «interés futuro anulado». No cambia ninguna función económica.
+function wizPerdon(si) { window.WZ.perdon = !!si; wizRefrescar(); }
+function wizAplicarPerdon() {
+  var comp = document.getElementById('nRefComp'); if (!comp) return null;
+  var viejos = refundeElegidos(), fecha = document.getElementById('nRefEfFec').value || document.getElementById('nFec').value, info = { gan: 0, fut: 0, sinDato: [] };
+  viejos.forEach(function (v) {
+    var q = comp.querySelector('input[data-qdev="' + v.id + '"]'), an = comp.querySelector('input[data-anul="' + v.id + '"]'), co = comp.querySelector('input[data-cond="' + v.id + '"]');
+    if (!q || !an || !co) return;
+    if (window.WZ.perdon) {
+      var b = partesViejo(v, fecha, null, null);
+      if (b.Q_dev_sugerido === null) { info.sinDato.push(v.codigo || v.id); return; }
+      q.value = '0'; q.setAttribute('data-editado', '1'); co.value = String(b.Q_dev_sugerido); an.value = String(b.interesPendiente - b.Q_dev_sugerido);
+      info.gan += b.Q_dev_sugerido; info.fut += b.interesPendiente - b.Q_dev_sugerido;
+    } else if (!window.WZ.avanzadoManual) {
+      q.value = ''; q.removeAttribute('data-editado'); co.value = '0'; an.value = '0';
+    }
+  });
+  return info;
+}
+// Recalcula la vista: primero el motor dibuja su tabla (prevCalc), se aplica la opción elegida y se llena el monto
+// con la MISMA suma que valida guardarCredito(): Σ partesViejo(...).traslado + dinero nuevo.
+function wizRefrescar() {
+  var W = window.WZ; if (!/^r[2-5]$/.test(W.paso)) { prevCalc(); return; }
+  var fNivel = document.getElementById('nRefEfFec').value || document.getElementById('nFec').value;
+  document.getElementById('nRefNivel').value = document.getElementById('nRefRef').value.trim() ? 'E1' : (fNivel === today() ? 'E2' : 'E3');
+  prevCalc();
+  var info = wizAplicarPerdon();
+  prevCalc();
+  var viejos = refundeElegidos(), fecha = fNivel, qd = qdevEscritos(), ac = anulCondEscritos();
+  var partes = viejos.map(function (v) { return partesViejo(v, fecha, qd[v.id], ac[v.id]); });
+  var tras = partes.reduce(function (a, x) { return a + x.traslado; }, 0);
+  var perd = partes.reduce(function (a, x) { return a + x.IF_anulado + x.condonado; }, 0);
+  var ef = Math.max(Math.round(Number(document.getElementById('nRefEf').value) || 0), 0);
+  if (viejos.length) document.getElementById('nMnt').value = tras + ef;
+  prevCalc();
+  document.getElementById('wizPerNo').classList.toggle('on', !W.perdon); document.getElementById('wizPerSi').classList.toggle('on', W.perdon);
+  var pt = document.getElementById('wizPerTxt');
+  pt.innerHTML = W.perdon && info ? ('Se dejan de cobrar <b>' + fmt(info.gan + info.fut) + '</b>: <b>' + fmt(info.gan) + '</b> de intereses ya ganados a la fecha (se perdonan) y <b>' + fmt(info.fut) +
+      '</b> de intereses futuros que aún no se habían ganado (no pasan al nuevo crédito).' + (info.sinDato.length ? '<br><b style="color:var(--yellow)">' + escTxt(info.sinDato.join(', ')) + ' no tiene vencimiento: usá el Ajuste avanzado.</b>' : ''))
+    : 'Los intereses pendientes pasan al nuevo crédito, como hasta ahora.';
+  document.getElementById('wizRes').innerHTML = viejos.length ? (
+    '<div class="wz-fila"><span>Deuda que pasa al nuevo crédito</span><b>' + fmt(tras) + '</b></div>' +
+    (perd ? '<div class="wz-fila"><span>Intereses que se dejan de cobrar</span><b>' + fmt(perd) + '</b></div>' : '') +
+    (W.paso !== 'r2' ? '<div class="wz-fila"><span>Dinero nuevo que vas a entregar</span><b>' + fmt(ef) + '</b></div><div class="wz-fila tot"><span>Nuevo crédito</span><b>' + fmt(tras + ef) + '</b></div>' : '')
+  ) : 'Marcá los créditos que se cierran.';
+}
+function wizConfirmacion() {
+  var W = window.WZ, v = function (id) { return document.getElementById(id).value; }, esRef = W.paso === 'r5';
+  var frec = { unico: 'Pago único', semanal: 'Semanal', quincenal: 'Quincenal', mensual: 'Mensual' }[v('nFrec')] || v('nFrec');
+  var f = function (a, b) { return '<div class="wz-fila"><span>' + a + '</span><b>' + b + '</b></div>'; };
+  var h = '<div class="wz-preg">Confirmar crédito</div>' + f('Cliente', escTxt(v('nCli')));
+  if (esRef) {
+    var viejos = refundeElegidos(), fecha = v('nRefEfFec') || v('nFec'), qd = qdevEscritos(), ac = anulCondEscritos();
+    var partes = viejos.map(function (x) { return partesViejo(x, fecha, qd[x.id], ac[x.id]); });
+    var tras = partes.reduce(function (a, x) { return a + x.traslado; }, 0), perd = partes.reduce(function (a, x) { return a + x.IF_anulado + x.condonado; }, 0);
+    h += f('Créditos que se refunden', viejos.map(function (x) { return escTxt(x.codigo || ('#' + x.id)) + ' (' + fmt(deudaTraslado(x)) + ')'; }).join(', ')) +
+      f('Deuda trasladada', fmt(tras)) + (perd ? f('Intereses que se dejan de cobrar', fmt(perd)) : '') + f('Dinero nuevo entregado', fmt(Number(v('nRefEf')) || 0));
+  }
+  h += f(esRef ? 'Nuevo crédito' : 'Monto', fmt(parseFloat(v('nMnt')) || 0)) + f('Interés', fmt(parseFloat(v('nInt')) || 0)) +
+    '<div class="wz-prev">' + (document.getElementById('nPrev').innerHTML || '') + '</div>' +
+    f('Frecuencia', frec) + f('Primer pago', v('nProx') ? fd(v('nProx')) : (v('nVenc') ? fd(v('nVenc')) : '—')) +
+    (!esRef ? f('¿Ya entregaste el dinero?', document.getElementById('nEfConf').checked ? 'Sí' : 'No, todavía no') : '') +
+    wizPlanPagos().replace('<details class="tec wz-plan"', '<details class="tec wz-plan" open') +
+    (esRef ? '<div class="wz-aviso">Al confirmar, los créditos seleccionados quedarán cerrados por refundición y el nuevo crédito será el crédito activo.</div>' : '');
+  document.getElementById('wizConf').innerHTML = h;
+}
+// Plan de pagos estimado: misma regla de reparto que la ficha del crédito (repartoCuotaPendiente). Solo se muestra; no se guarda.
+function wizPlanPagos() {
+  var v = function (id) { return document.getElementById(id).value; };
+  var m = parseFloat(v('nMnt')) || 0, n = parseInt(v('nCuotas')) || 1, cu = parseFloat(v('nCuota')) || 0, i = parseFloat(v('nInt')) || 0;
+  if (!(m > 0)) return '';
+  var p;
+  if (planNuevo() === 'interes') { var ci = cu > 0 ? cu : Math.round(i / n); p = { plan: 'interes', monto: m, cuota: ci, cuota_interes: ci, cuota_final: m, interes: ci * n, total: m + ci * n, num_cuotas: n + 1 }; }
+  else if (cu > 0) { p = { monto: m, cuota: cu, total: Math.round(cu * n), interes: Math.round(cu * n) - m, num_cuotas: n }; }
+  else { p = { monto: m, cuota: Math.round((m + i) / n), total: m + i, interes: i, num_cuotas: n }; }
+  var frec = v('nFrec'), dias = frec === 'quincenal' ? leerDiasNuevo() : null, f = v('nProx') || v('nVenc') || null;
+  var filas = '', tI = 0, tK = 0;
+  for (var k = 1; k <= p.num_cuotas && k <= 120; k++) {
+    var r = repartoCuotaPendiente(p, k); tI += r.interes; tK += r.capital;
+    var fecha = (esPlanInteres(p) && k === p.num_cuotas) ? (v('nVenc') || f) : f;
+    filas += '<tr><td>' + k + '</td><td>' + (fecha ? fd(fecha) : '—') + '</td><td>' + fmt(r.interes + r.capital) + '</td><td>' + fmt(r.interes) + '</td><td>' + fmt(r.capital) + '</td></tr>';
+    if (f && frec !== 'unico') f = sumarFrecuencia(f, frec, dias);
+  }
+  return '<details class="tec wz-plan"' + (window.WZ && window.WZ.planAbierto ? ' open' : '') + ' ontoggle="window.WZ.planAbierto=this.open"><summary>Plan de pagos: interés y capital de cada cuota</summary>' +
+    '<div style="overflow-x:auto"><table class="wz-tabla"><tr><th>#</th><th>Fecha</th><th>Cuota</th><th>Interés</th><th>Capital</th></tr>' + filas +
+    '<tr class="tot"><td colspan="2">Total</td><td>' + fmt(tI + tK) + '</td><td>' + fmt(tI) + '</td><td>' + fmt(tK) + '</td></tr></table></div>' +
+    '<div class="field-hint">Cada cuota se reparte igual que en la ficha del crédito: la parte de interés es proporcional al interés del total. Fechas estimadas.' +
+    (Math.abs(tI - p.interes) > 0 ? ' Por redondeo de cada cuota, la suma del interés difiere ' + fmt(Math.abs(tI - p.interes)) + ' del interés pactado (' + fmt(p.interes) + '); así lo registra la app al cobrar.' : '') + '</div></details>';
+}
 function prevCalc() {
   const m  = parseFloat(document.getElementById('nMnt').value) || 0;
   const c  = parseInt(document.getElementById('nCuotas').value) || 1;
@@ -4123,8 +4741,8 @@ function refrescarRefundibles() {
     return '<label class="ref-item' + (on ? ' on' : '') + '">' +
       '<input type="checkbox" data-id="' + p.id + '"' + (on ? ' checked' : '') + ' onchange="marcarRefItem(this)"/>' +
       '<span class="rcol"><span class="rc">' + escTxt(p.codigo || ('#' + p.id)) + '</span>' +
-      '<span class="rd">' + escTxt(p.cliente || '') +
-        (p.vencimiento ? ' · vence ' + fd(p.vencimiento) : '') + '</span></span>' +
+      '<span class="rd">Saldo ' + fmt(Number(p.saldo) || 0) + (cargosPendientes(p) ? ' · cargos ' + fmt(cargosPendientes(p)) : '') +
+        (proxPagoDe(p) ? ' · próximo pago ' + fd(proxPagoDe(p)) + (proxPagoDe(p) < today() ? ' · <b style="color:var(--yellow)">pendiente según registros</b>' : ' · al día') : '') + '</span></span>' +
       '<span class="rm">' + fmt(deudaTraslado(p)) + '</span>' +
     '</label>';
   }).join('');
@@ -4135,7 +4753,7 @@ function refrescarRefundibles() {
 function marcarRefItem(inp) {
   var fila = inp.closest ? inp.closest('.ref-item') : null;
   if (fila) fila.classList.toggle('on', inp.checked);
-  prevCalc();
+  if (window.WZ && /^r[2-5]$/.test(window.WZ.paso)) wizRefrescar(); else prevCalc();
 }
 function marcarTodosRefundibles() {
   var cont = document.getElementById('nRefLista');
@@ -4196,7 +4814,7 @@ function partesViejo(v, fecha, qdevEscrito, ac) {
     metodoQdev: (qdevEscrito === undefined || qdevEscrito === null || qdevEscrito === '') ? 'sugerencia método B aceptada' : 'registrado por Jero' };
 }
 function ampliarRefComp() { window.refCompAmpliado = !window.refCompAmpliado; prevCalc(); }
-function marcarQdev(i) { i.setAttribute('data-editado', '1'); prevCalc(); }
+function marcarQdev(i) { i.setAttribute('data-editado', '1'); window.WZ.avanzadoManual = true; prevCalc(); }
 function qdevEscritos() {   // solo los que Jero cambió a mano; los demás siguen la sugerencia (se recalcula si cambia la fecha)
   var r = {};
   [].forEach.call(document.querySelectorAll('#nRefComp input[data-qdev]'), function (i) { if (i.getAttribute('data-editado') === '1') r[i.getAttribute('data-qdev')] = i.value; });
@@ -4232,8 +4850,8 @@ function prevRefunde(mnt) {
     return '<tr><td>' + escTxt(x.codigo || ('#' + x.id)) + '</td><td>' + fmt(k) + '</td>' +
       '<td><input type="number" min="0" data-qdev="' + x.id + '"' + (escritos[x.id] !== undefined ? ' data-editado="1"' : '') + ' value="' + (escritos[x.id] !== undefined ? escritos[x.id] : (x.Q_dev === null ? '' : x.Q_dev)) + '" onchange="marcarQdev(this)" title="Sugerencia método B: ' + (x.Q_dev_sugerido === null ? 'sin vencimiento' : fmt(x.Q_dev_sugerido)) + '"/></td>' +
       '<td>' + (x.IFR === null ? '—' : (x.IFR < 0 ? '<b style="color:var(--red)">' + fmt(x.IFR) + '</b>' : fmt(x.IFR))) + '</td>' +
-      '<td><input type="number" min="0" data-anul="' + x.id + '" value="' + x.IF_anulado + '" onchange="prevCalc()" title="Interés futuro que NO pasa al nuevo (RD-4)"/></td>' +
-      '<td><input type="number" min="0" data-cond="' + x.id + '" value="' + x.condonado + '" onchange="prevCalc()" title="Interés que perdonás expresamente"/></td>' +
+      '<td><input type="number" min="0" data-anul="' + x.id + '" value="' + x.IF_anulado + '" onchange="window.WZ.avanzadoManual=true;prevCalc()" title="Interés futuro que NO pasa al nuevo (RD-4)"/></td>' +
+      '<td><input type="number" min="0" data-cond="' + x.id + '" value="' + x.condonado + '" onchange="window.WZ.avanzadoManual=true;prevCalc()" title="Interés que perdonás expresamente"/></td>' +
       '<td>' + fmt(x.C_cap) + '</td></tr>' + (x.cuadra ? '' : '<tr><td colspan="7" style="color:var(--red);text-align:left">⚠ ' + escTxt(x.codigo || '') + ': las partes no cuadran con el saldo viejo (control FAIL)</td></tr>');
   }).join('');
   var efTxt = document.getElementById('nRefEf').value, efNum = efTxt === '' ? null : Math.round(Number(efTxt) || 0);
@@ -4850,9 +5468,7 @@ function guardarEdicion() {
 function cerrar() {
   document.querySelectorAll('.overlay').forEach(e => e.classList.remove('open'));
 }
-document.querySelectorAll('.overlay').forEach(el => {
-  el.addEventListener('click', e => { if (e.target === el) cerrar(); });
-});
+// 7.0.2: un clic fuera del formulario ya NO lo cierra (se perdía lo digitado). Se cierra con Cancelar / Cerrar / Volver.
 document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrar(); });
 
 // ══════════════════════════════════════════
@@ -5295,7 +5911,7 @@ function renderFichaCliente() {
         '</div></div>' +
       '<div class="cf-box"><div class="l">Próximo pago</div><div class="v" style="font-size:.95rem">' + proxTxt + '</div>' +
         '<div class="s">' + proxSub + '</div></div>' +
-    '</div>' + ks.map(function (k) { return htmlEvidenciaCliente(k, false); }).join('');
+    '</div>' + '<div class="solo-tec">' + ks.map(function (k) { return htmlEvidenciaCliente(k, false); }).join('') + '</div>';
   box.classList.add('open');
 }
 
@@ -5348,7 +5964,7 @@ function renderDeuda() {
       '<div class="pag-stat red"><div class="l">Total por cobrar</div><div class="v">' + fmt(totalDebe) + '</div>' +
         '<div class="s">' + conDeuda.length + (conDeuda.length === 1 ? ' cliente debe' : ' clientes deben') +
         (totalInt > 0 ? ' · incluye ' + fmt(totalInt) + ' de intereses por posponer' : '') + '</div>' +
-        (function () { var pv = conDeuda.filter(function (c) { return esProvCliente(c.clave); }); return pv.length ? '<div class="s"><span class="est PROVISIONAL">PROVISIONAL</span> ' + fmt(pv.reduce(function (a, c) { return a + c.debe; }, 0)) + ' en ' + pv.length + ' cliente' + (pv.length === 1 ? '' : 's') + ' con datos reconstruidos o casos abiertos</div>' : ''; })() + '</div>' +
+        (function () { var pv = conDeuda.filter(function (c) { return esProvCliente(c.clave); }); return pv.length ? '<div class="s solo-tec"><span class="est PROVISIONAL">PROVISIONAL</span> ' + fmt(pv.reduce(function (a, c) { return a + c.debe; }, 0)) + ' en ' + pv.length + ' cliente' + (pv.length === 1 ? '' : 's') + ' con datos reconstruidos o casos abiertos</div>' : ''; })() + '</div>' +
       '<div class="pag-stat"><div class="l">Deuda promedio</div><div class="v">' + fmt(prom) + '</div>' +
         '<div class="s">por cliente con saldo</div></div>' +
       '<div class="pag-stat ' + (atrasados.length ? 'red' : 'green') + '"><div class="l">Con atrasos</div><div class="v">' +
@@ -5374,13 +5990,13 @@ function renderDeuda() {
 
   html += '<div class="deu-tbl"><table><thead><tr>' +
     '<th>Cliente</th><th>Créditos</th><th class="num col-menos">Saldo</th><th class="num">Debe</th>' +
-    '<th>Próximo pago</th><th class="num col-menos">Ya pagó</th><th>Evidencia 6.9</th>' +
+    '<th>Próximo pago</th><th class="num col-menos solo-tec">Ya pagó</th><th class="solo-tec">Evidencia 6.9</th>' +
     '</tr></thead><tbody>' +
     lista.map(function (c) {
       var vence = c.proxima && c.proxima <= hoyStr;
       return '<tr class="datarow" data-k="' + escTxt(c.clave) + '">' +
         '<td class="cliente-cell">' + escTxt(c.nombre) +
-          (c.codigos.length ? '<span class="cod">' + escTxt(c.codigos.join(', ')) + '</span>' : '') + '</td>' +
+          (c.codigos.length ? '<span class="cod solo-tec">' + escTxt(c.codigos.join(', ')) + '</span>' : '') + '</td>' +
         '<td style="font-size:.76rem">' + c.activos + (c.activos === 1 ? ' activo' : ' activos') +
           (c.pagados ? '<div class="ult-pago">' + c.pagados + ' pagado' + (c.pagados === 1 ? '' : 's') + '</div>' : '') +
           (c.vencidos ? '<div class="tag-venc">⚠ ' + c.vencidos + ' VENCIDO' + (c.vencidos === 1 ? '' : 'S') + '</div>' : '') +
@@ -5390,8 +6006,8 @@ function renderDeuda() {
           (c.intPend > 0 ? '<div class="deu-int">+ ' + fmt(c.intPend) + ' interés</div>' : '') + '</td>' +
         '<td style="font-size:.76rem">' + (c.proxima ? fd(c.proxima) : '—') +
           (vence ? '<br><span class="tag-venc">⚠ COBRAR</span>' : '') + '</td>' +
-        '<td class="num col-menos" style="color:var(--green)">' + fmt(c.pagado) + '</td>' +
-        '<td>' + htmlEvidenciaCliente(c.clave, true) + '</td>' +
+        '<td class="num col-menos solo-tec" style="color:var(--green)">' + fmt(c.pagado) + '</td>' +
+        '<td class="solo-tec">' + htmlEvidenciaCliente(c.clave, true) + '</td>' +
       '</tr>';
     }).join('') +
     '</tbody></table></div>';
@@ -5518,13 +6134,13 @@ function renderPagos() {
         <thead><tr>
           <th>Fecha</th><th>Cliente</th><th>Concepto</th>
           <th class="num">Monto</th><th class="num">Interés</th>
-          <th class="num col-menos">Capital</th><th class="num col-menos">Saldo después</th><th>Estado</th>
+          <th class="num col-menos">Capital</th><th class="num col-menos">Saldo después</th><th class="solo-tec">Estado</th>
         </tr></thead>
         <tbody>
           ${lista.map(x => `
-            <tr class="datarow" onclick="verDetalle(${x.p.id})">
+            <tr class="datarow${esEfectivo(x.g) ? '' : ' solo-tec'}" onclick="verDetalle(${x.p.id})">
               <td style="font-size:.78rem;white-space:nowrap">${fd(x.g.fecha)}</td>
-              <td class="cliente-cell">${escTxt(x.p.cliente)}<span class="cod">${escTxt(x.p.codigo || '')}</span></td>
+              <td class="cliente-cell">${escTxt(x.p.cliente)}${tagPara(x.p)}<span class="cod solo-tec">${escTxt(x.p.codigo || '')}</span></td>
               <td style="font-size:.78rem">${escTxt(x.g.descripcion || 'Pago')}</td>
               <td class="num">${esEfectivo(x.g)
                 ? `<strong style="color:var(--green)">${fmt(x.g.monto_cuota)}</strong>${esPagoDeCargo(x.g)
@@ -5535,7 +6151,7 @@ function renderPagos() {
               <td class="num" style="color:var(--yellow)">${esEfectivo(x.g) ? fmt((rep[x.g.id] || {interes:0}).interes) : '—'}</td>
               <td class="num col-menos" style="color:var(--accent-2)">${esEfectivo(x.g) ? fmt((rep[x.g.id] || {capital:0}).capital) : '—'}</td>
               <td class="num col-menos">${fmt(x.g.saldo_despues)}</td>
-              <td>${x.g.incidencia ? estTag(x.g.incidencia.estadoEvidencia) + '<div class="field-hint">sin efecto en cifras</div>'
+              <td class="solo-tec">${x.g.incidencia ? estTag(x.g.incidencia.estadoEvidencia) + '<div class="field-hint">sin efecto en cifras</div>'
                   : (!esEfectivo(x.g) ? estTag(((m69p.creditos[String(x.g.refunde_a)] || {}).partes || {}).estadoOperacion || 'RECONSTRUIDO')
                   : (gProv(x.p.id) ? '<span class="est PROVISIONAL">G PROVISIONAL</span>' : '<span class="est FIRME">FIRME</span>'))}</td>
             </tr>`).join('')}
@@ -5565,7 +6181,7 @@ function renderDesembolsos(desem, totalDes) {
           ${desem.map(p => `
             <tr class="datarow" onclick="verDetalle(${p.id})">
               <td style="font-size:.78rem;white-space:nowrap">${fd(p.fecha_inicio)}</td>
-              <td class="cliente-cell">${escTxt(p.cliente)}<span class="cod">${escTxt(p.codigo || '')}</span></td>
+              <td class="cliente-cell">${escTxt(p.cliente)}${tagPara(p)}<span class="cod">${escTxt(p.codigo || '')}</span></td>
               <td class="num"><strong>${fmt(p.monto)}</strong>${montoRefundido(p) > 0
                 ? `<div class="ref-tag">🔁 ${fmt(montoRefundido(p))} refundidos</div><div class="ult-pago">efectivo ${fmt(efectivoEntregado(p))}${marcaEstado(efectivoInfo(p).estado)}</div>` : ''}</td>
               <td class="num">${fmt(p.total)}<div class="cargo-tag" style="color:var(--muted)">+ ${fmt((Number(p.total) || 0) - (Number(p.monto) || 0))} interés</div></td>
