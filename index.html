@@ -489,6 +489,18 @@
   .ref-ef { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
   .ref-ef label { font-size: .78rem; }
   .wz-x { display: none !important; }
+  .g-rap { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; } .g-lbl { width: 100%; font-size: .74rem; color: var(--muted); font-weight: 600; }
+  .g-rap button { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 7px 12px; border-radius: 10px; border: 1px solid var(--border-2); background: var(--surface-2, #fafafa); font: inherit; font-size: .74rem; color: var(--muted); cursor: pointer; }
+  .g-rap button b { font-size: .88rem; color: var(--text); } .g-rap button.on { border-color: var(--text); box-shadow: 0 0 0 1px var(--text) inset; }
+  .cb-acts { display: flex; gap: 6px; margin-top: 6px; } .cb-acts .cb-btn { flex: 1; margin-top: 0; }
+  .cb-btn2 { padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border-2); background: var(--surface, #fff); color: var(--text); font: inherit; font-weight: 600; font-size: .82rem; cursor: pointer; }
+  .cb-post { display: inline-block; padding: 1px 7px; border-radius: 6px; background: var(--yellow-soft); color: var(--yellow); font-weight: 700; font-size: .7rem; }
+  .fx-acc > .fx-post { flex: 1 !important; justify-content: center; }
+  .fx-cobrar { font-weight: 700; color: var(--green) !important; border-color: var(--green) !important; }
+  .post-desg { font-size: .74rem; color: var(--muted); margin: -2px 0 2px; }
+  .g-aviso { font-size: .78rem; color: var(--muted); } .g-aviso.alerta { color: var(--red); background: var(--red-soft, #fdecec); padding: 8px 10px; border-radius: 8px; }
+  .p-post { display: flex !important; flex-direction: row !important; gap: 9px; align-items: flex-start; margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--yellow-soft); font-size: .82rem; color: var(--text); text-transform: none; letter-spacing: 0; } .p-post input { width: auto; margin-top: 2px; } .p-post small { color: var(--muted); }
+  .p-sigf { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--yellow-soft); font-size: .82rem; color: var(--text); }
   #pagStats { display: block !important; } .mv-res { display: grid; grid-template-columns: 1fr 1.6fr 1fr 1fr; gap: 10px; }
   .mv-c { padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface, #fff); } .mv-l { font-size: .74rem; color: var(--muted); }
   .mv-v { font-size: 1.45rem; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin: 2px 0; } .mv-v.rojo { color: var(--red); } .mv-v.verde { color: var(--green); } .mv-v.am { color: var(--yellow); } .mv-v.az { color: var(--accent); }
@@ -591,8 +603,8 @@
   body[data-vista] [data-sec] { display: none !important; }
   body[data-vista="inicio"] [data-sec="inicio"], body[data-vista="creditos"] [data-sec="creditos"], body[data-vista="clientes"] [data-sec="clientes"], body[data-vista="movimientos"] [data-sec="movimientos"] { display: block !important; }
   body[data-vista="inicio"] .stats[data-sec="inicio"] { display: grid !important; }
-  body.tec-on [data-sec="calc"] { display: block !important; }
-  .home-acc { grid-template-columns: repeat(6, 1fr) !important; }
+  body.tec-on [data-sec="calc"], body[data-vista="calc"] [data-sec="calc"] { display: block !important; }
+  .home-acc { grid-template-columns: repeat(7, 1fr) !important; }
   .ha-btn.on { border-color: var(--text) !important; box-shadow: 0 0 0 1px var(--text) inset; }
   .ha-pri.on { box-shadow: none; }
   body:not(.tec-on) table:has(#tbody) th:nth-child(3), body:not(.tec-on) table:has(#tbody) td:nth-child(3),
@@ -601,7 +613,7 @@
   body:not(.tec-on) table:has(#tbody) th:nth-child(6), body:not(.tec-on) table:has(#tbody) td:nth-child(6) { display: none; }
   .cb-sig { font-size: .8rem; color: var(--text); background: var(--bg-soft); border-radius: 8px; padding: 5px 8px; }
   .stats .stat { border-radius: 10px !important; margin-left: 0 !important; } .stats { gap: 10px !important; }
-  @media (max-width: 1100px) { .home-acc { grid-template-columns: repeat(3, 1fr) !important; } }
+  @media (max-width: 1300px) { .home-acc { grid-template-columns: repeat(4, 1fr) !important; } }
   @media (max-width: 600px) { .home-acc { grid-template-columns: 1fr 1fr !important; } .home-acc .ha-btn:last-child { grid-column: auto !important; } }
   .cb-head { margin-bottom: 10px; }
   .cb-filtros { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
@@ -1230,6 +1242,7 @@ html.oscuro .practica-bar button { background: #1d1d1b !important; color: #f2d69
   <button class="ha-btn" data-v="creditos" onclick="verTodosCreditos()"><span class="ha-ic"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span><span><b>Créditos</b><small>Activos, pagados y anulados</small></span></button>
   <button class="ha-btn" data-v="clientes" onclick="irVista('clientes')"><span class="ha-ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6"/></svg></span><span><b>Clientes</b><small>Quién debe y cuánto</small></span></button>
   <button class="ha-btn" data-v="movimientos" onclick="irVista('movimientos')"><span class="ha-ic"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span><b>Movimientos</b><small>Cobrado y prestado</small></span></button>
+  <button class="ha-btn" data-v="calc" onclick="irVista('calc')"><span class="ha-ic"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 19h8"/></svg></span><span><b>Calcular</b><small>Cuota e intereses</small></span></button>
 </div>
 <div class="stats" id="stats"></div>
 <div class="card atn" id="atencion" style="margin-bottom:18px"></div>
@@ -1592,10 +1605,9 @@ html.oscuro .practica-bar button { background: #1d1d1b !important; color: #f2d69
 <!-- Modal Cargo por posponer cuota -->
 <div class="overlay" id="ovCargo">
   <div class="modal">
-    <h2 id="cargoTit">Interés por posponer cuota</h2>
+    <h2 id="cargoTit">Postergar pago</h2>
     <div class="sync-info-box" style="margin-bottom:16px">
-      Registrá acá el interés negociado cuando el cliente no paga una cuota y se pospone el cobro.
-      Se guarda como <strong>cargo aparte</strong>: no modifica el saldo del crédito.
+      <span id="gInfo">El cliente pide más tiempo: se cobra un interés aparte y se corre la fecha de pago. El saldo del crédito no cambia.</span>
     </div>
     <div class="fg">
       <label>Fecha <input type="date" id="gFec" required/></label>
@@ -1603,18 +1615,20 @@ html.oscuro .practica-bar button { background: #1d1d1b !important; color: #f2d69
       <label class="s2">Descripción
         <input id="gDesc" placeholder="Ej: Pospone cuota 3 por 15 días"/>
       </label>
-      <label class="s2">Nueva fecha de próximo pago
+      <div class="s2 g-rap" id="gRap"></div>
+      <div class="s2 g-aviso" id="gAviso"></div>
+      <label class="s2">Nueva fecha de pago
         <input type="date" id="gProx"/>
-        <span class="field-hint">Opcional: si la ponés, se corre la fecha de cobro del crédito</span>
+        <span class="field-hint">Elige un botón de arriba o pon otra fecha.</span>
       </label>
       <label class="s2" style="flex-direction:row;align-items:center;gap:9px;text-transform:none;letter-spacing:0">
         <input type="checkbox" id="gPagado" style="width:auto" onchange="prevCargo()"/>
-        <span>Ya me pagó este interés</span>
+        <span>Ya me pagó este interés <small style="color:var(--muted);font-weight:400">(si no, se cobra junto con el próximo pago)</small></span>
       </label>
     </div>
     <div class="fa">
       <button class="btn btn-ghost" onclick="cerrar()">Cancelar</button>
-      <button class="btn btn-primary" onclick="guardarCargo()">Guardar cargo</button>
+      <button class="btn btn-primary" onclick="guardarCargo()">Guardar postergación</button>
     </div>
   </div>
 </div>
@@ -1714,7 +1728,7 @@ html.oscuro .practica-bar button { background: #1d1d1b !important; color: #f2d69
 // ── Helpers ──
 const fmt = n => '₡' + Math.round(n).toLocaleString('es-CR');
 const fd  = s => { if(!s) return '—'; return new Date(s+'T12:00').toLocaleDateString('es-CR',{day:'2-digit',month:'short',year:'numeric'}); };
-const today = () => new Date().toISOString().slice(0,10);
+const today = () => ymdLocal(new Date());   // 7.1.5: fecha local (antes UTC)
 let selId = null, pagoTarget = null, nextId = 100, nextPid = 500;
 let cargoTarget = null, nextCid = 900;
 
@@ -2952,7 +2966,7 @@ function renderAtencion(at) {
   var CAL = {}; act.forEach(function (p) { CAL[p.id] = calendarioCobro(p, hoyS, en7); });
   var esV = function (p) { return CAL[p.id].atrasadas > 0; }, esH = function (p) { return CAL[p.id].hoy; }, esS = function (p) { return CAL[p.id].semana; };
   var tarjeta = function (p) {
-    var c = CAL[p.id], plazo = p.vencimiento && p.vencimiento < hoyS, cls, est, cuerpo;
+    var c = CAL[p.id], plazo = plazoTerminado(p, hoyS), cls, est, cuerpo;
     if (c.atrasadas > 0) { cls = 'rojo'; est = 'Atrasado ' + c.diasAtraso + (c.diasAtraso === 1 ? ' día' : ' días'); }
     else if (c.hoy) { cls = 'verde'; est = 'Paga hoy'; }
     else if (!c.siguiente) { cls = 'gris'; est = 'Sin fecha'; }
@@ -2962,16 +2976,17 @@ function renderAtencion(at) {
       (c.siguiente ? '<div class="cb-sig">Siguiente cuota: <b>' + fd(c.siguiente) + '</b> · ' + fmt(c.cuota) + '</div>' : '');
     else if (c.siguiente) cuerpo = '<div class="cb-lbl">Próximo pago</div><div class="cb-mto">' + fmt(c.cuota) + '</div><div class="cb-fec">Fecha: ' + fd(c.siguiente) + (plazo ? ' · <span class="cb-plazo">plazo vencido</span>' : '') + '</div>';
     else cuerpo = '<div class="cb-lbl">Cuota</div><div class="cb-mto">' + fmt(montoProxPago(p)) + '</div><div class="cb-fec"><span class="cb-plazo">Falta la fecha de pago</span> (complétala en Editar crédito)</div>';
+    if (c.atrasadas > 0 || c.siguiente) cuerpo = conPost(cuerpo, 'cb-mto', c.atrasadas > 0 ? c.vencido : c.cuota, postPendiente(p));
     var ini = String(p.cliente || '?').trim().charAt(0).toUpperCase();
     var tot = Number(p.num_cuotas) || 0, hechas = Number(p.cuotas_canceladas) || 0, pct = Number(p.total) > 0 ? Math.max(0, Math.min(100, Math.round(100 * (1 - (Number(p.saldo) || 0) / Number(p.total))))) : 0;
     var frec = FTXT[frecDe(p)] + (esPlanInteres(p) ? ' · solo intereses' : '');
     return '<div class="cb-card ' + cls + '" onclick="verDetalle(' + p.id + ')" title="Ver el crédito">' +
       '<div class="cb-top"><div class="cb-av">' + escTxt(ini) + '</div><div class="cb-nom"><b>' + escTxt(p.cliente || '') + '</b>' + tagPara(p) + '</div>' +
       '<span class="cb-pill">' + est + '</span></div>' +
-      '<div class="cb-meta"><span class="cb-frec">' + frec + '</span>' + (tot ? '<span>' + hechas + ' de ' + tot + ' pagos</span>' : '') + '</div>' + cuerpo +
+      '<div class="cb-meta"><span class="cb-frec">' + frec + '</span>' + (tot ? '<span>' + hechas + ' de ' + tot + ' pagos</span>' : '') + (function () { var n = postergacionesDe(p).length; return n ? '<span class="cb-post">Postergado ' + n + '×</span>' : ''; })() + '</div>' + cuerpo +
       '<div class="cb-bar"><span style="width:' + pct + '%"></span></div>' +
       '<div class="cb-sal"><span>Saldo</span><b>' + fmt(p.saldo || 0) + '</b></div>' +
-      '<button class="cb-btn" onclick="event.stopPropagation();abrirPago(' + p.id + ')">+ Registrar pago</button></div>';
+      '<div class="cb-acts"><button class="cb-btn" onclick="event.stopPropagation();abrirPago(' + p.id + ')">+ Registrar pago</button><button class="cb-btn2" title="Postergar el pago" onclick="event.stopPropagation();abrirCargo(' + p.id + ')">Postergar</button></div></div>';
   };
   prestamos.forEach(function (p) {
     var r = p.refundicion; if (!r || r.version !== '7.0') return;
@@ -3332,7 +3347,11 @@ function cambiarFechaRefundicion(id, fNueva) {
 }
 function irA(id, foco) { var e = document.getElementById(id); if (!e) return; e.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (foco) setTimeout(function () { e.focus(); toast('Escribe el nombre del cliente y toca su crédito'); }, 350); }
 // 7.1: monto del próximo pago = la cuota pendiente que sigue (misma regla de la ficha), sin pasar del saldo. Solo vista.
-function montoProxPago(p) { try { if (p.frecuencia === 'unico' || (p.vencimiento && p.vencimiento < today())) return Number(p.saldo) || 0;   // pago único o plazo terminado: se debe todo el saldo
+function finEfectivo(p) { try { var f = p.proximo_pago, c = Number(p.cuota) || 0, sal = Number(p.saldo) || 0; if (!f || !p.frecuencia || p.frecuencia === 'unico' || !(c > 0) || !postergacionesDe(p).length) return p.vencimiento;
+  var fin = calcularFinCredito(f, p.frecuencia, Math.ceil(sal / c - 0.001), p.dias_pago); return fin && fin > p.vencimiento ? fin : p.vencimiento; } catch (e) { return p.vencimiento; } }
+// 7.1.5: si el crédito se postergó, el plazo se corre: las cuotas que faltan siguen su calendario aunque pasen el vencimiento original
+function plazoTerminado(p, h) { if (!(p.vencimiento && p.vencimiento < h)) return false; if (p.proximo_pago && p.proximo_pago > p.vencimiento) return false; var fe = finEfectivo(p); return !(fe && fe >= h); }
+function montoProxPago(p) { try { if (p.frecuencia === 'unico' || plazoTerminado(p, today())) return Number(p.saldo) || 0;   // pago único o plazo terminado: se debe todo el saldo
    var rp = repartoCuotaPendiente(p, (Number(p.cuotas_canceladas) || 0) + 1); var m = (Number(rp.interes) || 0) + (Number(rp.capital) || 0); var sal = Number(p.saldo) || 0; return sal > 0 && m > sal ? sal : (m || Number(p.cuota) || 0); } catch (e) { return Number(p.cuota) || 0; } }
 // Cambiar solo el NOMBRE del cliente en todos sus créditos (también los cerrados o refundidos). No toca montos, saldos ni pagos; deja un evento por crédito.
 function cambiarNombreCliente(id) {
@@ -3353,8 +3372,8 @@ function calendarioCobro(p, hoyS, en7) {
   var f = proxPagoDe(p), cuota = montoProxPago(p), sal = Number(p.saldo) || 0, dd = function (x) { return Math.round((new Date(hoyS + 'T12:00') - new Date(x + 'T12:00')) / 86400000); };
   var r = { atrasadas: 0, desde: null, diasAtraso: 0, vencido: 0, siguiente: null, enDias: 0, hoy: false, semana: false, cuota: cuota, unico: false };
   if (!f) return r;
-  if (p.frecuencia === 'unico' || !p.frecuencia || (p.vencimiento && p.vencimiento < hoyS)) {
-    if (!p.frecuencia && !(p.vencimiento && p.vencimiento < hoyS)) { if (f < hoyS) { r.atrasadas = 1; r.desde = f; r.diasAtraso = dd(f); r.vencido = Math.min(sal, cuota); } else { r.siguiente = f; } }
+  if (p.frecuencia === 'unico' || !p.frecuencia || plazoTerminado(p, hoyS)) {
+    if (!p.frecuencia && !plazoTerminado(p, hoyS)) { if (f < hoyS) { r.atrasadas = 1; r.desde = f; r.diasAtraso = dd(f); r.vencido = Math.min(sal, cuota); } else { r.siguiente = f; } }
     else { r.unico = true; if (f < hoyS) { r.atrasadas = 1; r.desde = f; r.diasAtraso = dd(f); r.vencido = sal; r.cuota = sal; } else { r.siguiente = f; r.cuota = sal; } }
   } else {
     var g = f, k = 0;
@@ -3371,6 +3390,7 @@ function irVista(v) {
   document.querySelectorAll('.ha-btn[data-v]').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
   try { cerrarDetalle(); } catch (e) {}
   if (v === 'clientes') { var h = document.getElementById('deuHdr'); if (h && !h.classList.contains('open')) toggleDeuda(); deuOrden = 'nombre'; try { renderDeuda(); } catch (e) {} }
+  if (v === 'calc') { var ch = document.getElementById('calcHdr'); if (ch && !ch.classList.contains('open')) toggleCalc(); }
   if (v === 'movimientos') { var m = document.getElementById('pagosHdr'); if (m && !m.classList.contains('open')) togglePagos(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -3456,6 +3476,7 @@ function fichaSimple(id) {
   else if (act && c.siguiente) lado = '<div class="fx-lbl">Próximo pago</div><div class="fx-big">' + fmt(c.cuota) + '</div><div class="fx-sub">' + fd(c.siguiente) + (c.enDias === 0 ? ' · hoy' : ' · en ' + c.enDias + (c.enDias === 1 ? ' día' : ' días')) + '</div>';
   else if (act) lado = '<div class="fx-lbl">Próximo pago</div><div class="fx-big">' + fmt(montoProxPago(p)) + '</div><div class="fx-sub rojo">Falta la fecha de pago: complétala en Editar crédito</div>';
   else { var up = ultimoPago(id); lado = '<div class="fx-lbl">Último pago</div><div class="fx-big">' + (up ? fd(up.fecha) : '—') + '</div>'; }
+  if (act && (c.atrasadas > 0 || c.siguiente)) lado = conPost(lado, 'fx-big', c.atrasadas > 0 ? c.vencido : c.cuota, postPendiente(p));
   var hechas = Number(p.cuotas_canceladas) || 0, nc = Number(p.num_cuotas) || 0;
   var facts = ['Prestado <b>' + fmt(p.monto) + '</b>', 'Interés <b>' + fmt(p.interes) + '</b>', 'Total <b>' + fmt(p.total) + '</b>', (FREC_TXT[p.frecuencia] || 'Sin frecuencia') + (esPlanInteres(p) ? ' · solo intereses' : ''), 'Inicio ' + fd(p.fecha_inicio), 'Vence ' + fd(p.vencimiento)];
   var hero = document.createElement('div'); hero.className = 'fx-hero ' + cls;
@@ -3467,7 +3488,8 @@ function fichaSimple(id) {
   var edit = body.querySelector('button[onclick^="abrirEditar("]'), cont = edit && edit.parentElement;
   if (cont) {
     cont.classList.add('fx-acc'); var pri = cont.querySelector('button.btn-primary');
-    var resto = [].slice.call(cont.children).filter(function (b) { return b !== pri && b.tagName === 'BUTTON'; });
+    var pos = cont.querySelector('button[onclick^="abrirCargo("]'); if (pos) { pos.textContent = '📅 Postergar'; pos.classList.add('fx-post'); }
+    var resto = [].slice.call(cont.children).filter(function (b) { return b !== pri && b !== pos && b.tagName === 'BUTTON'; });
     if (resto.length) { var d = document.createElement('details'); d.className = 'fx-mas'; d.innerHTML = '<summary class="btn">Más acciones ▾</summary><div class="fx-menu"></div>';
       var menu = d.querySelector('.fx-menu'); resto.forEach(function (b) { b.style.flex = ''; menu.appendChild(b); });
       if (p.estado === 'activo' && !p.anulado) { var cf = document.createElement('button'); cf.className = 'btn'; cf.textContent = '📅 Cambiar fecha del próximo pago'; cf.onclick = function () { abrirCambioProx(p.id); }; menu.insertBefore(cf, menu.firstChild); }
@@ -3476,6 +3498,15 @@ function fichaSimple(id) {
   }
   // historial → «Pagos»; plan plegado (3 cuotas pendientes visibles)
   [].forEach.call(body.querySelectorAll('.sec-title'), function (t) { if (t.textContent.trim() === 'Historial de pagos') t.textContent = 'Pagos'; });
+  var PS = postergacionesDe(p), mapa = {}; PS.forEach(function (x) { mapa[String(x.id)] = x; });
+  [].forEach.call(body.querySelectorAll('.sec-title'), function (t) { if (/^Intereses por posponer cuota/.test(t.textContent.trim())) {
+    var tot = PS.reduce(function (a, x) { return a + x.monto; }, 0), pend = PS.filter(function (x) { return !x.pagado && !x.condonado; }).reduce(function (a, x) { return a + x.monto; }, 0);
+    t.innerHTML = 'Postergaciones · ' + PS.length + (PS.length === 1 ? ' vez' : ' veces') + ' · ' + fmt(tot) + ' en intereses' + (pend > 0 ? ' <span style="color:var(--red)">· ' + fmt(pend) + ' sin cobrar</span>' : ''); } });
+  [].forEach.call(body.querySelectorAll('.prow'), function (row) { var b = row.querySelector('button[onclick^="toggleCargoPagado("]'); if (!b) return;
+    var m = /toggleCargoPagado\(\s*\d+\s*,\s*(\d+)\s*\)/.exec(b.getAttribute('onclick') || ''); var x = m && mapa[m[1]]; var pf = row.querySelector('.pfecha');
+    if (x && pf && (x.de || x.a)) pf.innerHTML += ' · <b>' + (x.de ? fd(x.de) : '—') + ' → ' + (x.a ? fd(x.a) : 'sin cambio de fecha') + '</b>';
+    if (x && !x.pagado && !x.condonado) { b.textContent = '✓ Ya me pagó'; b.classList.add('fx-cobrar'); }
+    var an = row.querySelector('button[onclick^="eliminarCargo("]'); if (x && an) { an.textContent = 'Anular'; an.title = 'Anular esta postergación (queda en el historial)'; } });
   var pend = body.querySelectorAll('.pend');
   if (pend.length > 3) {
     for (var i = 3; i < pend.length; i++) pend[i].classList.add('fx-oculta');
@@ -3484,6 +3515,78 @@ function fichaSimple(id) {
     pend[pend.length - 1].parentNode.insertBefore(bt, pend[pend.length - 1].nextSibling);
   }
 }
+// ── 7.1.5: postergaciones (se apoyan en los cargos «interés por posponer» que la app ya guarda) ──
+(function () {
+  var _gp = window.guardarPago; window.guardarPago = function () {
+    var id = pagoTarget, f = ((document.getElementById('pSigFec') || {}).value || '').trim();
+    var r = _gp.apply(this, arguments);
+    try { var p = creditoPorId(id); if (f && p && p.estado === 'activo' && !p.frecuencia && f !== p.proximo_pago) {
+      var antes = fotoCredito(p), vieja = p.proximo_pago; p.proximo_pago = f;
+      registrarEvento(p, 'MODIFICACION', { descripcion: 'Cambio de la fecha del próximo pago: ' + (vieja ? fd(vieja) : '—') + ' → ' + fd(f), motivo: 'Siguiente pago indicado al registrar el pago (crédito sin frecuencia)', antes: antes, despues: fotoCredito(p), ref: { tipo: 'credito', id: id }, impacto: { saldo: 0, monto: 0, interes: 0 } });
+      marcar(p); guardar(); render(); if (selId === id) verDetalle(id, false); } } catch (e) { console.error(e); }
+    var x = document.getElementById('pSigFec'); if (x) x.value = '';
+    return r; };
+})();
+function postergacionesDe(p) {
+  // el historial guarda la foto «después» de cada evento: la fecha anterior sale del evento previo
+  var H = (p.historial || []).slice().sort(ordenHist), usados = {}, ev = {};
+  (p.cargos || []).forEach(function (c) { for (var i = 0; i < H.length; i++) { var e = H[i];
+    if (e.tipo === 'CARGO' && !usados[i] && (e.fechaOperacion || e.fecha) === c.fecha && String(e.descripcion || '').indexOf(fmt(c.monto)) >= 0) {
+      usados[i] = 1; var prev = null; for (var j = i - 1; j >= 0; j--) if (H[j].despues && H[j].despues.proximo_pago !== undefined) { prev = H[j].despues; break; }
+      ev[String(c.id)] = { descripcion: e.descripcion, antes: prev, despues: e.despues }; break; } } });
+  return (p.cargos || []).filter(function (c) { return !c.trasladado_a && /posponer|postergaci/i.test(String(c.descripcion || '') + ' ' + ((ev[String(c.id)] || {}).descripcion || '')); })
+    .map(function (c) { var e = ev[String(c.id)] || {}, de = e.antes && e.antes.proximo_pago, a = e.despues && e.despues.proximo_pago;
+      return { id: c.id, fecha: c.fecha, monto: Number(c.monto) || 0, pagado: !!c.pagado, condonado: !!c.condonado, de: de || null, a: (a && a !== de) ? a : null }; })
+    .sort(function (x, y) { return x.fecha < y.fecha ? -1 : 1; });
+}
+function sumarDiasISO(f, n) { var d = new Date(f + 'T12:00'); d.setDate(d.getDate() + n); return ymdLocal(d); }
+function sumarMesISO(f) { var d = new Date(f + 'T12:00'), dia = d.getDate(); d.setDate(1); d.setMonth(d.getMonth() + 1); d.setDate(Math.min(dia, new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate())); return ymdLocal(d); }
+function gPoner(f, base) { var x = document.getElementById('gProx'); if (x) x.value = f; var ds = document.getElementById('gDesc'); if (ds) ds.value = 'Postergación de ' + fd(base) + ' a ' + fd(f);
+  [].forEach.call(document.querySelectorAll('#gRap button'), function (b) { b.classList.toggle('on', b.getAttribute('data-f') === f); }); gAvisar(f); }
+function gAvisar(f) { var w = document.getElementById('gAviso'), sig = window.__postSig; if (!w) return;
+  w.innerHTML = !sig ? '' : (f && f >= sig) ? '<b>Ojo:</b> el ' + fd(sig) + ' vence la siguiente cuota. Elige una fecha antes del ' + fd(sig) + ' para no mezclar las dos cuotas.' : 'La siguiente cuota sigue igual: ' + fd(sig) + '.';
+  w.classList.toggle('alerta', !!(sig && f && f >= sig)); }
+(function () {
+  var _ac = window.abrirCargo; window.abrirCargo = function (id) { var r = _ac.apply(this, arguments); try { postergarInfo(id); } catch (e) { console.error(e); } return r; };
+})();
+function postergarInfo(id) {
+  var p = creditoPorId(id); if (!p) return;
+  var c = calendarioCobro(p, today(), ymdLocal(new Date(Date.now() + 7 * 86400000)));
+  var base = (c.atrasadas > 0 ? c.desde : c.siguiente) || proxPagoDe(p) || today();
+  var prev = postergacionesDe(p), tot = prev.reduce(function (a, x) { return a + x.monto; }, 0);
+  document.getElementById('cargoTit').textContent = 'Postergar pago — ' + p.cliente;
+  document.getElementById('gPagado').checked = false;
+  var pp = postPendiente(p); window.__postSig = (p.frecuencia && p.frecuencia !== 'unico' && (Number(p.num_cuotas) || 0) > (Number(p.cuotas_canceladas) || 0) + 1) ? sumarFrecuencia(base, p.frecuencia, p.dias_pago) : null;
+  var info = document.getElementById('gInfo');
+  if (info) info.innerHTML = 'Fecha de pago pendiente: <b>' + fd(base) + '</b>' + (c.atrasadas > 0 ? ' <span style="color:var(--red)">(atrasado)</span>' : '') +
+    (prev.length ? '<br>Ya se ha postergado <b>' + prev.length + (prev.length === 1 ? ' vez' : ' veces') + '</b> (' + fmt(tot) + ' en intereses).' : '<br>Es la primera postergación de este crédito.') +
+    (pp > 0 ? '<br>Ya debe <b>' + fmt(pp) + '</b> de postergaciones anteriores (se cobran con el pago).' : '') +
+    '<br><span style="color:var(--muted)">Se posterga solo esta cuota. El interés se cobra junto con el pago; el saldo del crédito no cambia.</span>';
+  var ops = [['+1 semana', sumarDiasISO(base, 7)], ['+15 días', sumarDiasISO(base, 15)], ['+1 mes', sumarMesISO(base)]];
+  if (window.__postSig) { var ok = ops.filter(function (o) { return o[1] < window.__postSig; }); ops = ok.length ? ok : ops.slice(0, 1); }
+  var gp = document.getElementById('gProx'); if (gp) gp.onchange = function () { gAvisar(this.value); };
+  var rap = document.getElementById('gRap');
+  if (rap) rap.innerHTML = '<div class="g-lbl">Nueva fecha</div>' + ops.map(function (o) { return '<button type="button" data-f="' + o[1] + '" onclick="gPoner(\'' + o[1] + '\',\'' + base + '\')">' + o[0] + '<b>' + fd(o[1]) + '</b></button>'; }).join('');
+  gPoner(ops[0][1], base);
+  setTimeout(function () { var m = document.getElementById('gMnt'); if (m) m.focus(); }, 50);
+}
+// 7.1.5: intereses de postergación que el cliente todavía debe; se cobran junto con el próximo pago. Solo lectura.
+function postPendiente(p) { try { return postergacionesDe(p).filter(function (x) { return !x.pagado && !x.condonado; }).reduce(function (a, x) { return a + x.monto; }, 0); } catch (e) { return 0; } }
+function conPost(html, cls, base, pp) { if (!(pp > 0)) return html; var re = new RegExp('<div class="' + cls + '([^"]*)">[^<]*</div>');
+  return html.replace(re, function (m, extra) { return '<div class="' + cls + extra + '">' + fmt(base + pp) + '</div><div class="post-desg">' + fmt(base) + ' + ' + fmt(pp) + ' de postergación</div>'; }); }
+(function () {
+  var _pd = window.pagoDespues; window.pagoDespues = function () { var r = _pd.apply(this, arguments);
+    var el = document.getElementById('pDesp'), x = document.getElementById('pPost'), m = parseFloat((document.getElementById('pMnt') || {}).value) || 0;
+    if (el && x && x.checked && m > 0) el.innerHTML += '<br>Recibes en total <b>' + fmt(m + (window.__pagoPost || 0)) + '</b> (pago + postergación)'; return r; };
+  var _g = window.guardarPago; window.guardarPago = function () {
+    var id = pagoTarget, chk = document.getElementById('pPost'), cobrar = !!(chk && chk.checked), fec = (document.getElementById('pFec') || {}).value, n0 = (pagos[id] || []).length;
+    var r = _g.apply(this, arguments);
+    try { var p = creditoPorId(id); if (cobrar && p && fec && (pagos[id] || []).length > n0) {
+      var ids = postergacionesDe(p).filter(function (x) { return !x.pagado && !x.condonado; }).map(function (x) { return String(x.id); });
+      cargosDe(p).forEach(function (c) { if (ids.indexOf(String(c.id)) >= 0 && !c.pagado) registrarCobroCargo(p, c, fec); });
+      if (ids.length) { marcar(p); guardar(); render(); if (selId === id) verDetalle(id, false); toast('Pago y postergación registrados ✓'); } } } catch (e) { console.error(e); }
+    if (chk) chk.checked = false; return r; };
+})();
 function pagoInfo(id) {
   var p = creditoPorId(id), box = document.getElementById('pInfo'); if (!p || !box) return;
   var c = calendarioCobro(p, today(), ymdLocal(new Date(Date.now() + 7 * 86400000))), sal = Number(p.saldo) || 0, op = [];
@@ -3492,6 +3595,9 @@ function pagoInfo(id) {
   op.push(['Todo el saldo', sal]);
   box.innerHTML = '<div class="p-sal"><span>Saldo actual</span><b>' + fmt(sal) + '</b>' + (c.atrasadas > 0 ? '<span class="p-atr">' + c.atrasadas + (c.atrasadas === 1 ? ' cuota atrasada' : ' cuotas atrasadas') + ' · ' + fmt(c.vencido) + '</span>' : '') + '</div>' +
     '<div class="p-rap">' + op.map(function (o) { return '<button type="button" onclick="document.getElementById(\'pMnt\').value=' + o[1] + ';pagoDespues()">' + o[0] + '<b>' + fmt(o[1]) + '</b></button>'; }).join('') + '</div>';
+  if (!p.frecuencia && sal > 0) box.innerHTML += '<label class="p-sigf"><span><b>Este crédito no tiene frecuencia</b>, por eso la fecha de pago no avanza sola. ¿Cuándo es el siguiente pago?</span><input type="date" id="pSigFec"/></label>';
+  var pp = postPendiente(p); window.__pagoPost = pp;
+  if (pp > 0) box.innerHTML += '<label class="p-post"><input type="checkbox" id="pPost" checked onchange="pagoDespues()"/><span>Cobrar también <b>' + fmt(pp) + '</b> de postergación <small>(va aparte de la cuota; el saldo no cambia)</small></span></label>';
   var d = document.querySelector('#ovPago details.p-mas'); if (d) d.open = false;
   window.__pagoSaldo = sal; pagoDespues();
 }
@@ -3512,7 +3618,7 @@ function statsMov() {
     '<div class="mv-c mv-cob"><div class="mv-l">Cobrado (entró)</div><div class="mv-v verde">' + fmt(cob) + '</div><div class="mv-s">' + efec.length + (efec.length === 1 ? ' pago' : ' pagos') + '</div>' +
       '<div class="mv-bar"><span class="i" style="width:' + pi + '%"></span><span class="k" style="width:' + pc + '%"></span></div>' +
       '<div class="mv-leg"><span><i class="i"></i>Intereses <b>' + fmt(int) + '</b> · ' + pi + '%</span><span><i class="k"></i>Principal <b>' + fmt(cap) + '</b> · ' + pc + '%</span></div></div>' +
-    '<div class="mv-c"><div class="mv-l">De lo cobrado: intereses (ganancia)</div><div class="mv-v am">' + fmt(int) + '</div><div class="mv-s">' + pi + '% de lo cobrado</div></div>' +
+    '<div class="mv-c"><div class="mv-l">De lo cobrado: intereses (ganancia)</div><div class="mv-v am">' + fmt(int) + '</div><div class="mv-s">' + pi + '% de lo cobrado' + (function () { var x = efec.filter(function (y) { return esPagoDeCargo(y.g); }).reduce(function (a, y) { return a + (Number(y.g.monto_cuota) || 0); }, 0); return x > 0 ? ' · incluye ' + fmt(x) + ' por postergaciones' : ''; })() + '</div></div>' +
     '<div class="mv-c"><div class="mv-l">De lo cobrado: principal (capital que volvió)</div><div class="mv-v az">' + fmt(cap) + '</div><div class="mv-s">' + (pres > 0 ? 'equivale al ' + Math.round(100 * cap / pres) + '% de lo prestado en el período' : 'capital recuperado') + '</div></div>' +
     '</div>' + tec;
 }
@@ -3558,7 +3664,8 @@ function creditosSimples() {
     else if (c.siguiente) { cls = 'verde'; pill = 'Al día'; prox = '<b>' + fmt(c.cuota) + '</b><div class="cr-sub">' + fd(c.siguiente) + (c.enDias === 0 ? ' · hoy' : ' · en ' + c.enDias + (c.enDias === 1 ? ' día' : ' días')) + '</div>'; }
     else { cls = 'gris'; pill = 'Sin fecha'; prox = '<span class="cr-rojo">Falta la fecha de pago</span>'; }
     var up = ultimoPago(p.id), dU = up ? Math.round((new Date(hoyS + 'T12:00') - new Date(up.fecha + 'T12:00')) / 86400000) : null;
-    td[1].innerHTML = '<div class="cr-nom">' + escTxt(p.cliente || '') + tagPara(p) + '</div><div class="cr-sub"><span class="cr-est ' + cls + '">' + pill + '</span> ' + frec + '</div>';
+    var nPos = postergacionesDe(p).length;
+    td[1].innerHTML = '<div class="cr-nom">' + escTxt(p.cliente || '') + tagPara(p) + '</div><div class="cr-sub"><span class="cr-est ' + cls + '">' + pill + '</span> ' + frec + (nPos ? ' · <span class="cb-post">Postergado ' + nPos + '×</span>' : '') + '</div>';
     td[6].innerHTML = prox;
     td[7].innerHTML = up ? '<b>' + fmt(up.monto_cuota) + '</b><div class="cr-sub">' + fd(up.fecha) + (dU != null ? ' · ' + (dU === 0 ? 'hoy' : 'hace ' + dU + (dU === 1 ? ' día' : ' días')) : '') + '</div>' : '<span class="cr-sub">Sin pagos aún</span>';
     var tot = Number(p.total) || 0, pct = tot > 0 ? Math.max(0, Math.min(100, Math.round(100 * (1 - (Number(p.saldo) || 0) / tot)))) : 0;
