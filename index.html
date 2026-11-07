@@ -498,6 +498,8 @@
   .fx-acc > .fx-post { flex: 1 !important; justify-content: center; }
   .fx-cobrar { font-weight: 700; color: var(--green) !important; border-color: var(--green) !important; }
   .cb-cod { padding: 2px 7px; border-radius: 6px; border: 1px solid var(--border-2); color: var(--muted); font-family: var(--mono); font-weight: 700; font-size: .72rem; }
+  .wz-perd { display: flex; flex-direction: column; gap: 6px; margin: 6px 0; } .wz-perd label { display: flex !important; flex-direction: row !important; justify-content: space-between; align-items: center; gap: 10px; text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--text); font-size: .85rem; padding: 6px 10px; border: 1px solid var(--border-2); border-radius: 10px; }
+  .wz-perd-in { white-space: nowrap; } .wz-perd-in input { width: 110px; display: inline-block; }
   .fx-corr { margin-right: 4px; padding: 4px 9px !important; }
   .post-desg { font-size: .74rem; color: var(--muted); margin: -2px 0 2px; }
   .g-aviso { font-size: .78rem; color: var(--muted); } .g-aviso.alerta { color: var(--red); background: var(--red-soft, #fdecec); padding: 8px 10px; border-radius: 8px; }
@@ -1500,7 +1502,7 @@ html.oscuro .practica-bar button { background: #1d1d1b !important; color: #f2d69
           </div>
           <div class="ref-lista" id="nRefLista"></div>
           <div id="wizPerdon" class="wz-perdon">
-            <div class="wz-preg2">¿Quieres perdonar los intereses pendientes?</div>
+            <div class="wz-preg2">¿Le perdonas intereses?</div>
             <div class="wz-sn"><button type="button" id="wizPerNo" onclick="wizPerdon(false)">No</button><button type="button" id="wizPerSi" onclick="wizPerdon(true)">Sí</button></div>
             <div id="wizPerTxt" class="field-hint"></div>
           </div>
@@ -1523,7 +1525,7 @@ html.oscuro .practica-bar button { background: #1d1d1b !important; color: #f2d69
               <input id="nRefRef" placeholder="N.º SINPE o recibo, si tenés" oninput="wizRefrescar()"/>
             </label>
           </div>
-          <details class="tec" id="wRefAvz"><summary>Ajuste avanzado (opcional): detalle técnico por crédito</summary><div class="ref-comp" id="nRefComp"></div></details>
+          <details class="tec solo-tec" id="wRefAvz"><summary>Ajuste avanzado (opcional): detalle técnico por crédito</summary><div class="ref-comp" id="nRefComp"></div></details>
           <div class="ref-prev" id="nRefPrev"></div>
         </div>
       </div>
@@ -4699,13 +4701,31 @@ function wizElegirCliente(nomEnc) {
   document.getElementById('nCli').value = nom;
   refrescarRefundibles();
   document.getElementById('nRefunde').checked = true; cambioRefunde();
-  window.WZ.cli = nom; window.WZ.perdon = false;
+  window.WZ.cli = nom; window.WZ.perdon = false; window.PERD = {};
   wizIr('r2');
 }
 // Perdonar intereses: usa la división que YA calcula el motor (partesViejo): interés ganado a la fecha (sugerencia método B)
 // → «condonado»; interés futuro aún no ganado → «interés futuro anulado». No cambia ninguna función económica.
-function wizPerdon(si) { window.WZ.perdon = !!si; wizRefrescar(); }
+function wizPerdon(si) { window.WZ.perdon = !!si; if (!si) window.PERD = {}; wizRefrescar(); }
+window.PERD = {};
+function wizPerdonMonto(id, v) { window.PERD[id] = Math.max(Math.round(Number(v) || 0), 0); wizRefrescar(); }
 function wizAplicarPerdon() {
+  var comp = document.getElementById('nRefComp'); if (!comp) return null;
+  var viejos = refundeElegidos(), fecha = document.getElementById('nRefEfFec').value || document.getElementById('nFec').value, info = { gan: 0, fut: 0, sinDato: [], filas: [] };
+  viejos.forEach(function (v) {
+    var q = comp.querySelector('input[data-qdev="' + v.id + '"]'), an = comp.querySelector('input[data-anul="' + v.id + '"]'), co = comp.querySelector('input[data-cond="' + v.id + '"]');
+    if (!q || !an || !co) return;
+    var b = partesViejo(v, fecha, null, null), ip = Math.max(b.interesPendiente || 0, 0);
+    var gan = b.Q_dev_sugerido === null ? 0 : Math.min(b.Q_dev_sugerido, ip), fut = ip - gan;
+    if (window.WZ.perdon) {
+      var x = Math.min(window.PERD[v.id] || 0, ip), anul = Math.min(x, fut), cond = x - anul;
+      q.value = String(gan - cond); q.setAttribute('data-editado', '1'); an.value = String(anul); co.value = String(cond);
+      info.gan += cond; info.fut += anul; info.filas.push({ id: v.id, cod: v.codigo || ('#' + v.id), ip: ip, x: x });
+    } else if (!window.WZ.avanzadoManual) { q.value = ''; q.removeAttribute('data-editado'); co.value = '0'; an.value = '0'; }
+  });
+  return info;
+}
+function wizAplicarPerdonOriginal() {
   var comp = document.getElementById('nRefComp'); if (!comp) return null;
   var viejos = refundeElegidos(), fecha = document.getElementById('nRefEfFec').value || document.getElementById('nFec').value, info = { gan: 0, fut: 0, sinDato: [] };
   viejos.forEach(function (v) {
@@ -4740,6 +4760,9 @@ function wizRefrescar() {
   prevCalc();
   document.getElementById('wizPerNo').classList.toggle('on', !W.perdon); document.getElementById('wizPerSi').classList.toggle('on', W.perdon);
   var pt = document.getElementById('wizPerTxt');
+  if (W.perdon && info && info.filas) { pt.innerHTML = '<div class="wz-perd">' + info.filas.map(function (f) {
+      return '<label><span><b>' + escTxt(f.cod) + '</b> · intereses pendientes ' + fmt(f.ip) + '</span><span class="wz-perd-in">Perdonar ₡ <input type="number" min="0" step="500" value="' + f.x + '" onchange="wizPerdonMonto(' + f.id + ', this.value)"/></span></label>'; }).join('') +
+      '</div><div>Total perdonado: <b>' + fmt(info.gan + info.fut) + '</b>. Lo que no perdones pasa al crédito nuevo.</div>'; } else
   pt.innerHTML = W.perdon && info ? ('Se dejan de cobrar <b>' + fmt(info.gan + info.fut) + '</b>: <b>' + fmt(info.gan) + '</b> de intereses ya ganados a la fecha (se perdonan) y <b>' + fmt(info.fut) +
       '</b> de intereses futuros que aún no se habían ganado (no pasan al nuevo crédito).' + (info.sinDato.length ? '<br><b style="color:var(--yellow)">' + escTxt(info.sinDato.join(', ')) + ' no tiene vencimiento: usá el Ajuste avanzado.</b>' : ''))
     : 'Los intereses pendientes pasan al nuevo crédito, como hasta ahora.';
