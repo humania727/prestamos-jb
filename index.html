@@ -497,6 +497,8 @@
   .cb-post { display: inline-block; padding: 1px 7px; border-radius: 6px; background: var(--yellow-soft); color: var(--yellow); font-weight: 700; font-size: .7rem; }
   .fx-acc > .fx-post { flex: 1 !important; justify-content: center; }
   .fx-cobrar { font-weight: 700; color: var(--green) !important; border-color: var(--green) !important; }
+  .cb-cod { padding: 2px 7px; border-radius: 6px; border: 1px solid var(--border-2); color: var(--muted); font-family: var(--mono); font-weight: 700; font-size: .72rem; }
+  .fx-corr { margin-right: 4px; padding: 4px 9px !important; }
   .post-desg { font-size: .74rem; color: var(--muted); margin: -2px 0 2px; }
   .g-aviso { font-size: .78rem; color: var(--muted); } .g-aviso.alerta { color: var(--red); background: var(--red-soft, #fdecec); padding: 8px 10px; border-radius: 8px; }
   .p-post { display: flex !important; flex-direction: row !important; gap: 9px; align-items: flex-start; margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--yellow-soft); font-size: .82rem; color: var(--text); text-transform: none; letter-spacing: 0; } .p-post input { width: auto; margin-top: 2px; } .p-post small { color: var(--muted); }
@@ -1320,7 +1322,7 @@ html.oscuro .practica-bar button { background: #1d1d1b !important; color: #f2d69
     <div class="tbl-toolbar">
       <div class="cli-buscar">
         <svg class="lupa" viewBox="0 0 24 24" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
-        <input id="cliBuscar" placeholder="Buscar cliente…" autocomplete="off" spellcheck="false"
+        <input id="cliBuscar" placeholder="Buscar cliente o código…" autocomplete="off" spellcheck="false"
                oninput="cliInput()" onfocus="abrirSugerencias(true)" onkeydown="cliTecla(event)"/>
         <button type="button" class="limpiar" id="cliLimpiar" onclick="limpiarCliente()" title="Quitar el filtro de cliente" style="display:none">✕</button>
         <div class="cli-sug" id="cliSug"></div>
@@ -2983,7 +2985,7 @@ function renderAtencion(at) {
     return '<div class="cb-card ' + cls + '" onclick="verDetalle(' + p.id + ')" title="Ver el crédito">' +
       '<div class="cb-top"><div class="cb-av">' + escTxt(ini) + '</div><div class="cb-nom"><b>' + escTxt(p.cliente || '') + '</b>' + tagPara(p) + '</div>' +
       '<span class="cb-pill">' + est + '</span></div>' +
-      '<div class="cb-meta"><span class="cb-frec">' + frec + '</span>' + (tot ? '<span>' + hechas + ' de ' + tot + ' pagos</span>' : '') + (function () { var n = postergacionesDe(p).length; return n ? '<span class="cb-post">Postergado ' + n + '×</span>' : ''; })() + '</div>' + cuerpo +
+      '<div class="cb-meta">' + (p.codigo ? '<span class="cb-cod" title="Código del crédito">' + escTxt(p.codigo) + '</span>' : '') + '<span class="cb-frec">' + frec + '</span>' + (tot ? '<span>' + hechas + ' de ' + tot + ' pagos</span>' : '') + (function () { var n = postergacionesDe(p).length; return n ? '<span class="cb-post">Postergado ' + n + '×</span>' : ''; })() + '</div>' + cuerpo +
       '<div class="cb-bar"><span style="width:' + pct + '%"></span></div>' +
       '<div class="cb-sal"><span>Saldo</span><b>' + fmt(p.saldo || 0) + '</b></div>' +
       '<div class="cb-acts"><button class="cb-btn" onclick="event.stopPropagation();abrirPago(' + p.id + ')">+ Registrar pago</button><button class="cb-btn2" title="Postergar el pago" onclick="event.stopPropagation();abrirCargo(' + p.id + ')">Postergar</button></div></div>';
@@ -3498,6 +3500,9 @@ function fichaSimple(id) {
   }
   // historial → «Pagos»; plan plegado (3 cuotas pendientes visibles)
   [].forEach.call(body.querySelectorAll('.sec-title'), function (t) { if (t.textContent.trim() === 'Historial de pagos') t.textContent = 'Pagos'; });
+  [].forEach.call(body.querySelectorAll('button[onclick^="eliminarPago("]'), function (b) { var m = /eliminarPago\(\s*(\d+)\s*,\s*(\d+)\s*\)/.exec(b.getAttribute('onclick') || ''); if (!m) return;
+    var g = (pagos[m[1]] || []).find(function (x) { return String(x.id) === m[2]; }); if (!g || !pagoCorregible(p, g)) return;
+    var e = document.createElement('button'); e.className = 'btn btn-sm fx-corr'; e.textContent = '✎'; e.title = 'Corregir monto o fecha'; e.setAttribute('onclick', 'abrirCorregirPago(' + m[1] + ',' + m[2] + ')'); b.parentNode.insertBefore(e, b); });
   var PS = postergacionesDe(p), mapa = {}; PS.forEach(function (x) { mapa[String(x.id)] = x; });
   [].forEach.call(body.querySelectorAll('.sec-title'), function (t) { if (/^Intereses por posponer cuota/.test(t.textContent.trim())) {
     var tot = PS.reduce(function (a, x) { return a + x.monto; }, 0), pend = PS.filter(function (x) { return !x.pagado && !x.condonado; }).reduce(function (a, x) { return a + x.monto; }, 0);
@@ -3527,6 +3532,49 @@ function fichaSimple(id) {
     var x = document.getElementById('pSigFec'); if (x) x.value = '';
     return r; };
 })();
+function pagoCorregible(p, g) { return !!(p && g && !p.anulado && !p.refundido_en && !p.cancelado_anticipado && !g.no_efectivo && !g.cargo_id && !esPagoDeCargo(g) && !g.cancelacion && !esTrasladoDeRefundicion(g)); }
+function abrirCorregirPago(pid, gid) {
+  var p = creditoPorId(pid), g = (pagos[pid] || []).find(function (x) { return String(x.id) === String(gid); }); if (!p || !g) return;
+  var ov = document.getElementById('ovCorr'); if (!ov) { ov = document.createElement('div'); ov.id = 'ovCorr'; ov.className = 'overlay'; document.body.appendChild(ov); }
+  window.__corr = { pid: pid, gid: g.id, monto: Number(g.monto_cuota) || 0, saldo: Number(p.saldo) || 0 };
+  ov.innerHTML = '<div class="modal" style="max-width:440px"><h2>✎ Corregir pago</h2>' +
+    '<p style="font-size:.9rem;color:var(--muted);margin:6px 0 14px"><b>' + escTxt(p.cliente) + ' ' + escTxt(p.codigo || '') + '</b> · ' + escTxt(g.descripcion || 'Pago') + ' del <b>' + fd(g.fecha) + '</b> por <b>' + fmt(g.monto_cuota) + '</b>.<br>' +
+    'El pago original no se borra: queda anulado en el historial y se registra el corregido. La fecha del próximo pago no cambia.</p>' +
+    '<label>Monto correcto (₡)<input type="number" id="crMnt" value="' + (Number(g.monto_cuota) || 0) + '" oninput="prevCorregir()"/></label>' +
+    '<label style="margin-top:10px">Fecha correcta<input type="date" id="crFec" value="' + g.fecha + '"/></label>' +
+    '<label style="margin-top:10px">Motivo<input id="crMot" placeholder="Ej.: se registró ₡37.650 y era ₡36.750"/></label>' +
+    '<div class="field-hint" id="crPrev" style="margin-top:10px"></div>' +
+    '<div class="fa" style="margin-top:16px"><button class="btn btn-ghost" onclick="document.getElementById(\'ovCorr\').classList.remove(\'open\')">Cancelar</button>' +
+    '<button class="btn btn-primary" onclick="guardarCorreccionPago()">Guardar corrección</button></div></div>';
+  ov.classList.add('open'); prevCorregir();
+}
+function prevCorregir() { var c = window.__corr, el = document.getElementById('crPrev'); if (!c || !el) return; var m = Math.round(Number(document.getElementById('crMnt').value) || 0), d = m - c.monto;
+  el.innerHTML = d === 0 ? 'Mismo monto.' : 'El saldo pasa de <b>' + fmt(c.saldo) + '</b> a <b>' + fmt(Math.max(c.saldo - d, 0)) + '</b> (' + (d > 0 ? 'baja ' : 'sube ') + fmt(Math.abs(d)) + ').'; }
+function guardarCorreccionPago() { var c = window.__corr; if (!c) return;
+  var r = corregirPago(c.pid, c.gid, Math.round(Number(document.getElementById('crMnt').value) || 0), document.getElementById('crFec').value, (document.getElementById('crMot').value || '').trim());
+  if (!r.ok) { toast(r.error, false); return; } document.getElementById('ovCorr').classList.remove('open'); toast('Pago corregido ✓'); }
+function corregirPago(pid, gid, monto, fecha, motivo) {
+  var p = creditoPorId(pid), g = (pagos[pid] || []).find(function (x) { return String(x.id) === String(gid); });
+  if (!p || !g) return { ok: false, error: 'No se encontró el pago' };
+  if (!pagoCorregible(p, g)) return { ok: false, error: 'Este movimiento no se puede corregir aquí (traslado, cargo o crédito cerrado por refundición)' };
+  if (!(monto > 0) || !fecha) return { ok: false, error: 'Poné el monto y la fecha correctos' };
+  if (!motivo) return { ok: false, error: 'Escribí el motivo (queda en el historial)' };
+  if (monto === Number(g.monto_cuota) && fecha === g.fecha) return { ok: false, error: 'No hay cambios' };
+  if (cierreQueCubre(g.fecha) || cierreQueCubre(fecha)) return { ok: false, error: 'El pago está en un período cerrado: regístralo como ajuste posterior' };
+  var antes = fotoCredito(p), prox = p.proximo_pago, estadoAntes = p.estado;
+  var nuevo = copiaProf(g); delete nuevo.reparto; delete nuevo.anulacion; nuevo.id = nuevoId(); nuevo._ts = ahora(); nuevo.monto_cuota = monto; nuevo.fecha = fecha; nuevo.corrige = g.id;
+  moverPagoAAnulados(p, g, 'Corrección: ' + motivo, null);
+  pagos[pid].push(nuevo);
+  aplicarDerivados(p); if (g.reparto && g.reparto.congelado) congelarReparto(p, nuevo); nuevo.saldo_despues = p.saldo;
+  if (p.saldo === 0) { p.estado = 'pagado'; p.proximo_pago = null; } else { if (estadoAntes === 'pagado') p.estado = 'activo'; p.proximo_pago = prox; }
+  var ev = registrarEvento(p, 'CORRECCION_PAGO', { fecha: fecha,
+    descripcion: 'Corrección del pago del ' + fd(g.fecha) + (g.descripcion ? ' («' + g.descripcion + '»)' : '') + ': ' + fmt(g.monto_cuota) + ' → ' + fmt(monto) + (fecha !== g.fecha ? ' · fecha ' + fd(g.fecha) + ' → ' + fd(fecha) : ''),
+    motivo: motivo, antes: antes, despues: fotoCredito(p), ref: { tipo: 'pago', id: nuevo.id }, relacionados: { anulado: g.id },
+    impacto: { efectivo: monto - (Number(g.monto_cuota) || 0), monto: monto - (Number(g.monto_cuota) || 0) } });
+  var a = (p.pagosAnulados || []).filter(function (x) { return x.id === g.id; }).pop(); if (a && a.anulacion) a.anulacion.evento = ev.id;
+  marcar(p); guardar(); render(); if (selId === pid) verDetalle(pid, false);
+  return { ok: true, id: nuevo.id };
+}
 function postergacionesDe(p) {
   // el historial guarda la foto «después» de cada evento: la fecha anterior sale del evento previo
   var H = (p.historial || []).slice().sort(ordenHist), usados = {}, ev = {};
@@ -3665,7 +3713,7 @@ function creditosSimples() {
     else { cls = 'gris'; pill = 'Sin fecha'; prox = '<span class="cr-rojo">Falta la fecha de pago</span>'; }
     var up = ultimoPago(p.id), dU = up ? Math.round((new Date(hoyS + 'T12:00') - new Date(up.fecha + 'T12:00')) / 86400000) : null;
     var nPos = postergacionesDe(p).length;
-    td[1].innerHTML = '<div class="cr-nom">' + escTxt(p.cliente || '') + tagPara(p) + '</div><div class="cr-sub"><span class="cr-est ' + cls + '">' + pill + '</span> ' + frec + (nPos ? ' · <span class="cb-post">Postergado ' + nPos + '×</span>' : '') + '</div>';
+    td[1].innerHTML = '<div class="cr-nom">' + escTxt(p.cliente || '') + tagPara(p) + '</div><div class="cr-sub">' + (p.codigo ? '<span class="cb-cod">' + escTxt(p.codigo) + '</span> ' : '') + '<span class="cr-est ' + cls + '">' + pill + '</span> ' + frec + (nPos ? ' · <span class="cb-post">Postergado ' + nPos + '×</span>' : '') + '</div>';
     td[6].innerHTML = prox;
     td[7].innerHTML = up ? '<b>' + fmt(up.monto_cuota) + '</b><div class="cr-sub">' + fd(up.fecha) + (dU != null ? ' · ' + (dU === 0 ? 'hoy' : 'hace ' + dU + (dU === 1 ? ' día' : ' días')) : '') + '</div>' : '<span class="cr-sub">Sin pagos aún</span>';
     var tot = Number(p.total) || 0, pct = tot > 0 ? Math.max(0, Math.min(100, Math.round(100 * (1 - (Number(p.saldo) || 0) / tot)))) : 0;
@@ -3868,7 +3916,7 @@ function verDetalle(id, scroll=true) {
     <div class="rep-resumen">
       <div class="i">De lo cobrado, interés${intCargos > 0 ? ' (+ posponer)' : ''}<strong>${fmt(cobInt + intCargos)}</strong></div>
       <div class="k">Abonado al capital<strong>${fmt(cobCap)}</strong></div>
-      <div>${p.cancelado_anticipado ? 'Interés perdonado' : 'Falta de interés'}<strong>${fmt(Math.max((Number(p.interes)||0) - cobInt, 0))}</strong></div>
+      <div>${p.cancelado_anticipado ? 'Interés perdonado' : 'Falta de interés'}<strong>${fmt(Math.max((Number(p.interes)||0) - cobInt - (p.cancelado_anticipado ? 0 : trasInt) - (p.cancelado_anticipado ? 0 : (Number(p.condonado) || 0)), 0))}</strong></div>
       <div>${p.cancelado_anticipado ? 'Capital sin recuperar' : 'Falta de capital'}<strong>${fmt(Math.max((Number(p.monto)||0) - cobCap - trasCap, 0))}</strong></div>
       ${psTr.length ? `<div>Trasladado sin efectivo<strong>${fmt(trasCap + trasInt)}</strong></div>` : ''}
     </div>`;
@@ -6296,7 +6344,7 @@ function clavesFiltradas() {
   if (cliExacto) return [cliExacto];
   var t = normNombre(cliTexto);
   if (!t) return null;
-  return Object.keys(resumenClientes()).filter(function (k) { return k.indexOf(t) >= 0; });
+  var R = resumenClientes(); return Object.keys(R).filter(function (k) { return k.indexOf(t) >= 0 || (R[k].codigos || []).some(function (c) { return String(c).indexOf(t) >= 0; }); });
 }
 function hayFiltroCliente() { return !!(cliExacto || normNombre(cliTexto)); }
 
@@ -6357,7 +6405,7 @@ function renderSugerencias() {
   if (!box) return;
   var t = cliExacto ? '' : normNombre(cliTexto);
   var lista = listaClientes();
-  if (t) lista = lista.filter(function (c) { return c.clave.indexOf(t) >= 0; });
+  if (t) lista = lista.filter(function (c) { return c.clave.indexOf(t) >= 0 || (c.codigos || []).some(function (x) { return String(x).indexOf(t) >= 0; }); });
   lista.sort(function (a, b) { return (b.debe - a.debe) || a.nombre.localeCompare(b.nombre); });
   if (!lista.length) {
     box.innerHTML = '<div class="vacio">' +
